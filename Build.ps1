@@ -30,7 +30,7 @@
 #>
 
 param(
-    [ValidateSet("All", "Launcher", "Dialer", "Messaging", "Browser", "ModemLib")]
+    [ValidateSet("All", "Launcher", "Dialer", "Messaging", "Browser", "Music", "ModemLib")]
     [string]$App = "All",
 
     [ValidateSet("Debug", "Release")]
@@ -83,6 +83,13 @@ $Apps = @{
         Description = "Chromium-based web browser (720x720)"
         DependsOn = @()
     }
+    Music = @{
+        Name = "Music"
+        Project = "Music\Launcher\WindowsPhoneMusic.csproj"
+        Type = "Application"
+        Description = "Music player with spectrum visualizer"
+        DependsOn = @()
+    }
 }
 
 function Write-Status {
@@ -104,7 +111,7 @@ function Show-BuildTargets {
     Write-Host "========================" -ForegroundColor Magenta
     Write-Host ""
 
-    foreach ($key in @("ModemLib", "Launcher", "Dialer", "Messaging", "Browser")) {
+    foreach ($key in @("ModemLib", "Launcher", "Dialer", "Messaging", "Browser", "Music")) {
         $app = $Apps[$key]
         $type = if ($app.Type -eq "Library") { "[LIB]" } else { "[APP]" }
         Write-Host "  $($key.PadRight(12))" -NoNewline -ForegroundColor Cyan
@@ -251,7 +258,7 @@ Write-Host ""
 # Determine which apps to build
 $appsToBuild = @()
 if ($App -eq "All") {
-    $appsToBuild = @("ModemLib", "Launcher", "Dialer", "Messaging", "Browser")
+    $appsToBuild = @("ModemLib", "Launcher", "Dialer", "Messaging", "Browser", "Music")
 } else {
     # Add dependencies first
     $appDef = $Apps[$App]
@@ -320,7 +327,7 @@ if ($Deploy) {
     Write-Status "Deploying to $DeployPath..." -Type "Header"
 
     # Create deployment directories
-    $deployDirs = @("Launcher", "Dialer", "Messaging", "Browser", "Config", "Scripts", "Logs")
+    $deployDirs = @("Launcher", "Dialer", "Messaging", "Browser", "Music", "Config", "Scripts", "Logs")
     foreach ($dir in $deployDirs) {
         $fullPath = Join-Path $DeployPath $dir
         if (-not (Test-Path $fullPath)) {
