@@ -27,9 +27,9 @@ public partial class MainWindow : Window
         _viewDate = _currentDate;
 
         var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        var calendarFolder = Path.Combine(appData, "WindowsPhoneNext", "Calendar");
+        var calendarFolder = System.IO.Path.Combine(appData, "WindowsPhoneNext", "Calendar");
         Directory.CreateDirectory(calendarFolder);
-        _dataFilePath = Path.Combine(calendarFolder, "marked_dates.json");
+        _dataFilePath = System.IO.Path.Combine(calendarFolder, "marked_dates.json");
     }
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
