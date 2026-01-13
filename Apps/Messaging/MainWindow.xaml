@@ -1,0 +1,319 @@
+<Window x:Class="WindowsPhoneNext.Messaging.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:WindowsPhoneNext.Messaging"
+        Title="Messages"
+        Width="720" Height="720"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BackgroundBrush}"
+        Loaded="Window_Loaded">
+
+    <Window.Resources>
+        <local:MessageAlignmentConverter x:Key="MessageAlignmentConverter"/>
+        <local:MessageBubbleConverter x:Key="MessageBubbleConverter"/>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Top Bar -->
+        <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}">
+            <Grid Margin="16,0">
+                <Button x:Name="BackButton"
+                       Content="&#x2190;"
+                       HorizontalAlignment="Left"
+                       Background="Transparent"
+                       Foreground="{StaticResource TextPrimaryBrush}"
+                       BorderThickness="0"
+                       FontSize="24"
+                       Cursor="Hand"
+                       Click="BackButton_Click"/>
+                <TextBlock x:Name="TitleText"
+                          Text="Messages"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          FontSize="18"
+                          FontWeight="SemiBold"
+                          Foreground="{StaticResource TextPrimaryBrush}"/>
+            </Grid>
+        </Border>
+
+        <!-- Content Area -->
+        <Grid Grid.Row="1">
+            <!-- Conversations List View -->
+            <Grid x:Name="ConversationsView">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Conversations List -->
+                <ListView x:Name="ConversationsList"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         SelectionMode="Single"
+                         SelectionChanged="ConversationsList_SelectionChanged">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Margin" Value="0"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListViewItem">
+                                        <Border x:Name="border"
+                                               Background="Transparent"
+                                               Padding="16,12"
+                                               Cursor="Hand">
+                                            <ContentPresenter/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="border" Property="Background"
+                                                       Value="{StaticResource CardBrush}"/>
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="border" Property="Background"
+                                                       Value="{StaticResource CardBrush}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Avatar -->
+                                <Ellipse Grid.Column="0" Width="44" Height="44"
+                                        Fill="{StaticResource PrimaryBrush}">
+                                </Ellipse>
+                                <TextBlock Grid.Column="0"
+                                          Text="{Binding Initial}"
+                                          FontSize="18"
+                                          FontWeight="SemiBold"
+                                          Foreground="{StaticResource TextPrimaryBrush}"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"/>
+
+                                <!-- Message Preview -->
+                                <StackPanel Grid.Column="1" Margin="12,0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding ContactName}"
+                                              FontSize="16"
+                                              FontWeight="SemiBold"
+                                              Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <TextBlock Text="{Binding LastMessage}"
+                                              FontSize="13"
+                                              Foreground="{StaticResource TextSecondaryBrush}"
+                                              TextTrimming="CharacterEllipsis"
+                                              MaxWidth="400"/>
+                                </StackPanel>
+
+                                <!-- Time and Unread Badge -->
+                                <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                    <TextBlock Text="{Binding Time}"
+                                              FontSize="12"
+                                              Foreground="{StaticResource TextSecondaryBrush}"
+                                              HorizontalAlignment="Right"/>
+                                    <Border x:Name="UnreadBadge"
+                                           Background="{StaticResource PrimaryBrush}"
+                                           CornerRadius="10"
+                                           Padding="8,2"
+                                           Margin="0,4,0,0"
+                                           HorizontalAlignment="Right"
+                                           Visibility="{Binding HasUnread}">
+                                        <TextBlock Text="{Binding UnreadCount}"
+                                                  FontSize="11"
+                                                  FontWeight="Bold"
+                                                  Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+                <!-- Empty State -->
+                <StackPanel x:Name="EmptyState"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                           Visibility="Collapsed">
+                    <TextBlock Text="&#128172;"
+                              FontSize="64"
+                              HorizontalAlignment="Center"
+                              Opacity="0.5"/>
+                    <TextBlock Text="No messages yet"
+                              FontSize="18"
+                              Foreground="{StaticResource TextSecondaryBrush}"
+                              HorizontalAlignment="Center"
+                              Margin="0,16,0,0"/>
+                </StackPanel>
+
+                <!-- New Message FAB -->
+                <Button Style="{StaticResource NewMessageButtonStyle}"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Bottom"
+                       Margin="24"
+                       Click="NewMessageButton_Click">
+                    <TextBlock Text="&#x270F;" FontSize="24"/>
+                </Button>
+            </Grid>
+
+            <!-- Chat View (hidden by default) -->
+            <Grid x:Name="ChatView" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Messages List -->
+                <ListView x:Name="MessagesList"
+                         Grid.Row="0"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         Margin="16,8"
+                         SelectionMode="None">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Margin" Value="0,4"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListViewItem">
+                                        <ContentPresenter/>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid HorizontalAlignment="{Binding IsSent, Converter={StaticResource MessageAlignmentConverter}}">
+                                <Border Background="{Binding IsSent, Converter={StaticResource MessageBubbleConverter}}"
+                                       CornerRadius="16"
+                                       Padding="14,10"
+                                       MaxWidth="480">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Body}"
+                                                  FontSize="14"
+                                                  Foreground="{StaticResource TextPrimaryBrush}"
+                                                  TextWrapping="Wrap"/>
+                                        <TextBlock Text="{Binding TimeString}"
+                                                  FontSize="10"
+                                                  Foreground="{StaticResource TextSecondaryBrush}"
+                                                  HorizontalAlignment="Right"
+                                                  Margin="0,4,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+                <!-- Message Input -->
+                <Border Grid.Row="1"
+                       Background="{StaticResource SurfaceBrush}"
+                       Padding="16,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox x:Name="MessageInput"
+                                Grid.Column="0"
+                                Style="{StaticResource MessageInputStyle}"
+                                Margin="0,0,12,0"
+                                KeyDown="MessageInput_KeyDown"
+                                TextChanged="MessageInput_TextChanged"/>
+
+                        <Button x:Name="SendButton"
+                               Grid.Column="1"
+                               Style="{StaticResource SendButtonStyle}"
+                               IsEnabled="False"
+                               Click="SendButton_Click">
+                            <TextBlock Text="&#x27A4;" FontSize="20"/>
+                        </Button>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- New Message View (hidden by default) -->
+            <Grid x:Name="NewMessageView" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Recipient Input -->
+                <Border Grid.Row="0"
+                       Background="{StaticResource SurfaceBrush}"
+                       Padding="16">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0"
+                                  Text="To:"
+                                  FontSize="16"
+                                  Foreground="{StaticResource TextSecondaryBrush}"
+                                  VerticalAlignment="Center"
+                                  Margin="0,0,12,0"/>
+
+                        <TextBox x:Name="RecipientInput"
+                                Grid.Column="1"
+                                Background="Transparent"
+                                Foreground="{StaticResource TextPrimaryBrush}"
+                                BorderThickness="0"
+                                FontSize="16"
+                                VerticalAlignment="Center"/>
+                    </Grid>
+                </Border>
+
+                <!-- Spacer -->
+                <Border Grid.Row="1"/>
+
+                <!-- Message Input -->
+                <Border Grid.Row="2"
+                       Background="{StaticResource SurfaceBrush}"
+                       Padding="16,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox x:Name="NewMessageInput"
+                                Grid.Column="0"
+                                Style="{StaticResource MessageInputStyle}"
+                                Margin="0,0,12,0"
+                                TextChanged="NewMessageInput_TextChanged"/>
+
+                        <Button x:Name="NewSendButton"
+                               Grid.Column="1"
+                               Style="{StaticResource SendButtonStyle}"
+                               IsEnabled="False"
+                               Click="NewSendButton_Click">
+                            <TextBlock Text="&#x27A4;" FontSize="20"/>
+                        </Button>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
