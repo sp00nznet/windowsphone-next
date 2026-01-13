@@ -8,15 +8,10 @@
     <UseWPF>true</UseWPF>
     <RootNamespace>WindowsPhoneNext.Launcher</RootNamespace>
     <AssemblyName>WindowsPhoneLauncher</AssemblyName>
-    <ApplicationIcon>Assets\phone.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Shared\ModemLib\ModemLib.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="Assets\**\*" />
   </ItemGroup>
 
 </Project>
