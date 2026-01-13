@@ -419,6 +419,3 @@ public partial class MainWindow : Window
         }
     }
 }
-
-// Helper for XAML
-public class Ellipse : System.Windows.Shapes.Ellipse { }
