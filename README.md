@@ -4,8 +4,7 @@ A custom Windows 11 phone platform for embedded hardware, featuring a modern tou
 
 ## Target Hardware
 
-- **Board**: UP Core (https://up-board.org/upcore/specifications/)
-- **Processor**: LattePanda 3 Delta 864
+- **Board**: UP Core (https://up-board.org/upcore/specifications/) or LattePanda 3 Delta 864
 - **Power**: PiSugar2 Plus battery management
 - **Display**: 720x720 4:4 aspect ratio touchscreen
 - **Modem**: Quectel EM06-A LTE card (voice calls + SMS)
