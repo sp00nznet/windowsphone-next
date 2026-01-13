@@ -4,11 +4,13 @@ A custom Windows 11 phone platform for embedded hardware, featuring a modern tou
 
 ## Target Hardware
 
-- **Board**: UP Core (https://up-board.org/upcore/specifications/) or LattePanda 3 Delta 864
-- **Power**: PiSugar2 Plus battery management
-- **Display**: 720x720 4:4 aspect ratio touchscreen
-- **Modem**: Quectel EM06-A LTE card (voice calls + SMS)
-- **GPS**: VK-172 USB GPS dongle (optional, for Maps app)
+| Component | Description |
+|-----------|-------------|
+| **SBC** | [UP Core](https://up-board.org/upcore/specifications/) or [LattePanda 3 Delta 864](https://www.lattepanda.com/lattepanda-3-delta) |
+| **Power** | [PiSugar2 Plus](https://www.pisugar.com/products/pisugar2-plus-5000-mah-raspberry-pi-ups) 5000mAh battery/UPS |
+| **Display** | [Waveshare 4" Square LCD](https://www.waveshare.com/4inch-dpi-lcd-c.htm) 720x720 IPS touchscreen |
+| **Modem** | [Quectel EM06-A](https://www.quectel.com/product/lte-a-em06-series/) LTE Cat 6 M.2 module |
+| **GPS** | VK-172 USB GPS/GLONASS dongle (optional) |
 
 ## Features
 
