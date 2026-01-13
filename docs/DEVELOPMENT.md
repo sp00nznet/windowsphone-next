@@ -221,10 +221,11 @@ All apps use a consistent dark theme.
 2. Target `net8.0-windows` framework
 3. Reference `ModemLib` if modem access needed
 4. Use shared theme resources
-5. Set window: 720x720, WindowStyle="None", ResizeMode="NoResize"
-6. Add project to `WindowsPhoneNext.sln`
-7. Add to `Build.ps1` apps list
-8. Add to Launcher's app grid
+5. Set window: 720x1560, WindowStyle="None", ResizeMode="NoResize"
+6. Add KeyDown="Window_KeyDown" for keyboard shortcuts (Escape to close)
+7. Add project to `WindowsPhoneNext.sln`
+8. Add to `Build.ps1` apps list
+9. Add to Launcher's app grid
 
 ### Project Template
 

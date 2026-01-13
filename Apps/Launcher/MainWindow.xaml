@@ -5,18 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Windows Phone"
-        Width="720" Height="720"
+        Width="720" Height="1560"
         WindowStyle="None"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource BackgroundBrush}"
-        Loaded="Window_Loaded">
+        Loaded="Window_Loaded"
+        KeyDown="Window_KeyDown">
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="60"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="80"/>
+            <RowDefinition Height="100"/>
         </Grid.RowDefinitions>
 
         <!-- Status Bar -->
@@ -35,13 +36,13 @@
                           Foreground="{StaticResource TextPrimaryBrush}"
                           VerticalAlignment="Center"
                           HorizontalAlignment="Left"
-                          Margin="8,0,0,0"/>
+                          Margin="16,0,0,0"/>
 
                 <!-- Status Icons -->
                 <StackPanel Grid.Column="1"
                            Orientation="Horizontal"
                            VerticalAlignment="Center"
-                           Margin="0,0,8,0">
+                           Margin="0,0,16,0">
 
                     <!-- Signal Strength -->
                     <StackPanel Orientation="Horizontal" Margin="0,0,16,0">
@@ -97,67 +98,108 @@
         </Border>
 
         <!-- Main Content Area -->
-        <Grid Grid.Row="1" Margin="20">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <Grid Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-            <!-- Date Display -->
-            <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,20,0,40">
-                <TextBlock x:Name="DateText"
-                          Text="Monday, January 13"
-                          FontSize="24"
-                          FontWeight="Light"
-                          Foreground="{StaticResource TextSecondaryBrush}"
-                          HorizontalAlignment="Center"/>
-                <TextBlock x:Name="BigTimeText"
-                          Text="12:00"
-                          FontSize="72"
-                          FontWeight="Light"
-                          Foreground="{StaticResource TextPrimaryBrush}"
-                          HorizontalAlignment="Center"
-                          Margin="0,-10,0,0"/>
-            </StackPanel>
+                <!-- Date Display -->
+                <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,40,0,60">
+                    <TextBlock x:Name="DateText"
+                              Text="Monday, January 13"
+                              FontSize="28"
+                              FontWeight="Light"
+                              Foreground="{StaticResource TextSecondaryBrush}"
+                              HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="BigTimeText"
+                              Text="12:00"
+                              FontSize="96"
+                              FontWeight="Light"
+                              Foreground="{StaticResource TextPrimaryBrush}"
+                              HorizontalAlignment="Center"
+                              Margin="0,-10,0,0"/>
+                </StackPanel>
 
-            <!-- App Grid -->
-            <ItemsControl x:Name="AppGrid"
-                         Grid.Row="1"
-                         HorizontalAlignment="Center"
-                         VerticalAlignment="Center">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <UniformGrid Columns="3" Rows="3"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Button Style="{StaticResource AppTileStyle}"
-                               Width="140" Height="140"
-                               Margin="10"
-                               Click="AppTile_Click"
-                               Tag="{Binding AppPath}">
-                            <StackPanel HorizontalAlignment="Center">
-                                <TextBlock Text="{Binding Icon}"
-                                          FontSize="48"
-                                          HorizontalAlignment="Center"/>
-                                <TextBlock Text="{Binding Name}"
-                                          FontSize="14"
-                                          Foreground="{StaticResource TextSecondaryBrush}"
-                                          HorizontalAlignment="Center"
-                                          Margin="0,8,0,0"/>
-                            </StackPanel>
-                        </Button>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </Grid>
+                <!-- App Grid (4x3 layout for taller screen) -->
+                <ItemsControl x:Name="AppGrid"
+                             Grid.Row="1"
+                             HorizontalAlignment="Center">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="3" Rows="4"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Style="{StaticResource AppTileStyle}"
+                                   Width="200" Height="200"
+                                   Margin="12"
+                                   Click="AppTile_Click"
+                                   Tag="{Binding AppPath}">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock Text="{Binding Icon}"
+                                              FontSize="64"
+                                              HorizontalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Name}"
+                                              FontSize="16"
+                                              Foreground="{StaticResource TextSecondaryBrush}"
+                                              HorizontalAlignment="Center"
+                                              Margin="0,12,0,0"/>
+                                </StackPanel>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Keyboard Shortcuts Info -->
+                <Border Grid.Row="2"
+                       Background="{StaticResource CardBrush}"
+                       CornerRadius="12"
+                       Padding="20"
+                       Margin="0,40,0,20">
+                    <StackPanel>
+                        <TextBlock Text="Keyboard Shortcuts"
+                                  FontSize="16"
+                                  FontWeight="SemiBold"
+                                  Foreground="{StaticResource TextPrimaryBrush}"
+                                  Margin="0,0,0,12"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="P - Phone" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="M - Messages" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4"/>
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="B - Browser" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="N - Maps" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4"/>
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="U - Music" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="C - Calendar" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4"/>
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="G - Gallery" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="S - Settings" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4"/>
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="1-9 - Quick launch apps" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4"/>
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="Esc - Exit app" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </ScrollViewer>
 
         <!-- Bottom Navigation -->
         <Border Grid.Row="2"
                Background="{StaticResource SurfaceBrush}"
                CornerRadius="24,24,0,0">
-            <Grid Margin="40,0">
+            <Grid Margin="60,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
@@ -167,29 +209,29 @@
                 <!-- Phone Button -->
                 <Button Grid.Column="0"
                        Style="{StaticResource AppTileStyle}"
-                       Width="56" Height="56"
+                       Width="64" Height="64"
                        Click="PhoneButton_Click"
-                       ToolTip="Phone">
-                    <TextBlock Text="&#128222;" FontSize="28"/>
+                       ToolTip="Phone (P)">
+                    <TextBlock Text="&#128222;" FontSize="32"/>
                 </Button>
 
                 <!-- Home Button -->
                 <Button Grid.Column="1"
                        Style="{StaticResource AppTileStyle}"
-                       Width="56" Height="56"
+                       Width="64" Height="64"
                        Background="{StaticResource PrimaryBrush}"
                        Click="HomeButton_Click"
                        ToolTip="Home">
-                    <Ellipse Width="16" Height="16" Fill="White"/>
+                    <Ellipse Width="18" Height="18" Fill="White"/>
                 </Button>
 
                 <!-- Messages Button -->
                 <Button Grid.Column="2"
                        Style="{StaticResource AppTileStyle}"
-                       Width="56" Height="56"
+                       Width="64" Height="64"
                        Click="MessagesButton_Click"
-                       ToolTip="Messages">
-                    <TextBlock Text="&#128172;" FontSize="28"/>
+                       ToolTip="Messages (M)">
+                    <TextBlock Text="&#128172;" FontSize="32"/>
                 </Button>
             </Grid>
         </Border>

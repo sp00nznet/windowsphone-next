@@ -12,9 +12,9 @@ A custom Windows 11 phone platform for embedded single-board computers.
 
 | Component | Description |
 |-----------|-------------|
-| **SBC** | [UP Core](https://up-board.org/upcore/specifications/) or [LattePanda 3 Delta](https://www.lattepanda.com/lattepanda-3-delta) |
+| **SBC** | [LattePanda 3 Delta](https://www.lattepanda.com/lattepanda-3-delta) (x86-64 with Windows 11) |
 | **Power** | [PiSugar2 Plus](https://www.pisugar.com/products/pisugar2-plus-5000-mah-raspberry-pi-ups) 5000mAh UPS |
-| **Display** | [Waveshare 4" LCD](https://www.waveshare.com/4inch-dpi-lcd-c.htm) 720x720 IPS touch |
+| **Display** | Waveshare 6.25" LCD 720x1560 IPS touch |
 | **Modem** | [Quectel EM06-A](https://www.quectel.com/product/lte-a-em06-series/) LTE Cat 6 M.2 |
 | **GPS** | VK-172 USB GPS/GLONASS *(optional)* |
 
@@ -32,8 +32,24 @@ A custom Windows 11 phone platform for embedded single-board computers.
 | **Maps** | GPS navigation with OpenStreetMap routing |
 | **Calendar** | Month/day/year views with date marking |
 | **Gallery** | Image viewer with thumbnail strip |
+| **Settings** | System configuration and display info |
 
-> Apps requiring hardware (Dialer, Maps) include **demo modes** for testing without devices.
+> Apps requiring hardware (Dialer, Maps) include **demo mode toggles** in their settings menus for testing without devices.
+
+### Keyboard Shortcuts
+
+| Key | Action |
+|-----|--------|
+| **P** | Phone |
+| **M** | Messages |
+| **B** | Browser |
+| **N** | Maps (Navigation) |
+| **U** | Music |
+| **C** | Calendar |
+| **G** | Gallery |
+| **S** | Settings |
+| **1-9** | Quick launch apps (by grid position) |
+| **Esc** | Exit current app / Close settings |
 
 ---
 

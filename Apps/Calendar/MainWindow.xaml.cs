@@ -2,6 +2,7 @@ using System.IO;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -399,6 +400,15 @@ public partial class MainWindow : Window
 
         SaveMarkedDates();
         UpdateView();
+    }
+
+    private void Window_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape)
+        {
+            BackButton_Click(sender, e);
+            e.Handled = true;
+        }
     }
 
     private void BackButton_Click(object sender, RoutedEventArgs e)

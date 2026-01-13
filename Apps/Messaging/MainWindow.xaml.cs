@@ -419,6 +419,15 @@ public partial class MainWindow : Window
 
     #endregion
 
+    private void Window_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape)
+        {
+            BackButton_Click(sender, e);
+            e.Handled = true;
+        }
+    }
+
     protected override void OnClosed(EventArgs e)
     {
         _refreshTimer.Stop();

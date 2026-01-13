@@ -1,6 +1,7 @@
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using WindowsPhoneNext.ModemLib;
@@ -391,6 +392,22 @@ public partial class MainWindow : Window
     }
 
     #endregion
+
+    private void Window_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape)
+        {
+            if (_isInCall)
+            {
+                EndCallButton_Click(sender, e);
+            }
+            else
+            {
+                Close();
+            }
+            e.Handled = true;
+        }
+    }
 
     private void BackButton_Click(object sender, RoutedEventArgs e)
     {

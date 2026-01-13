@@ -2,11 +2,12 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Settings"
-        Width="720" Height="720"
+        Width="720" Height="1560"
         WindowStyle="None"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
-        Background="{StaticResource BackgroundBrush}">
+        Background="{StaticResource BackgroundBrush}"
+        KeyDown="Window_KeyDown">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -16,7 +17,7 @@
 
         <!-- Top Bar -->
         <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}">
-            <Grid Margin="8,0">
+            <Grid Margin="12,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
@@ -44,76 +45,28 @@
                      Padding="20">
             <StackPanel>
 
-                <!-- Apps Section -->
-                <TextBlock Text="Apps"
+                <!-- Display Section -->
+                <TextBlock Text="Display"
                           FontSize="14"
                           FontWeight="SemiBold"
                           Foreground="{StaticResource TextSecondaryBrush}"
                           Margin="0,0,0,12"/>
 
-                <!-- Gallery Settings -->
+                <!-- Display Info -->
                 <Border Style="{StaticResource SettingsItemStyle}">
                     <StackPanel>
-                        <TextBlock Text="Gallery"
+                        <TextBlock Text="Screen"
                                   FontSize="16"
                                   FontWeight="SemiBold"
                                   Foreground="{StaticResource TextPrimaryBrush}"
-                                  Margin="0,0,0,4"/>
-                        <TextBlock Text="Image folder location"
+                                  Margin="0,0,0,8"/>
+                        <TextBlock Text="Waveshare 6.25&quot; LCD"
+                                  FontSize="14"
+                                  Foreground="{StaticResource TextSecondaryBrush}"/>
+                        <TextBlock Text="720 x 1560 pixels"
                                   FontSize="12"
                                   Foreground="{StaticResource TextSecondaryBrush}"
-                                  Margin="0,0,0,12"/>
-
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-
-                            <TextBox x:Name="GalleryPathBox"
-                                    Grid.Column="0"
-                                    Style="{StaticResource TextInputStyle}"
-                                    IsReadOnly="True"
-                                    Margin="0,0,8,0"/>
-
-                            <Button Grid.Column="1"
-                                   Style="{StaticResource PrimaryButtonStyle}"
-                                   Content="Browse"
-                                   Click="BrowseGalleryPath_Click"/>
-                        </Grid>
-                    </StackPanel>
-                </Border>
-
-                <!-- Music Settings -->
-                <Border Style="{StaticResource SettingsItemStyle}">
-                    <StackPanel>
-                        <TextBlock Text="Music"
-                                  FontSize="16"
-                                  FontWeight="SemiBold"
-                                  Foreground="{StaticResource TextPrimaryBrush}"
-                                  Margin="0,0,0,4"/>
-                        <TextBlock Text="Music folder location"
-                                  FontSize="12"
-                                  Foreground="{StaticResource TextSecondaryBrush}"
-                                  Margin="0,0,0,12"/>
-
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-
-                            <TextBox x:Name="MusicPathBox"
-                                    Grid.Column="0"
-                                    Style="{StaticResource TextInputStyle}"
-                                    IsReadOnly="True"
-                                    Margin="0,0,8,0"/>
-
-                            <Button Grid.Column="1"
-                                   Style="{StaticResource PrimaryButtonStyle}"
-                                   Content="Browse"
-                                   Click="BrowseMusicPath_Click"/>
-                        </Grid>
+                                  Margin="0,4,0,0"/>
                     </StackPanel>
                 </Border>
 

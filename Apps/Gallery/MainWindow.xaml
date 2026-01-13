@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Gallery"
-        Width="720" Height="720"
+        Width="720" Height="1560"
         WindowStyle="None"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
@@ -12,9 +12,9 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="60"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="120"/>
+            <RowDefinition Height="140"/>
         </Grid.RowDefinitions>
 
         <!-- Top Bar -->
@@ -24,14 +24,15 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <!-- Back Button -->
                 <Button Grid.Column="0"
                        Style="{StaticResource NavButtonStyle}"
-                       Width="40" Height="40"
+                       Width="44" Height="44"
                        Click="BackButton_Click">
-                    <TextBlock Text="&#x2190;" FontSize="20"/>
+                    <TextBlock Text="&#x2190;" FontSize="22"/>
                 </Button>
 
                 <!-- Title / Image Info -->
@@ -40,13 +41,13 @@
                            VerticalAlignment="Center">
                     <TextBlock x:Name="TitleText"
                               Text="Gallery"
-                              FontSize="16"
+                              FontSize="18"
                               FontWeight="SemiBold"
                               HorizontalAlignment="Center"
                               Foreground="{StaticResource TextPrimaryBrush}"/>
                     <TextBlock x:Name="ImageCountText"
                               Text="0 images"
-                              FontSize="11"
+                              FontSize="12"
                               HorizontalAlignment="Center"
                               Foreground="{StaticResource TextSecondaryBrush}"/>
                 </StackPanel>
@@ -54,10 +55,19 @@
                 <!-- Open Folder Button -->
                 <Button Grid.Column="2"
                        Style="{StaticResource NavButtonStyle}"
-                       Width="40" Height="40"
+                       Width="44" Height="44"
                        Click="OpenFolder_Click"
                        ToolTip="Open Folder">
-                    <TextBlock Text="&#x1F4C1;" FontSize="18"/>
+                    <TextBlock Text="&#x1F4C1;" FontSize="20"/>
+                </Button>
+
+                <!-- Settings Button -->
+                <Button Grid.Column="3"
+                       Style="{StaticResource NavButtonStyle}"
+                       Width="44" Height="44"
+                       Click="SettingsButton_Click"
+                       ToolTip="Settings">
+                    <TextBlock Text="&#x2699;" FontSize="20"/>
                 </Button>
             </Grid>
         </Border>
@@ -155,6 +165,86 @@
                 <StackPanel x:Name="ThumbnailPanel"
                            Orientation="Horizontal"/>
             </ScrollViewer>
+        </Border>
+
+        <!-- Settings Overlay -->
+        <Border x:Name="SettingsOverlay"
+               Grid.RowSpan="3"
+               Background="#E0000000"
+               Visibility="Collapsed"
+               Panel.ZIndex="200">
+            <Border Background="{StaticResource SurfaceBrush}"
+                   CornerRadius="16"
+                   Margin="40"
+                   Padding="24"
+                   VerticalAlignment="Center"
+                   MaxHeight="500">
+                <StackPanel>
+                    <Grid Margin="0,0,0,20">
+                        <TextBlock Text="Gallery Settings"
+                                  FontSize="20"
+                                  FontWeight="SemiBold"
+                                  Foreground="{StaticResource TextPrimaryBrush}"
+                                  HorizontalAlignment="Left"/>
+                        <Button Content="&#x2715;"
+                               HorizontalAlignment="Right"
+                               Background="Transparent"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               BorderThickness="0"
+                               FontSize="20"
+                               Cursor="Hand"
+                               Click="CloseSettings_Click"/>
+                    </Grid>
+
+                    <!-- Default Folder Setting -->
+                    <Border Background="{StaticResource CardBrush}"
+                           CornerRadius="8"
+                           Padding="16"
+                           Margin="0,0,0,12">
+                        <StackPanel>
+                            <TextBlock Text="Default Image Folder"
+                                      FontSize="16"
+                                      FontWeight="SemiBold"
+                                      Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <TextBlock Text="Set a folder to load on startup"
+                                      FontSize="12"
+                                      Foreground="{StaticResource TextSecondaryBrush}"
+                                      Margin="0,4,0,12"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="DefaultPathBox"
+                                        Grid.Column="0"
+                                        IsReadOnly="True"
+                                        Background="{StaticResource BackgroundBrush}"
+                                        Foreground="{StaticResource TextSecondaryBrush}"
+                                        BorderThickness="0"
+                                        Padding="12,8"
+                                        FontSize="12"
+                                        Margin="0,0,8,0"/>
+                                <Button Grid.Column="1"
+                                       Content="Browse"
+                                       Background="{StaticResource PrimaryBrush}"
+                                       Foreground="White"
+                                       BorderThickness="0"
+                                       Padding="16,8"
+                                       Cursor="Hand"
+                                       Click="BrowseDefaultPath_Click"/>
+                            </Grid>
+                            <Button Content="Clear Default"
+                                   Background="Transparent"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   BorderThickness="0"
+                                   HorizontalAlignment="Left"
+                                   Margin="0,8,0,0"
+                                   Cursor="Hand"
+                                   Click="ClearDefaultPath_Click"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
         </Border>
     </Grid>
 </Window>
