@@ -14,6 +14,8 @@ public partial class MainWindow : Window
     private List<string> _imagePaths = new();
     private int _currentIndex = -1;
     private string _currentFolder = string.Empty;
+    private readonly string _settingsPath;
+    private GallerySettings _settings;
 
     private static readonly string[] SupportedExtensions =
         { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".tiff", ".tif" };
@@ -21,41 +23,52 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+
+        // Initialize settings path
+        var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        var settingsFolder = Path.Combine(appData, "WindowsPhoneNext");
+        Directory.CreateDirectory(settingsFolder);
+        _settingsPath = Path.Combine(settingsFolder, "gallery_settings.json");
+
+        _settings = new GallerySettings();
+        LoadSettings();
+    }
+
+    private void LoadSettings()
+    {
+        try
+        {
+            if (File.Exists(_settingsPath))
+            {
+                var json = File.ReadAllText(_settingsPath);
+                _settings = JsonSerializer.Deserialize<GallerySettings>(json) ?? new GallerySettings();
+            }
+        }
+        catch { }
+    }
+
+    private void SaveSettings()
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(_settings, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(_settingsPath, json);
+        }
+        catch { }
     }
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         // Check for configured gallery path in settings
-        var configuredPath = GetConfiguredGalleryPath();
-
-        if (!string.IsNullOrEmpty(configuredPath) && Directory.Exists(configuredPath))
+        if (!string.IsNullOrEmpty(_settings.DefaultPath) && Directory.Exists(_settings.DefaultPath))
         {
-            LoadFolder(configuredPath);
+            LoadFolder(_settings.DefaultPath);
         }
         else
         {
             // Show empty state - user needs to select a folder
             ShowEmptyState();
         }
-    }
-
-    private string GetConfiguredGalleryPath()
-    {
-        try
-        {
-            var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            var settingsPath = System.IO.Path.Combine(appData, "WindowsPhoneNext", "settings.json");
-
-            if (File.Exists(settingsPath))
-            {
-                var json = File.ReadAllText(settingsPath);
-                var settings = JsonSerializer.Deserialize<GallerySettings>(json);
-                return settings?.GalleryPath ?? "";
-            }
-        }
-        catch { }
-
-        return "";
     }
 
     private void ShowEmptyState()
@@ -69,6 +82,16 @@ public partial class MainWindow : Window
 
     private void Window_KeyDown(object sender, KeyEventArgs e)
     {
+        if (SettingsOverlay.Visibility == Visibility.Visible)
+        {
+            if (e.Key == Key.Escape)
+            {
+                SettingsOverlay.Visibility = Visibility.Collapsed;
+                e.Handled = true;
+            }
+            return;
+        }
+
         switch (e.Key)
         {
             case Key.Left:
@@ -357,11 +380,44 @@ public partial class MainWindow : Window
     {
         Close();
     }
+
+    private void SettingsButton_Click(object sender, RoutedEventArgs e)
+    {
+        DefaultPathBox.Text = string.IsNullOrEmpty(_settings.DefaultPath)
+            ? "(Not set)"
+            : _settings.DefaultPath;
+        SettingsOverlay.Visibility = Visibility.Visible;
+    }
+
+    private void CloseSettings_Click(object sender, RoutedEventArgs e)
+    {
+        SettingsOverlay.Visibility = Visibility.Collapsed;
+    }
+
+    private void BrowseDefaultPath_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new OpenFolderDialog
+        {
+            Title = "Select Default Image Folder"
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            _settings.DefaultPath = dialog.FolderName;
+            SaveSettings();
+            DefaultPathBox.Text = _settings.DefaultPath;
+        }
+    }
+
+    private void ClearDefaultPath_Click(object sender, RoutedEventArgs e)
+    {
+        _settings.DefaultPath = "";
+        SaveSettings();
+        DefaultPathBox.Text = "(Not set)";
+    }
 }
 
-// Settings class for deserialization
 public class GallerySettings
 {
-    public string GalleryPath { get; set; } = "";
-    public string MusicPath { get; set; } = "";
+    public string DefaultPath { get; set; } = "";
 }

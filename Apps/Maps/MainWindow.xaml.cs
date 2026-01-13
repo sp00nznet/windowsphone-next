@@ -1,3 +1,4 @@
+using System.IO;
 using System.Net.Http;
 using System.Text.Json;
 using System.Windows;
@@ -19,6 +20,7 @@ public partial class MainWindow : Window
 
     // Demo mode
     private bool _isDemoMode;
+    private bool _demoModeEnabled;
     private System.Windows.Threading.DispatcherTimer? _demoTimer;
     private int _demoStep;
     private readonly List<(double Lat, double Lon, double Speed, double Heading)> _demoPath = new()
@@ -35,6 +37,9 @@ public partial class MainWindow : Window
         (40.7190, -73.9995, 10, 10),
     };
 
+    // Settings
+    private readonly string _settingsPath;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -45,10 +50,61 @@ public partial class MainWindow : Window
 
         _httpClient = new HttpClient();
         _httpClient.DefaultRequestHeaders.Add("User-Agent", "WindowsPhoneNext-Maps/1.0");
+
+        // Settings path
+        var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        var settingsFolder = Path.Combine(appData, "WindowsPhoneNext");
+        Directory.CreateDirectory(settingsFolder);
+        _settingsPath = Path.Combine(settingsFolder, "maps_settings.json");
+
+        LoadSettings();
+    }
+
+    private void LoadSettings()
+    {
+        try
+        {
+            if (File.Exists(_settingsPath))
+            {
+                var json = File.ReadAllText(_settingsPath);
+                var settings = JsonSerializer.Deserialize<MapsSettings>(json);
+                _demoModeEnabled = settings?.DemoModeEnabled ?? false;
+            }
+        }
+        catch { }
+    }
+
+    private void SaveSettings()
+    {
+        try
+        {
+            var settings = new MapsSettings { DemoModeEnabled = _demoModeEnabled };
+            var json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(_settingsPath, json);
+        }
+        catch { }
+    }
+
+    private void Window_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape)
+        {
+            if (SettingsOverlay.Visibility == Visibility.Visible)
+            {
+                SettingsOverlay.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                BackButton_Click(sender, e);
+            }
+            e.Handled = true;
+        }
     }
 
     private async void Window_Loaded(object sender, RoutedEventArgs e)
     {
+        // Set focus to window to ensure key events work
+        Focus();
         await InitializeMapAsync();
         await InitializeGpsAsync();
     }
@@ -85,13 +141,16 @@ public partial class MainWindow : Window
     {
         UpdateGpsStatus("Searching...", false);
 
-        if (await _gps.AutoConnectAsync())
+        if (!_demoModeEnabled && await _gps.AutoConnectAsync())
         {
             UpdateGpsStatus($"Connected ({_gps.Satellites} sats)", _gps.HasFix);
+            DemoModeToggle.IsChecked = false;
         }
         else
         {
             // Start demo mode
+            _demoModeEnabled = true;
+            DemoModeToggle.IsChecked = true;
             StartDemoMode();
         }
     }
@@ -562,6 +621,48 @@ public partial class MainWindow : Window
         Close();
     }
 
+    private void SettingsButton_Click(object sender, RoutedEventArgs e)
+    {
+        DemoModeToggle.IsChecked = _demoModeEnabled;
+        SettingsOverlay.Visibility = Visibility.Visible;
+    }
+
+    private void CloseSettings_Click(object sender, RoutedEventArgs e)
+    {
+        SettingsOverlay.Visibility = Visibility.Collapsed;
+    }
+
+    private async void DemoModeToggle_Click(object sender, RoutedEventArgs e)
+    {
+        _demoModeEnabled = DemoModeToggle.IsChecked == true;
+        SaveSettings();
+
+        if (_demoModeEnabled)
+        {
+            if (!_isDemoMode)
+            {
+                StartDemoMode();
+            }
+        }
+        else
+        {
+            StopDemoMode();
+            UpdateGpsStatus("Searching...", false);
+            if (await _gps.AutoConnectAsync())
+            {
+                UpdateGpsStatus($"Connected ({_gps.Satellites} sats)", _gps.HasFix);
+            }
+            else
+            {
+                // No GPS available, force demo mode back on
+                _demoModeEnabled = true;
+                DemoModeToggle.IsChecked = true;
+                SaveSettings();
+                StartDemoMode();
+            }
+        }
+    }
+
     private void ExecuteMapScript(string script)
     {
         try
@@ -616,4 +717,9 @@ public class OsrmRoute
 public class OsrmGeometry
 {
     public List<double[]> coordinates { get; set; } = new();
+}
+
+public class MapsSettings
+{
+    public bool DemoModeEnabled { get; set; }
 }

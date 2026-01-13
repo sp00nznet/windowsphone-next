@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Threading;
 using WindowsPhoneNext.ModemLib;
 
@@ -21,18 +22,21 @@ public partial class MainWindow : Window
         _modem = new ModemController();
         _appsBasePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..");
 
-        // Initialize apps list
+        // Initialize apps list (12 apps for 4x3 grid)
         _apps = new List<AppInfo>
         {
-            new AppInfo { Name = "Phone", Icon = "\U0001F4DE", AppPath = "Dialer" },
-            new AppInfo { Name = "Messages", Icon = "\U0001F4AC", AppPath = "Messaging" },
-            new AppInfo { Name = "Browser", Icon = "\U0001F310", AppPath = "Browser" },
-            new AppInfo { Name = "Maps", Icon = "\U0001F5FA\uFE0F", AppPath = "Maps" },
-            new AppInfo { Name = "Music", Icon = "\U0001F3B5", AppPath = "Music" },
-            new AppInfo { Name = "Calendar", Icon = "\U0001F4C5", AppPath = "Calendar" },
-            new AppInfo { Name = "Gallery", Icon = "\U0001F5BC\uFE0F", AppPath = "Gallery" },
-            new AppInfo { Name = "Camera", Icon = "\U0001F4F7", AppPath = "Camera" },
-            new AppInfo { Name = "Settings", Icon = "\u2699\uFE0F", AppPath = "Settings" }
+            new AppInfo { Name = "Phone", Icon = "\U0001F4DE", AppPath = "Dialer", Shortcut = Key.P },
+            new AppInfo { Name = "Messages", Icon = "\U0001F4AC", AppPath = "Messaging", Shortcut = Key.M },
+            new AppInfo { Name = "Browser", Icon = "\U0001F310", AppPath = "Browser", Shortcut = Key.B },
+            new AppInfo { Name = "Maps", Icon = "\U0001F5FA\uFE0F", AppPath = "Maps", Shortcut = Key.N },
+            new AppInfo { Name = "Music", Icon = "\U0001F3B5", AppPath = "Music", Shortcut = Key.U },
+            new AppInfo { Name = "Calendar", Icon = "\U0001F4C5", AppPath = "Calendar", Shortcut = Key.C },
+            new AppInfo { Name = "Gallery", Icon = "\U0001F5BC\uFE0F", AppPath = "Gallery", Shortcut = Key.G },
+            new AppInfo { Name = "Camera", Icon = "\U0001F4F7", AppPath = "Camera", Shortcut = Key.None },
+            new AppInfo { Name = "Settings", Icon = "\u2699\uFE0F", AppPath = "Settings", Shortcut = Key.S },
+            new AppInfo { Name = "Clock", Icon = "\U0001F552", AppPath = "Clock", Shortcut = Key.None },
+            new AppInfo { Name = "Notes", Icon = "\U0001F4DD", AppPath = "Notes", Shortcut = Key.None },
+            new AppInfo { Name = "Files", Icon = "\U0001F4C2", AppPath = "Files", Shortcut = Key.None }
         };
 
         AppGrid.ItemsSource = _apps;
@@ -203,6 +207,41 @@ public partial class MainWindow : Window
         LaunchApp("Messaging");
     }
 
+    private void Window_KeyDown(object sender, KeyEventArgs e)
+    {
+        // Check for letter shortcuts
+        foreach (var app in _apps)
+        {
+            if (app.Shortcut != Key.None && e.Key == app.Shortcut)
+            {
+                LaunchApp(app.AppPath);
+                e.Handled = true;
+                return;
+            }
+        }
+
+        // Number keys 1-9 for quick launch
+        var number = e.Key switch
+        {
+            Key.D1 or Key.NumPad1 => 0,
+            Key.D2 or Key.NumPad2 => 1,
+            Key.D3 or Key.NumPad3 => 2,
+            Key.D4 or Key.NumPad4 => 3,
+            Key.D5 or Key.NumPad5 => 4,
+            Key.D6 or Key.NumPad6 => 5,
+            Key.D7 or Key.NumPad7 => 6,
+            Key.D8 or Key.NumPad8 => 7,
+            Key.D9 or Key.NumPad9 => 8,
+            _ => -1
+        };
+
+        if (number >= 0 && number < _apps.Count)
+        {
+            LaunchApp(_apps[number].AppPath);
+            e.Handled = true;
+        }
+    }
+
     private void LaunchApp(string appName)
     {
         try
@@ -294,4 +333,5 @@ public class AppInfo
     public string Name { get; set; } = "";
     public string Icon { get; set; } = "";
     public string AppPath { get; set; } = "";
+    public Key Shortcut { get; set; } = Key.None;
 }

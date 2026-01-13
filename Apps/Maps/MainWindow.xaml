@@ -3,27 +3,30 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         Title="Maps"
-        Width="720" Height="720"
+        Width="720" Height="1560"
         WindowStyle="None"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource BackgroundBrush}"
-        Loaded="Window_Loaded">
+        Loaded="Window_Loaded"
+        KeyDown="Window_KeyDown">
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="60"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <!-- Top Bar with Search -->
         <Border Grid.Row="0"
                Background="{StaticResource SurfaceBrush}"
-               Padding="12,8">
+               Padding="12,8"
+               Panel.ZIndex="100">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
@@ -91,6 +94,16 @@
                        ToolTip="Navigation">
                     <TextBlock Text="&#x27A4;" FontSize="20" Foreground="White"/>
                 </Button>
+
+                <!-- Settings Button -->
+                <Button Grid.Column="3"
+                       Style="{StaticResource MapButtonStyle}"
+                       Width="44" Height="44"
+                       Margin="8,0,0,0"
+                       Click="SettingsButton_Click"
+                       ToolTip="Settings">
+                    <TextBlock Text="&#x2699;" FontSize="20" Foreground="White"/>
+                </Button>
             </Grid>
         </Border>
 
@@ -98,7 +111,8 @@
         <Grid Grid.Row="1">
             <!-- Map WebView -->
             <wv2:WebView2 x:Name="MapView"
-                         Source="about:blank"/>
+                         Source="about:blank"
+                         Focusable="False"/>
 
             <!-- Route Info Panel (shown when navigating) -->
             <Border x:Name="RouteInfoPanel"
@@ -107,7 +121,8 @@
                    Background="{StaticResource SurfaceBrush}"
                    CornerRadius="8"
                    Padding="16,12"
-                   Visibility="Collapsed">
+                   Visibility="Collapsed"
+                   Panel.ZIndex="10">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -137,7 +152,8 @@
             <StackPanel VerticalAlignment="Bottom"
                        HorizontalAlignment="Right"
                        Margin="16"
-                       Orientation="Vertical">
+                       Orientation="Vertical"
+                       Panel.ZIndex="10">
 
                 <!-- GPS Status Indicator -->
                 <Border x:Name="GpsStatusBorder"
@@ -186,12 +202,14 @@
                    VerticalAlignment="Bottom"
                    Margin="0,0,0,16"
                    Visibility="Collapsed"
+                   Panel.ZIndex="10"
                    Click="GetRoute_Click"/>
 
             <!-- Loading Overlay -->
             <Border x:Name="LoadingOverlay"
                    Background="#CC1A1A2E"
-                   Visibility="Collapsed">
+                   Visibility="Collapsed"
+                   Panel.ZIndex="20">
                 <StackPanel HorizontalAlignment="Center"
                            VerticalAlignment="Center">
                     <TextBlock Text="Loading..."
@@ -201,5 +219,60 @@
                 </StackPanel>
             </Border>
         </Grid>
+
+        <!-- Settings Overlay -->
+        <Border x:Name="SettingsOverlay"
+               Grid.RowSpan="2"
+               Background="#E0000000"
+               Visibility="Collapsed"
+               Panel.ZIndex="200">
+            <Border Background="{StaticResource SurfaceBrush}"
+                   CornerRadius="16"
+                   Margin="40"
+                   Padding="24"
+                   VerticalAlignment="Center"
+                   MaxHeight="400">
+                <StackPanel>
+                    <Grid Margin="0,0,0,20">
+                        <TextBlock Text="Maps Settings"
+                                  FontSize="20"
+                                  FontWeight="SemiBold"
+                                  Foreground="{StaticResource TextPrimaryBrush}"
+                                  HorizontalAlignment="Left"/>
+                        <Button Content="&#x2715;"
+                               HorizontalAlignment="Right"
+                               Background="Transparent"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               BorderThickness="0"
+                               FontSize="20"
+                               Cursor="Hand"
+                               Click="CloseSettings_Click"/>
+                    </Grid>
+
+                    <!-- Demo Mode Toggle -->
+                    <Border Background="{StaticResource CardBrush}"
+                           CornerRadius="8"
+                           Padding="16"
+                           Margin="0,0,0,12">
+                        <Grid>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="Demo Mode"
+                                          FontSize="16"
+                                          FontWeight="SemiBold"
+                                          Foreground="{StaticResource TextPrimaryBrush}"/>
+                                <TextBlock Text="Simulate GPS movement without hardware"
+                                          FontSize="12"
+                                          Foreground="{StaticResource TextSecondaryBrush}"
+                                          Margin="0,4,0,0"/>
+                            </StackPanel>
+                            <CheckBox x:Name="DemoModeToggle"
+                                     HorizontalAlignment="Right"
+                                     VerticalAlignment="Center"
+                                     Click="DemoModeToggle_Click"/>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </Border>
     </Grid>
 </Window>

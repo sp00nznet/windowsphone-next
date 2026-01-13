@@ -372,6 +372,30 @@ public partial class MainWindow : Window
         // Updated via PreviewMouseUp for seeking
     }
 
+    private void Window_KeyDown(object sender, KeyEventArgs e)
+    {
+        switch (e.Key)
+        {
+            case Key.Escape:
+                StopPlayback();
+                Close();
+                e.Handled = true;
+                break;
+            case Key.Space:
+                PlayPauseButton_Click(sender, e);
+                e.Handled = true;
+                break;
+            case Key.N:
+                NextButton_Click(sender, e);
+                e.Handled = true;
+                break;
+            case Key.P:
+                PreviousButton_Click(sender, e);
+                e.Handled = true;
+                break;
+        }
+    }
+
     private void BackButton_Click(object sender, RoutedEventArgs e)
     {
         StopPlayback();
