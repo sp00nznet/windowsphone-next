@@ -30,7 +30,7 @@
 #>
 
 param(
-    [ValidateSet("All", "Launcher", "Dialer", "Messaging", "Browser", "Music", "Maps", "Calendar", "Gallery", "ModemLib")]
+    [ValidateSet("All", "Launcher", "Dialer", "Messaging", "Browser", "Music", "Maps", "Calendar", "Gallery", "Settings", "ModemLib")]
     [string]$App = "All",
 
     [ValidateSet("Debug", "Release")]
@@ -111,6 +111,13 @@ $Apps = @{
         Description = "Image gallery with thumbnails"
         DependsOn = @()
     }
+    Settings = @{
+        Name = "Settings"
+        Project = "Settings\WindowsPhoneSettings.csproj"
+        Type = "Application"
+        Description = "App settings and configuration"
+        DependsOn = @()
+    }
 }
 
 function Write-Status {
@@ -132,7 +139,7 @@ function Show-BuildTargets {
     Write-Host "========================" -ForegroundColor Magenta
     Write-Host ""
 
-    foreach ($key in @("ModemLib", "Launcher", "Dialer", "Messaging", "Browser", "Music", "Maps", "Calendar", "Gallery")) {
+    foreach ($key in @("ModemLib", "Launcher", "Dialer", "Messaging", "Browser", "Music", "Maps", "Calendar", "Gallery", "Settings")) {
         $appDef = $Apps[$key]
         $type = if ($appDef.Type -eq "Library") { "[LIB]" } else { "[APP]" }
         Write-Host "  $($key.PadRight(12))" -NoNewline -ForegroundColor Cyan
@@ -279,7 +286,7 @@ Write-Host ""
 # Determine which apps to build
 $appsToBuild = @()
 if ($App -eq "All") {
-    $appsToBuild = @("ModemLib", "Launcher", "Dialer", "Messaging", "Browser", "Music", "Maps", "Calendar", "Gallery")
+    $appsToBuild = @("ModemLib", "Launcher", "Dialer", "Messaging", "Browser", "Music", "Maps", "Calendar", "Gallery", "Settings")
 } else {
     # Add dependencies first
     $appDef = $Apps[$App]
@@ -348,7 +355,7 @@ if ($Deploy) {
     Write-Status "Deploying to $DeployPath..." -Type "Header"
 
     # Create deployment directories
-    $deployDirs = @("Launcher", "Dialer", "Messaging", "Browser", "Music", "Maps", "Calendar", "Gallery", "Config", "Scripts", "Logs")
+    $deployDirs = @("Launcher", "Dialer", "Messaging", "Browser", "Music", "Maps", "Calendar", "Gallery", "Settings", "Config", "Scripts", "Logs")
     foreach ($dir in $deployDirs) {
         $fullPath = Join-Path $DeployPath $dir
         if (-not (Test-Path $fullPath)) {
