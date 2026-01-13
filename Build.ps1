@@ -378,6 +378,45 @@ if ($Deploy) {
     Write-Status "Deployment complete" -Type "Success"
 }
 
+# Create unified distribution folder
+$DistPath = Join-Path $ScriptPath "Dist"
+if ($App -eq "All") {
+    Write-Host ""
+    Write-Status "Creating distribution package..." -Type "Header"
+
+    # Clean and create dist folder
+    if (Test-Path $DistPath) {
+        Remove-Item -Path $DistPath -Recurse -Force
+    }
+    New-Item -ItemType Directory -Path $DistPath -Force | Out-Null
+
+    # Copy each application to dist folder
+    foreach ($appName in $appsToBuild) {
+        $app = $Apps[$appName]
+        if ($app.Type -eq "Application") {
+            $projectDir = Split-Path (Join-Path $AppsPath $app.Project)
+            $binPath = Join-Path $projectDir "bin\$Configuration\net8.0-windows"
+            $appDistPath = Join-Path $DistPath $appName
+
+            if (Test-Path $binPath) {
+                New-Item -ItemType Directory -Path $appDistPath -Force | Out-Null
+                Copy-Item -Path "$binPath\*" -Destination $appDistPath -Recurse -Force
+                Write-Status "  Packaged $appName" -Type "Success"
+            }
+        }
+    }
+
+    # Create a launcher batch file
+    $launcherBat = @"
+@echo off
+cd /d "%~dp0Launcher"
+start "" "WindowsPhoneLauncher.exe"
+"@
+    $launcherBat | Out-File -FilePath (Join-Path $DistPath "Start-WindowsPhone.bat") -Encoding ASCII
+
+    Write-Status "Distribution package created at: $DistPath" -Type "Success"
+}
+
 # Summary
 Write-Host ""
 Write-Host "================================================" -ForegroundColor DarkGray
@@ -390,7 +429,11 @@ if ($App -eq "All") {
 }
 
 Write-Host ""
-Write-Host "Output: $OutputPath" -ForegroundColor Gray
+Write-Host "Output locations:" -ForegroundColor Gray
+Write-Host "  Build:        $OutputPath" -ForegroundColor DarkGray
+if ($App -eq "All") {
+    Write-Host "  Distribution: $DistPath" -ForegroundColor DarkGray
+}
 
 if (-not $Deploy) {
     Write-Host ""
