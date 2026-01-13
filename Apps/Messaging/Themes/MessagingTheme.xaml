@@ -1,0 +1,125 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Colors -->
+    <Color x:Key="PrimaryColor">#0078D4</Color>
+    <Color x:Key="BackgroundColor">#1A1A2E</Color>
+    <Color x:Key="SurfaceColor">#16213E</Color>
+    <Color x:Key="CardColor">#1F2937</Color>
+    <Color x:Key="MessageSentColor">#0078D4</Color>
+    <Color x:Key="MessageReceivedColor">#374151</Color>
+    <Color x:Key="TextPrimaryColor">#FFFFFF</Color>
+    <Color x:Key="TextSecondaryColor">#9CA3AF</Color>
+    <Color x:Key="SuccessColor">#10B981</Color>
+
+    <!-- Brushes -->
+    <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}"/>
+    <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}"/>
+    <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}"/>
+    <SolidColorBrush x:Key="CardBrush" Color="{StaticResource CardColor}"/>
+    <SolidColorBrush x:Key="MessageSentBrush" Color="{StaticResource MessageSentColor}"/>
+    <SolidColorBrush x:Key="MessageReceivedBrush" Color="{StaticResource MessageReceivedColor}"/>
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimaryColor}"/>
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondaryColor}"/>
+    <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}"/>
+
+    <!-- Conversation Item Style -->
+    <Style x:Key="ConversationItemStyle" TargetType="Border">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Padding" Value="16,12"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource CardBrush}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Message Input Style -->
+    <Style x:Key="MessageInputStyle" TargetType="TextBox">
+        <Setter Property="Background" Value="{StaticResource CardBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="16,12"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border Background="{TemplateBinding Background}"
+                            CornerRadius="24"
+                            Padding="{TemplateBinding Padding}">
+                        <ScrollViewer x:Name="PART_ContentHost"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Send Button Style -->
+    <Style x:Key="SendButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Width" Value="48"/>
+        <Setter Property="Height" Value="48"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="24">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                         VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Opacity" Value="0.9"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Opacity" Value="0.7"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource CardBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- New Message Button Style -->
+    <Style x:Key="NewMessageButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Width" Value="56"/>
+        <Setter Property="Height" Value="56"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="28">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="10"
+                                             ShadowDepth="3"
+                                             Opacity="0.3"
+                                             Color="Black"/>
+                        </Border.Effect>
+                        <ContentPresenter HorizontalAlignment="Center"
+                                         VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Opacity" Value="0.9"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
