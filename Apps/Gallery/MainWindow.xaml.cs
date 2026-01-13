@@ -1,4 +1,5 @@
 using System.IO;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -24,12 +25,46 @@ public partial class MainWindow : Window
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
-        // Default to Pictures folder
-        var picturesFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-        if (Directory.Exists(picturesFolder))
+        // Check for configured gallery path in settings
+        var configuredPath = GetConfiguredGalleryPath();
+
+        if (!string.IsNullOrEmpty(configuredPath) && Directory.Exists(configuredPath))
         {
-            LoadFolder(picturesFolder);
+            LoadFolder(configuredPath);
         }
+        else
+        {
+            // Show empty state - user needs to select a folder
+            ShowEmptyState();
+        }
+    }
+
+    private string GetConfiguredGalleryPath()
+    {
+        try
+        {
+            var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            var settingsPath = System.IO.Path.Combine(appData, "WindowsPhoneNext", "settings.json");
+
+            if (File.Exists(settingsPath))
+            {
+                var json = File.ReadAllText(settingsPath);
+                var settings = JsonSerializer.Deserialize<GallerySettings>(json);
+                return settings?.GalleryPath ?? "";
+            }
+        }
+        catch { }
+
+        return "";
+    }
+
+    private void ShowEmptyState()
+    {
+        NoImagesPanel.Visibility = Visibility.Visible;
+        MainImage.Source = null;
+        ImageCountText.Text = "No folder";
+        TitleText.Text = "Gallery";
+        ImageInfoOverlay.Visibility = Visibility.Collapsed;
     }
 
     private void Window_KeyDown(object sender, KeyEventArgs e)
@@ -322,4 +357,11 @@ public partial class MainWindow : Window
     {
         Close();
     }
+}
+
+// Settings class for deserialization
+public class GallerySettings
+{
+    public string GalleryPath { get; set; } = "";
+    public string MusicPath { get; set; } = "";
 }
