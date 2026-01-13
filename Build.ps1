@@ -133,11 +133,11 @@ function Show-BuildTargets {
     Write-Host ""
 
     foreach ($key in @("ModemLib", "Launcher", "Dialer", "Messaging", "Browser", "Music", "Maps", "Calendar", "Gallery")) {
-        $app = $Apps[$key]
-        $type = if ($app.Type -eq "Library") { "[LIB]" } else { "[APP]" }
+        $appDef = $Apps[$key]
+        $type = if ($appDef.Type -eq "Library") { "[LIB]" } else { "[APP]" }
         Write-Host "  $($key.PadRight(12))" -NoNewline -ForegroundColor Cyan
         Write-Host "$type " -NoNewline -ForegroundColor Yellow
-        Write-Host $app.Description -ForegroundColor Gray
+        Write-Host $appDef.Description -ForegroundColor Gray
     }
 
     Write-Host ""
@@ -161,13 +161,13 @@ function Build-App {
         [string]$Configuration
     )
 
-    $app = $Apps[$AppName]
-    if (-not $app) {
+    $appDef = $Apps[$AppName]
+    if (-not $appDef) {
         Write-Status "Unknown app: $AppName" -Type "Error"
         return $false
     }
 
-    $projectPath = Join-Path $AppsPath $app.Project
+    $projectPath = Join-Path $AppsPath $appDef.Project
 
     if (-not (Test-Path $projectPath)) {
         Write-Status "Project not found: $projectPath" -Type "Error"
@@ -208,12 +208,12 @@ function Publish-App {
         [string]$OutputPath
     )
 
-    $app = $Apps[$AppName]
-    if (-not $app -or $app.Type -ne "Application") {
+    $appDef = $Apps[$AppName]
+    if (-not $appDef -or $appDef.Type -ne "Application") {
         return $true  # Skip libraries
     }
 
-    $projectPath = Join-Path $AppsPath $app.Project
+    $projectPath = Join-Path $AppsPath $appDef.Project
     $appOutput = Join-Path $OutputPath $AppName
 
     Write-Status "Publishing $AppName..."
@@ -238,10 +238,10 @@ function Publish-App {
 function Clean-App {
     param([string]$AppName)
 
-    $app = $Apps[$AppName]
-    if (-not $app) { return }
+    $appDef = $Apps[$AppName]
+    if (-not $appDef) { return }
 
-    $projectDir = Split-Path (Join-Path $AppsPath $app.Project)
+    $projectDir = Split-Path (Join-Path $AppsPath $appDef.Project)
     $binPath = Join-Path $projectDir "bin"
     $objPath = Join-Path $projectDir "obj"
 
@@ -358,8 +358,8 @@ if ($Deploy) {
 
     # Copy applications
     foreach ($appName in $appsToBuild) {
-        $app = $Apps[$appName]
-        if ($app.Type -eq "Application") {
+        $appDef = $Apps[$appName]
+        if ($appDef.Type -eq "Application") {
             $source = Join-Path $OutputPath $appName
             $dest = Join-Path $DeployPath $appName
             if (Test-Path $source) {
@@ -392,9 +392,9 @@ if ($App -eq "All") {
 
     # Copy each application to dist folder
     foreach ($appName in $appsToBuild) {
-        $app = $Apps[$appName]
-        if ($app.Type -eq "Application") {
-            $projectDir = Split-Path (Join-Path $AppsPath $app.Project)
+        $appInfo = $Apps[$appName]
+        if ($appInfo.Type -eq "Application") {
+            $projectDir = Split-Path (Join-Path $AppsPath $appInfo.Project)
             $binPath = Join-Path $projectDir "bin\$Configuration\net8.0-windows"
             $appDistPath = Join-Path $DistPath $appName
 
