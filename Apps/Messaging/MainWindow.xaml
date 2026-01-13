@@ -1,7 +1,6 @@
 <Window x:Class="WindowsPhoneNext.Messaging.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:WindowsPhoneNext.Messaging"
         Title="Messages"
         Width="720" Height="720"
         WindowStyle="None"
@@ -9,11 +8,6 @@
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource BackgroundBrush}"
         Loaded="Window_Loaded">
-
-    <Window.Resources>
-        <local:MessageAlignmentConverter x:Key="MessageAlignmentConverter"/>
-        <local:MessageBubbleConverter x:Key="MessageBubbleConverter"/>
-    </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -97,8 +91,7 @@
 
                                 <!-- Avatar -->
                                 <Ellipse Grid.Column="0" Width="44" Height="44"
-                                        Fill="{StaticResource PrimaryBrush}">
-                                </Ellipse>
+                                        Fill="{StaticResource PrimaryBrush}"/>
                                 <TextBlock Grid.Column="0"
                                           Text="{Binding Initial}"
                                           FontSize="18"
@@ -178,49 +171,38 @@
                 </Grid.RowDefinitions>
 
                 <!-- Messages List -->
-                <ListView x:Name="MessagesList"
-                         Grid.Row="0"
-                         Background="Transparent"
-                         BorderThickness="0"
-                         Margin="16,8"
-                         SelectionMode="None">
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="ListViewItem">
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                            <Setter Property="Padding" Value="0"/>
-                            <Setter Property="Margin" Value="0,4"/>
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="ListViewItem">
-                                        <ContentPresenter/>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </ListView.ItemContainerStyle>
-                    <ListView.ItemTemplate>
+                <ItemsControl x:Name="MessagesList"
+                             Grid.Row="0"
+                             Background="Transparent"
+                             Margin="16,8">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Grid HorizontalAlignment="{Binding IsSent, Converter={StaticResource MessageAlignmentConverter}}">
-                                <Border Background="{Binding IsSent, Converter={StaticResource MessageBubbleConverter}}"
+                            <Grid Margin="0,4" HorizontalAlignment="{Binding Alignment}">
+                                <Border Background="{Binding BubbleColor}"
                                        CornerRadius="16"
                                        Padding="14,10"
                                        MaxWidth="480">
                                     <StackPanel>
                                         <TextBlock Text="{Binding Body}"
                                                   FontSize="14"
-                                                  Foreground="{StaticResource TextPrimaryBrush}"
+                                                  Foreground="#FFFFFF"
                                                   TextWrapping="Wrap"/>
                                         <TextBlock Text="{Binding TimeString}"
                                                   FontSize="10"
-                                                  Foreground="{StaticResource TextSecondaryBrush}"
+                                                  Foreground="#9CA3AF"
                                                   HorizontalAlignment="Right"
                                                   Margin="0,4,0,0"/>
                                     </StackPanel>
                                 </Border>
                             </Grid>
                         </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
                 <!-- Message Input -->
                 <Border Grid.Row="1"

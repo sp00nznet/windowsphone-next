@@ -1,8 +1,6 @@
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -36,7 +34,6 @@ public partial class MainWindow : Window
         ConversationsList.ItemsSource = _conversations;
         MessagesList.ItemsSource = _messages;
 
-        // Auto-refresh for new messages
         _refreshTimer = new DispatcherTimer
         {
             Interval = TimeSpan.FromSeconds(30)
@@ -77,7 +74,6 @@ public partial class MainWindow : Window
             }
             else
             {
-                // Demo data when modem not connected
                 LoadDemoData();
             }
 
@@ -103,7 +99,7 @@ public partial class MainWindow : Window
                 existingConv = new Conversation
                 {
                     PhoneNumber = group.Key,
-                    ContactName = group.Key, // Would look up in contacts
+                    ContactName = group.Key,
                     Initial = GetInitial(group.Key)
                 };
                 _conversations.Add(existingConv);
@@ -131,7 +127,6 @@ public partial class MainWindow : Window
             }
         }
 
-        // Sort conversations by most recent
         var sorted = _conversations.OrderByDescending(c =>
             c.Messages.Any() ? c.Messages.Max(m => m.Timestamp) : DateTime.MinValue).ToList();
 
@@ -144,6 +139,8 @@ public partial class MainWindow : Window
 
     private void LoadDemoData()
     {
+        if (_conversations.Count > 0) return;
+
         _conversations.Add(new Conversation
         {
             PhoneNumber = "+1 555 123 4567",
@@ -188,11 +185,8 @@ public partial class MainWindow : Window
     private static string GetInitial(string name)
     {
         if (string.IsNullOrWhiteSpace(name)) return "?";
-
-        // If it's a phone number, use #
         if (name.StartsWith("+") || char.IsDigit(name[0]))
             return "#";
-
         return name[0].ToString().ToUpper();
     }
 
@@ -244,10 +238,8 @@ public partial class MainWindow : Window
         _currentConversation = conversation;
         TitleText.Text = conversation.ContactName;
 
-        // Mark as read
         conversation.UnreadCount = 0;
 
-        // Load messages
         _messages.Clear();
         foreach (var msg in conversation.Messages.OrderBy(m => m.Timestamp))
         {
@@ -257,12 +249,6 @@ public partial class MainWindow : Window
         ConversationsView.Visibility = Visibility.Collapsed;
         ChatView.Visibility = Visibility.Visible;
         NewMessageView.Visibility = Visibility.Collapsed;
-
-        // Scroll to bottom
-        if (MessagesList.Items.Count > 0)
-        {
-            MessagesList.ScrollIntoView(MessagesList.Items[^1]);
-        }
     }
 
     private void ShowNewMessageView()
@@ -336,7 +322,6 @@ public partial class MainWindow : Window
         _currentConversation.Time = "Just now";
 
         MessageInput.Text = "";
-        MessagesList.ScrollIntoView(message);
 
         try
         {
@@ -347,7 +332,6 @@ public partial class MainWindow : Window
             }
             else
             {
-                // Demo mode - simulate sending
                 await Task.Delay(500);
                 message.Status = MessageStatus.Sent;
             }
@@ -372,7 +356,6 @@ public partial class MainWindow : Window
         if (string.IsNullOrEmpty(recipient) || string.IsNullOrEmpty(messageText))
             return;
 
-        // Find or create conversation
         var conversation = _conversations.FirstOrDefault(c => c.PhoneNumber == recipient);
         if (conversation == null)
         {
@@ -460,12 +443,19 @@ public class Conversation
 
 public class Message
 {
+    private static readonly SolidColorBrush SentBrush = new(Color.FromRgb(0x00, 0x78, 0xD4));
+    private static readonly SolidColorBrush ReceivedBrush = new(Color.FromRgb(0x37, 0x41, 0x51));
+
     public string Body { get; set; } = "";
     public DateTime Timestamp { get; set; }
     public bool IsSent { get; set; }
     public MessageStatus Status { get; set; } = MessageStatus.Sent;
     public int SmsIndex { get; set; }
     public string TimeString => Timestamp.ToString("h:mm tt");
+
+    // Properties for XAML binding without converters
+    public HorizontalAlignment Alignment => IsSent ? HorizontalAlignment.Right : HorizontalAlignment.Left;
+    public SolidColorBrush BubbleColor => IsSent ? SentBrush : ReceivedBrush;
 }
 
 public enum MessageStatus
@@ -474,39 +464,6 @@ public enum MessageStatus
     Sent,
     Delivered,
     Failed
-}
-
-#endregion
-
-#region Converters
-
-public class MessageAlignmentConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        return (bool)value ? HorizontalAlignment.Right : HorizontalAlignment.Left;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        throw new NotImplementedException();
-    }
-}
-
-public class MessageBubbleConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        var isSent = (bool)value;
-        return isSent
-            ? new SolidColorBrush(Color.FromRgb(0x00, 0x78, 0xD4))  // MessageSentColor
-            : new SolidColorBrush(Color.FromRgb(0x37, 0x41, 0x51)); // MessageReceivedColor
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        throw new NotImplementedException();
-    }
 }
 
 #endregion
