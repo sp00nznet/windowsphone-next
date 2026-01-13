@@ -39,7 +39,6 @@
                 <Grid Grid.Column="1">
                     <!-- Single Search Mode -->
                     <TextBox x:Name="SearchBox"
-                            Style="{StaticResource SearchBoxStyle}"
                             Text=""
                             KeyDown="SearchBox_KeyDown"
                             Visibility="Visible">
