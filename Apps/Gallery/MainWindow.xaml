@@ -1,0 +1,160 @@
+<Window x:Class="WindowsPhoneNext.Gallery.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Gallery"
+        Width="720" Height="720"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BackgroundBrush}"
+        Loaded="Window_Loaded"
+        KeyDown="Window_KeyDown">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="120"/>
+        </Grid.RowDefinitions>
+
+        <!-- Top Bar -->
+        <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}">
+            <Grid Margin="12,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Back Button -->
+                <Button Grid.Column="0"
+                       Style="{StaticResource NavButtonStyle}"
+                       Width="40" Height="40"
+                       Click="BackButton_Click">
+                    <TextBlock Text="&#x2190;" FontSize="20"/>
+                </Button>
+
+                <!-- Title / Image Info -->
+                <StackPanel Grid.Column="1"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center">
+                    <TextBlock x:Name="TitleText"
+                              Text="Gallery"
+                              FontSize="16"
+                              FontWeight="SemiBold"
+                              HorizontalAlignment="Center"
+                              Foreground="{StaticResource TextPrimaryBrush}"/>
+                    <TextBlock x:Name="ImageCountText"
+                              Text="0 images"
+                              FontSize="11"
+                              HorizontalAlignment="Center"
+                              Foreground="{StaticResource TextSecondaryBrush}"/>
+                </StackPanel>
+
+                <!-- Open Folder Button -->
+                <Button Grid.Column="2"
+                       Style="{StaticResource NavButtonStyle}"
+                       Width="40" Height="40"
+                       Click="OpenFolder_Click"
+                       ToolTip="Open Folder">
+                    <TextBlock Text="&#x1F4C1;" FontSize="18"/>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- Main Image Area -->
+        <Grid Grid.Row="1" Background="Black">
+            <!-- Image Display -->
+            <Image x:Name="MainImage"
+                  Stretch="Uniform"
+                  RenderOptions.BitmapScalingMode="HighQuality"/>
+
+            <!-- No Images Message -->
+            <StackPanel x:Name="NoImagesPanel"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Visibility="Visible">
+                <TextBlock Text="&#x1F5BC;"
+                          FontSize="64"
+                          HorizontalAlignment="Center"
+                          Foreground="{StaticResource TextSecondaryBrush}"/>
+                <TextBlock Text="No images"
+                          FontSize="18"
+                          HorizontalAlignment="Center"
+                          Foreground="{StaticResource TextSecondaryBrush}"
+                          Margin="0,8,0,0"/>
+                <TextBlock Text="Open a folder to view images"
+                          FontSize="12"
+                          HorizontalAlignment="Center"
+                          Foreground="{StaticResource TextSecondaryBrush}"
+                          Margin="0,4,0,0"/>
+            </StackPanel>
+
+            <!-- Navigation Arrows (on hover) -->
+            <Button x:Name="PrevButton"
+                   Style="{StaticResource ControlButtonStyle}"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Center"
+                   Margin="16,0,0,0"
+                   Visibility="Collapsed"
+                   Click="PrevImage_Click">
+                <TextBlock Text="&#x25C0;" FontSize="20"/>
+            </Button>
+
+            <Button x:Name="NextButton"
+                   Style="{StaticResource ControlButtonStyle}"
+                   HorizontalAlignment="Right"
+                   VerticalAlignment="Center"
+                   Margin="0,0,16,0"
+                   Visibility="Collapsed"
+                   Click="NextImage_Click">
+                <TextBlock Text="&#x25B6;" FontSize="20"/>
+            </Button>
+
+            <!-- Image Info Overlay -->
+            <Border x:Name="ImageInfoOverlay"
+                   VerticalAlignment="Bottom"
+                   HorizontalAlignment="Stretch"
+                   Background="#80000000"
+                   Padding="16,8"
+                   Visibility="Collapsed">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0">
+                        <TextBlock x:Name="ImageFileName"
+                                  Text=""
+                                  FontSize="14"
+                                  Foreground="{StaticResource TextPrimaryBrush}"
+                                  TextTrimming="CharacterEllipsis"/>
+                        <TextBlock x:Name="ImageDetails"
+                                  Text=""
+                                  FontSize="11"
+                                  Foreground="{StaticResource TextSecondaryBrush}"/>
+                    </StackPanel>
+
+                    <TextBlock x:Name="ImageIndex"
+                              Grid.Column="1"
+                              Text="1 / 10"
+                              FontSize="14"
+                              Foreground="{StaticResource TextSecondaryBrush}"
+                              VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Thumbnail Strip -->
+        <Border Grid.Row="2" Background="{StaticResource SurfaceBrush}">
+            <ScrollViewer x:Name="ThumbnailScroller"
+                         HorizontalScrollBarVisibility="Auto"
+                         VerticalScrollBarVisibility="Disabled"
+                         Margin="8">
+                <StackPanel x:Name="ThumbnailPanel"
+                           Orientation="Horizontal"/>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</Window>

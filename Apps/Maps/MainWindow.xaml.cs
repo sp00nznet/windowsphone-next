@@ -17,6 +17,24 @@ public partial class MainWindow : Window
     private double _currentLon = -74.0060;
     private int _currentZoom = 13;
 
+    // Demo mode
+    private bool _isDemoMode;
+    private System.Windows.Threading.DispatcherTimer? _demoTimer;
+    private int _demoStep;
+    private readonly List<(double Lat, double Lon, double Speed, double Heading)> _demoPath = new()
+    {
+        (40.7128, -74.0060, 0, 0),        // Start: NYC
+        (40.7135, -74.0055, 15, 45),
+        (40.7142, -74.0048, 25, 45),
+        (40.7150, -74.0040, 30, 40),
+        (40.7160, -74.0030, 35, 35),
+        (40.7168, -74.0020, 30, 30),
+        (40.7175, -74.0010, 25, 25),
+        (40.7180, -74.0005, 20, 20),
+        (40.7185, -74.0000, 15, 15),
+        (40.7190, -73.9995, 10, 10),
+    };
+
     public MainWindow()
     {
         InitializeComponent();
@@ -73,8 +91,57 @@ public partial class MainWindow : Window
         }
         else
         {
-            UpdateGpsStatus("GPS not found", false);
+            // Start demo mode
+            StartDemoMode();
         }
+    }
+
+    private void StartDemoMode()
+    {
+        _isDemoMode = true;
+        _demoStep = 0;
+
+        UpdateGpsStatus("Demo Mode", true);
+
+        // Set initial position
+        var start = _demoPath[0];
+        _currentLat = start.Lat;
+        _currentLon = start.Lon;
+        ExecuteMapScript($"updateCurrentLocation({start.Lat}, {start.Lon}, {start.Heading});");
+        ExecuteMapScript($"setView({start.Lat}, {start.Lon}, 15);");
+
+        // Start demo timer
+        _demoTimer = new System.Windows.Threading.DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(2)
+        };
+        _demoTimer.Tick += DemoTimer_Tick;
+        _demoTimer.Start();
+    }
+
+    private void DemoTimer_Tick(object? sender, EventArgs e)
+    {
+        _demoStep = (_demoStep + 1) % _demoPath.Count;
+        var pos = _demoPath[_demoStep];
+
+        _currentLat = pos.Lat;
+        _currentLon = pos.Lon;
+
+        UpdateGpsStatus($"Demo: {pos.Speed:F0} km/h", true);
+        ExecuteMapScript($"updateCurrentLocation({pos.Lat}, {pos.Lon}, {pos.Heading});");
+
+        // Follow the simulated position
+        if (_isNavigating)
+        {
+            ExecuteMapScript($"setView({pos.Lat}, {pos.Lon}, 16);");
+        }
+    }
+
+    private void StopDemoMode()
+    {
+        _isDemoMode = false;
+        _demoTimer?.Stop();
+        _demoTimer = null;
     }
 
     private void UpdateGpsStatus(string status, bool hasFix)
@@ -332,9 +399,9 @@ public partial class MainWindow : Window
             GetRouteButton.Visibility = Visibility.Visible;
 
             // Set current location as start
-            if (_gps.HasFix)
+            if (_gps.HasFix || _isDemoMode)
             {
-                FromBox.Text = "Current Location";
+                FromBox.Text = _isDemoMode ? "Current Location (Demo)" : "Current Location";
                 FromBox.Tag = new LatLon(_currentLat, _currentLon);
             }
             else
@@ -362,7 +429,7 @@ public partial class MainWindow : Window
 
         if (fromCoord == null)
         {
-            if (_gps.HasFix)
+            if (_gps.HasFix || _isDemoMode)
             {
                 fromCoord = new LatLon(_currentLat, _currentLon);
             }
@@ -478,7 +545,7 @@ public partial class MainWindow : Window
 
     private void MyLocation_Click(object sender, RoutedEventArgs e)
     {
-        if (_gps.HasFix)
+        if (_gps.HasFix || _isDemoMode)
         {
             ExecuteMapScript($"setView({_currentLat}, {_currentLon}, 16);");
         }
@@ -509,6 +576,7 @@ public partial class MainWindow : Window
 
     protected override void OnClosed(EventArgs e)
     {
+        StopDemoMode();
         _gps.Dispose();
         _httpClient.Dispose();
         base.OnClosed(e);

@@ -26,13 +26,13 @@ public partial class MainWindow : Window
         {
             new AppInfo { Name = "Phone", Icon = "\U0001F4DE", AppPath = "Dialer" },
             new AppInfo { Name = "Messages", Icon = "\U0001F4AC", AppPath = "Messaging" },
-            new AppInfo { Name = "Settings", Icon = "\u2699\uFE0F", AppPath = "Settings" },
             new AppInfo { Name = "Browser", Icon = "\U0001F310", AppPath = "Browser" },
             new AppInfo { Name = "Maps", Icon = "\U0001F5FA\uFE0F", AppPath = "Maps" },
-            new AppInfo { Name = "Camera", Icon = "\U0001F4F7", AppPath = "Camera" },
             new AppInfo { Name = "Music", Icon = "\U0001F3B5", AppPath = "Music" },
             new AppInfo { Name = "Calendar", Icon = "\U0001F4C5", AppPath = "Calendar" },
-            new AppInfo { Name = "Notes", Icon = "\U0001F4DD", AppPath = "Notes" }
+            new AppInfo { Name = "Gallery", Icon = "\U0001F5BC\uFE0F", AppPath = "Gallery" },
+            new AppInfo { Name = "Camera", Icon = "\U0001F4F7", AppPath = "Camera" },
+            new AppInfo { Name = "Settings", Icon = "\u2699\uFE0F", AppPath = "Settings" }
         };
 
         AppGrid.ItemsSource = _apps;

@@ -16,6 +16,7 @@ public partial class MainWindow : Window
     private bool _isMuted;
     private bool _isSpeakerOn;
     private bool _isInCall;
+    private bool _isDemoMode;
     private readonly List<CallRecord> _recentCalls = new();
 
     public MainWindow()
@@ -49,11 +50,17 @@ public partial class MainWindow : Window
             if (await _modem.AutoConnectAsync())
             {
                 await _modem.InitializeAsync();
+                _isDemoMode = false;
+            }
+            else
+            {
+                _isDemoMode = true;
             }
         }
         catch
         {
-            // Modem initialization failed, show error or continue in demo mode
+            // Modem initialization failed, continue in demo mode
+            _isDemoMode = true;
         }
     }
 
@@ -165,6 +172,13 @@ public partial class MainWindow : Window
         ShowActiveCallView(number);
         CallStatusText.Text = "Calling...";
 
+        if (_isDemoMode)
+        {
+            // Demo mode: simulate call flow
+            await SimulateDemoCallAsync(number);
+            return;
+        }
+
         try
         {
             var success = await _modem.DialAsync(number);
@@ -189,6 +203,28 @@ public partial class MainWindow : Window
             await Task.Delay(2000);
             ShowDialpadView();
         }
+    }
+
+    private async Task SimulateDemoCallAsync(string number)
+    {
+        // Simulate dialing
+        CallStatusText.Text = "Dialing... (Demo)";
+        await Task.Delay(1500);
+
+        if (!_isInCall) return;
+
+        // Simulate ringing
+        CallStatusText.Text = "Ringing... (Demo)";
+        await Task.Delay(2500);
+
+        if (!_isInCall) return;
+
+        // Simulate connection
+        CallStatusText.Text = "Connected (Demo)";
+        _callStartTime = DateTime.Now;
+        _callTimer.Start();
+
+        // Let the demo call run until user ends it
     }
 
     private async Task MonitorCallStatusAsync()
