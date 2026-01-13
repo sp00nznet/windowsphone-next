@@ -10,7 +10,7 @@
     - UP Core Board (https://up-board.org/upcore/specifications/)
     - LattePanda 3 Delta 864
     - PiSugar2 Plus (Power Management)
-    - 720x720 4:4 Display
+    - 720x1560 9:19.5 Display
     - EM06-A LTE Card (Phone/SMS functionality)
 #>
 
@@ -18,6 +18,7 @@ param(
     [switch]$SkipDrivers,
     [switch]$SkipDisplay,
     [switch]$SkipAutoStart,
+    [switch]$SkipAppRemoval,
     [string]$InstallPath = "C:\WindowsPhoneNext"
 )
 
@@ -42,6 +43,84 @@ function Test-AdminPrivileges {
     return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 }
 
+function Remove-UnnecessaryApps {
+    Write-Status "Removing unnecessary Windows apps..."
+
+    # List of bloatware apps to remove for a clean phone experience
+    $appsToRemove = @(
+        "Microsoft.3DBuilder"
+        "Microsoft.BingFinance"
+        "Microsoft.BingNews"
+        "Microsoft.BingSports"
+        "Microsoft.BingWeather"
+        "Microsoft.GetHelp"
+        "Microsoft.Getstarted"
+        "Microsoft.Microsoft3DViewer"
+        "Microsoft.MicrosoftOfficeHub"
+        "Microsoft.MicrosoftSolitaireCollection"
+        "Microsoft.MixedReality.Portal"
+        "Microsoft.Office.OneNote"
+        "Microsoft.OneConnect"
+        "Microsoft.People"
+        "Microsoft.Print3D"
+        "Microsoft.SkypeApp"
+        "Microsoft.Wallet"
+        "Microsoft.WindowsAlarms"
+        "Microsoft.WindowsFeedbackHub"
+        "Microsoft.WindowsMaps"
+        "Microsoft.Xbox.TCUI"
+        "Microsoft.XboxApp"
+        "Microsoft.XboxGameOverlay"
+        "Microsoft.XboxGamingOverlay"
+        "Microsoft.XboxIdentityProvider"
+        "Microsoft.XboxSpeechToTextOverlay"
+        "Microsoft.YourPhone"
+        "Microsoft.ZuneMusic"
+        "Microsoft.ZuneVideo"
+        "Clipchamp.Clipchamp"
+        "Microsoft.Todos"
+        "Microsoft.PowerAutomateDesktop"
+        "MicrosoftTeams"
+        "Microsoft.549981C3F5F10"  # Cortana
+    )
+
+    $removedCount = 0
+    foreach ($app in $appsToRemove) {
+        $package = Get-AppxPackage -Name $app -AllUsers -ErrorAction SilentlyContinue
+        if ($package) {
+            try {
+                Get-AppxPackage -Name $app -AllUsers | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue
+                Get-AppxProvisionedPackage -Online | Where-Object { $_.DisplayName -eq $app } | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
+                $removedCount++
+                Write-Status "  Removed: $app" -Type "Info"
+            }
+            catch {
+                Write-Status "  Could not remove: $app" -Type "Warning"
+            }
+        }
+    }
+
+    # Disable Cortana
+    $cortanaKey = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search"
+    if (-not (Test-Path $cortanaKey)) {
+        New-Item -Path $cortanaKey -Force | Out-Null
+    }
+    Set-ItemProperty -Path $cortanaKey -Name "AllowCortana" -Value 0 -Type DWord -ErrorAction SilentlyContinue
+
+    # Disable Windows Consumer Features (prevents automatic app reinstallation)
+    $cloudKey = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent"
+    if (-not (Test-Path $cloudKey)) {
+        New-Item -Path $cloudKey -Force | Out-Null
+    }
+    Set-ItemProperty -Path $cloudKey -Name "DisableWindowsConsumerFeatures" -Value 1 -Type DWord -ErrorAction SilentlyContinue
+
+    # Disable suggested apps
+    Set-ItemProperty -Path $cloudKey -Name "DisableSoftLanding" -Value 1 -Type DWord -ErrorAction SilentlyContinue
+    Set-ItemProperty -Path $cloudKey -Name "DisableCloudOptimizedContent" -Value 1 -Type DWord -ErrorAction SilentlyContinue
+
+    Write-Status "Removed $removedCount unnecessary apps" -Type "Success"
+}
+
 function Install-RequiredFeatures {
     Write-Status "Installing required Windows features..."
 
@@ -53,7 +132,7 @@ function Install-RequiredFeatures {
 }
 
 function Set-DisplayConfiguration {
-    Write-Status "Configuring 720x720 display..."
+    Write-Status "Configuring 720x1560 display..."
 
     # Create display configuration script
     $displayScript = @"
@@ -218,11 +297,11 @@ function Install-Applications {
 }
 
 function Set-TouchConfiguration {
-    Write-Status "Configuring touch input for 720x720 display..."
+    Write-Status "Configuring touch input for 720x1560 display..."
 
     # Touch calibration script
     $touchConfig = @'
-# Configure touch input mapping for 720x720 display
+# Configure touch input mapping for 720x1560 display
 # This may need adjustment based on specific touch controller
 
 Add-Type -AssemblyName System.Windows.Forms
@@ -279,6 +358,9 @@ function Start-Installation {
     Write-Status "Directories created" -Type "Success"
 
     # Run installation steps
+    if (-not $SkipAppRemoval) {
+        Remove-UnnecessaryApps
+    }
     Install-RequiredFeatures
 
     if (-not $SkipDisplay) {

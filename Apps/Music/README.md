@@ -1,8 +1,8 @@
 # Windows Phone Next - Music Player
 
-Custom Winamp build with integrated visualizer for the 720x720 display.
+Custom Winamp build with integrated visualizer for the 720x1560 display.
 
-## Layout (720x720)
+## Layout (720x1560)
 
 ```
 +----------------------------------+
@@ -11,7 +11,7 @@ Custom Winamp build with integrated visualizer for the 720x720 display.
 |                                  |
 |                                  |
 |     vis_wpnext Visualizer        |
-|     (720x550)                    |
+|     (720x1390)                   |
 |                                  |
 |     - Spectrum Analyzer          |
 |     - Oscilloscope overlay       |
@@ -77,14 +77,14 @@ See `winamp-src/README.md` for full build requirements including:
 ## Integration with WindowsPhoneNext
 
 The Music app is launched from the Launcher with:
-- Fixed 720x720 window
+- Fixed 720x1560 window
 - Visualizer docked at top
 - Player controls at bottom
 - Back button handling via IPC
 
 ## Future Enhancements
 
-The extra width space can be used for:
+The extra height space can be used for:
 - Song info scroller
 - Playlist preview
 - Album art display

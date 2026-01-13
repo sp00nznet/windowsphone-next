@@ -21,7 +21,7 @@
     <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}"/>
     <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource ErrorColor}"/>
 
-    <!-- Dialpad Button Style - Sized to fit 720x720 -->
+    <!-- Dialpad Button Style - Sized to fit 720x1560 -->
     <Style x:Key="DialpadButtonStyle" TargetType="Button">
         <Setter Property="Background" Value="{StaticResource CardBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>

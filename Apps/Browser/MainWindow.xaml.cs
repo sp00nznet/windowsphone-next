@@ -29,7 +29,7 @@ public partial class MainWindow : Window
         {
             LoadingOverlay.Visibility = Visibility.Visible;
 
-            // Initialize WebView2 with custom settings for 720x720 display
+            // Initialize WebView2 with custom settings for 720x1560 display
             var env = await CoreWebView2Environment.CreateAsync();
             await WebView.EnsureCoreWebView2Async(env);
 
@@ -39,7 +39,7 @@ public partial class MainWindow : Window
             WebView.CoreWebView2.Settings.IsZoomControlEnabled = false;
             WebView.CoreWebView2.Settings.AreDevToolsEnabled = false;
 
-            // Set user agent to indicate mobile device for better 720x720 rendering
+            // Set user agent to indicate mobile device for better 720x1560 rendering
             WebView.CoreWebView2.Settings.UserAgent =
                 "Mozilla/5.0 (Linux; Android 13; WindowsPhoneNext) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36";
 

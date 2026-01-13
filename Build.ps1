@@ -59,7 +59,7 @@ $Apps = @{
         Name = "Launcher"
         Project = "Launcher\WindowsPhoneLauncher.csproj"
         Type = "Application"
-        Description = "Home screen launcher (720x720)"
+        Description = "Home screen launcher (720x1560)"
         DependsOn = @("ModemLib")
     }
     Dialer = @{
@@ -80,7 +80,7 @@ $Apps = @{
         Name = "Browser"
         Project = "Browser\WindowsPhoneBrowser.csproj"
         Type = "Application"
-        Description = "Chromium-based web browser (720x720)"
+        Description = "Chromium-based web browser (720x1560)"
         DependsOn = @()
     }
     Music = @{
