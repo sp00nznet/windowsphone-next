@@ -1,0 +1,6 @@
+# Ignore cloned Winamp source (external dependency)
+winamp-src/
+
+# Build outputs
+bin/
+obj/

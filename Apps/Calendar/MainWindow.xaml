@@ -1,0 +1,187 @@
+<Window x:Class="WindowsPhoneNext.Calendar.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Calendar"
+        Width="720" Height="720"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BackgroundBrush}"
+        Loaded="Window_Loaded">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Top Bar -->
+        <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}">
+            <Grid Margin="12,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Back Button -->
+                <Button Grid.Column="0"
+                       Style="{StaticResource NavButtonStyle}"
+                       Width="40" Height="40"
+                       Click="BackButton_Click">
+                    <TextBlock Text="&#x2190;" FontSize="20"/>
+                </Button>
+
+                <!-- Title -->
+                <TextBlock x:Name="TitleText"
+                          Grid.Column="1"
+                          Text="January 2026"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          FontSize="18"
+                          FontWeight="SemiBold"
+                          Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                <!-- Today Button -->
+                <Button Grid.Column="2"
+                       Style="{StaticResource NavButtonStyle}"
+                       Width="40" Height="40"
+                       Click="TodayButton_Click"
+                       ToolTip="Go to Today">
+                    <TextBlock Text="&#x25C9;" FontSize="18"/>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- Content Area -->
+        <Grid Grid.Row="1">
+            <!-- Year View -->
+            <Grid x:Name="YearView" Visibility="Collapsed" Margin="16">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Year Navigation -->
+                <Grid Grid.Row="0" Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" Style="{StaticResource NavButtonStyle}"
+                           Click="PrevYear_Click" Content="&#x25C0;"/>
+                    <TextBlock x:Name="YearText" Grid.Column="1"
+                              Text="2026"
+                              FontSize="24" FontWeight="Bold"
+                              Foreground="{StaticResource TextPrimaryBrush}"
+                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Button Grid.Column="2" Style="{StaticResource NavButtonStyle}"
+                           Click="NextYear_Click" Content="&#x25B6;"/>
+                </Grid>
+
+                <!-- Month Grid (4x3) -->
+                <UniformGrid x:Name="YearMonthGrid" Grid.Row="1"
+                            Rows="4" Columns="3"/>
+            </Grid>
+
+            <!-- Month View -->
+            <Grid x:Name="MonthView" Visibility="Visible" Margin="16">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Month Navigation -->
+                <Grid Grid.Row="0" Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" Style="{StaticResource NavButtonStyle}"
+                           Click="PrevMonth_Click" Content="&#x25C0;"/>
+                    <Button Grid.Column="1" Style="{StaticResource NavButtonStyle}"
+                           Width="Auto" Padding="16,0"
+                           Click="ShowYearView_Click">
+                        <TextBlock x:Name="MonthYearText"
+                                  Text="January 2026"
+                                  FontSize="20" FontWeight="Bold"
+                                  Foreground="{StaticResource TextPrimaryBrush}"/>
+                    </Button>
+                    <Button Grid.Column="2" Style="{StaticResource NavButtonStyle}"
+                           Click="NextMonth_Click" Content="&#x25B6;"/>
+                </Grid>
+
+                <!-- Day Headers -->
+                <UniformGrid Grid.Row="1" Columns="7" Margin="0,0,0,8">
+                    <TextBlock Text="Sun" HorizontalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                    <TextBlock Text="Mon" HorizontalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                    <TextBlock Text="Tue" HorizontalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                    <TextBlock Text="Wed" HorizontalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                    <TextBlock Text="Thu" HorizontalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                    <TextBlock Text="Fri" HorizontalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                    <TextBlock Text="Sat" HorizontalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                </UniformGrid>
+
+                <!-- Day Grid (6x7) -->
+                <UniformGrid x:Name="MonthDayGrid" Grid.Row="2"
+                            Rows="6" Columns="7"/>
+            </Grid>
+
+            <!-- Day View -->
+            <Grid x:Name="DayView" Visibility="Collapsed" Margin="16">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Day Navigation -->
+                <Grid Grid.Row="0" Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" Style="{StaticResource NavButtonStyle}"
+                           Click="PrevDay_Click" Content="&#x25C0;"/>
+                    <Button Grid.Column="1" Style="{StaticResource NavButtonStyle}"
+                           Width="Auto" Padding="16,0"
+                           Click="ShowMonthView_Click">
+                        <TextBlock x:Name="DayHeaderText"
+                                  Text="Monday, January 13"
+                                  FontSize="18" FontWeight="Bold"
+                                  Foreground="{StaticResource TextPrimaryBrush}"/>
+                    </Button>
+                    <Button Grid.Column="2" Style="{StaticResource NavButtonStyle}"
+                           Click="NextDay_Click" Content="&#x25B6;"/>
+                </Grid>
+
+                <!-- Mark Important Button -->
+                <Button x:Name="MarkDayButton"
+                       Grid.Row="1"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,12"
+                       Padding="16,8"
+                       Background="{StaticResource CardBrush}"
+                       Foreground="{StaticResource TextPrimaryBrush}"
+                       BorderThickness="0"
+                       Click="MarkDay_Click">
+                    <TextBlock x:Name="MarkDayText" Text="&#x2606; Mark as Important"/>
+                </Button>
+
+                <!-- Hour Slots -->
+                <ScrollViewer Grid.Row="2"
+                             VerticalScrollBarVisibility="Auto"
+                             HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel x:Name="HourSlotsPanel"/>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

@@ -30,7 +30,7 @@
 #>
 
 param(
-    [ValidateSet("All", "Launcher", "Dialer", "Messaging", "ModemLib")]
+    [ValidateSet("All", "Launcher", "Dialer", "Messaging", "Browser", "Music", "Maps", "Calendar", "Gallery", "ModemLib")]
     [string]$App = "All",
 
     [ValidateSet("Debug", "Release")]
@@ -76,6 +76,41 @@ $Apps = @{
         Description = "SMS messaging application"
         DependsOn = @("ModemLib")
     }
+    Browser = @{
+        Name = "Browser"
+        Project = "Browser\WindowsPhoneBrowser.csproj"
+        Type = "Application"
+        Description = "Chromium-based web browser (720x720)"
+        DependsOn = @()
+    }
+    Music = @{
+        Name = "Music"
+        Project = "Music\Launcher\WindowsPhoneMusic.csproj"
+        Type = "Application"
+        Description = "Music player with spectrum visualizer"
+        DependsOn = @()
+    }
+    Maps = @{
+        Name = "Maps"
+        Project = "Maps\WindowsPhoneMaps.csproj"
+        Type = "Application"
+        Description = "GPS navigation with OpenStreetMap"
+        DependsOn = @()
+    }
+    Calendar = @{
+        Name = "Calendar"
+        Project = "Calendar\WindowsPhoneCalendar.csproj"
+        Type = "Application"
+        Description = "Calendar with month/day/year views"
+        DependsOn = @()
+    }
+    Gallery = @{
+        Name = "Gallery"
+        Project = "Gallery\WindowsPhoneGallery.csproj"
+        Type = "Application"
+        Description = "Image gallery with thumbnails"
+        DependsOn = @()
+    }
 }
 
 function Write-Status {
@@ -97,7 +132,7 @@ function Show-BuildTargets {
     Write-Host "========================" -ForegroundColor Magenta
     Write-Host ""
 
-    foreach ($key in @("ModemLib", "Launcher", "Dialer", "Messaging")) {
+    foreach ($key in @("ModemLib", "Launcher", "Dialer", "Messaging", "Browser", "Music", "Maps", "Calendar", "Gallery")) {
         $app = $Apps[$key]
         $type = if ($app.Type -eq "Library") { "[LIB]" } else { "[APP]" }
         Write-Host "  $($key.PadRight(12))" -NoNewline -ForegroundColor Cyan
@@ -244,7 +279,7 @@ Write-Host ""
 # Determine which apps to build
 $appsToBuild = @()
 if ($App -eq "All") {
-    $appsToBuild = @("ModemLib", "Launcher", "Dialer", "Messaging")
+    $appsToBuild = @("ModemLib", "Launcher", "Dialer", "Messaging", "Browser", "Music", "Maps", "Calendar", "Gallery")
 } else {
     # Add dependencies first
     $appDef = $Apps[$App]
@@ -313,7 +348,7 @@ if ($Deploy) {
     Write-Status "Deploying to $DeployPath..." -Type "Header"
 
     # Create deployment directories
-    $deployDirs = @("Launcher", "Dialer", "Messaging", "Config", "Scripts", "Logs")
+    $deployDirs = @("Launcher", "Dialer", "Messaging", "Browser", "Music", "Maps", "Calendar", "Gallery", "Config", "Scripts", "Logs")
     foreach ($dir in $deployDirs) {
         $fullPath = Join-Path $DeployPath $dir
         if (-not (Test-Path $fullPath)) {

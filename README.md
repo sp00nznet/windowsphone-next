@@ -4,19 +4,25 @@ A custom Windows 11 phone platform for embedded hardware, featuring a modern tou
 
 ## Target Hardware
 
-- **Board**: UP Core (https://up-board.org/upcore/specifications/)
-- **Processor**: LattePanda 3 Delta 864
+- **Board**: UP Core (https://up-board.org/upcore/specifications/) or LattePanda 3 Delta 864
 - **Power**: PiSugar2 Plus battery management
 - **Display**: 720x720 4:4 aspect ratio touchscreen
 - **Modem**: Quectel EM06-A LTE card (voice calls + SMS)
+- **GPS**: VK-172 USB GPS dongle (optional, for Maps app)
 
 ## Features
 
 - **Modern Launcher** - Full-screen 720x720 home screen with app grid, status bar, and quick access navigation
 - **Phone Dialer** - Complete phone application with dialpad, call history, and in-call controls using AT commands
 - **SMS Messaging** - Conversation-based messaging app with send/receive functionality via AT commands
+- **Web Browser** - Chromium-based web browser with tabbed browsing
+- **Music Player** - Audio player with real-time spectrum analyzer visualization
+- **Maps & Navigation** - GPS navigation with OpenStreetMap and turn-by-turn routing
+- **Calendar** - Month/day/year views with date marking functionality
+- **Gallery** - Image viewer with thumbnail navigation
 - **Auto-start Kiosk Mode** - Boots directly into launcher, replacing Windows shell
 - **Power Management** - Optimized for battery operation with PiSugar2 Plus
+- **Demo Modes** - Hardware-dependent apps (Dialer, Maps) work without hardware for testing
 
 ## Project Structure
 
@@ -27,7 +33,12 @@ windowsphone-next/
 │   │   └── ModemLib/           # Shared AT command modem library
 │   ├── Launcher/               # Home screen launcher (WPF)
 │   ├── Dialer/                 # Phone/call application (WPF)
-│   └── Messaging/              # SMS messaging application (WPF)
+│   ├── Messaging/              # SMS messaging application (WPF)
+│   ├── Browser/                # Chromium-based web browser (WPF)
+│   ├── Music/                  # Music player with visualizer (WPF)
+│   ├── Maps/                   # GPS navigation with OSM (WPF)
+│   ├── Calendar/               # Calendar application (WPF)
+│   └── Gallery/                # Image gallery viewer (WPF)
 ├── Setup/
 │   ├── Install-WindowsPhone.ps1      # Main installation script
 │   └── Configure-KioskMode.ps1       # Kiosk mode configuration
@@ -140,6 +151,9 @@ Full-featured phone application:
 - Contacts integration
 - Active call screen with mute/speaker/keypad
 - DTMF tone support during calls
+- **Demo Mode**: Works without modem hardware, simulates call flow
+
+**Hardware Required**: Quectel EM06-A LTE modem (or compatible AT modem)
 
 ### Messaging
 
@@ -149,6 +163,56 @@ SMS messaging application:
 - New message composition
 - Auto-refresh for incoming messages
 - Unread message badges
+- **Demo Mode**: Works without modem with sample conversations
+
+**Hardware Required**: Quectel EM06-A LTE modem (or compatible AT modem)
+
+### Browser
+
+Chromium-based web browser:
+- Tabbed browsing interface
+- Address bar with search
+- Back/forward/refresh navigation
+- Desktop-class web rendering via WebView2
+
+### Music
+
+Audio player with visualizer:
+- Supports MP3, WAV, FLAC, OGG formats
+- 64-bar real-time spectrum analyzer
+- Peak hold visualization
+- Playlist with shuffle/repeat
+- Keyboard shortcuts (Space=play/pause, N=next, P=prev)
+
+### Maps
+
+GPS navigation application:
+- OpenStreetMap tile rendering
+- A-to-B route calculation via OSRM
+- Location search via Nominatim geocoding
+- Real-time GPS position tracking
+- Turn-by-turn navigation
+- **Demo Mode**: Simulated GPS movement when hardware unavailable
+
+**Hardware Required**: VK-172 USB GPS dongle (or compatible NMEA GPS device)
+
+### Calendar
+
+Calendar application:
+- Month view (default)
+- Day view with hourly time slots
+- Year view (zoom out)
+- Mark important dates
+- Data persistence in local storage
+
+### Gallery
+
+Image viewer application:
+- Thumbnail strip navigation
+- Full-size image display
+- Keyboard navigation (Arrow keys, Home, End)
+- Supports JPG, PNG, GIF, BMP, WebP, TIFF
+- Open folder dialog
 
 ## AT Commands Reference
 
