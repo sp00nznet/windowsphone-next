@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using WindowsPhoneNext.ModemLib;
+using WindowsPhoneNext.AccelerometerLib;
 
 namespace WindowsPhoneNext.Launcher;
 
@@ -40,6 +41,8 @@ public partial class MainWindow : Window
             new AppInfo { Name = "Files", Icon = "\U0001F4C2", AppPath = "Files", Shortcut = Key.None },
             new AppInfo { Name = "Android", Icon = "\U0001F4E6", AppPath = "AndroidApps", Shortcut = Key.A },
             new AppInfo { Name = "Terminal", Icon = "\U0001F427", AppPath = "Terminal", Shortcut = Key.T },
+            new AppInfo { Name = "Calculator", Icon = "\U0001F5A9", AppPath = "Calculator", Shortcut = Key.K },
+            new AppInfo { Name = "Sensors", Icon = "\U0001F4F1", AppPath = "Accelerometer", Shortcut = Key.R },
             new AppInfo { Name = "Solitaire", Icon = "\U0001F0CF", AppPath = "Solitaire", Shortcut = Key.None },
             new AppInfo { Name = "Mahjong", Icon = "\U0001F004", AppPath = "Mahjong", Shortcut = Key.None }
         };
@@ -72,6 +75,33 @@ public partial class MainWindow : Window
         UpdateClock();
         await InitializeModemAsync();
         await UpdateStatusAsync();
+
+        // Start orientation service as server (Launcher is the main app)
+        await OrientationService.Instance.StartAsServerAsync();
+        OrientationService.Instance.OrientationChanged += OnOrientationChanged;
+        ApplyOrientation(OrientationService.Instance.CurrentOrientation);
+    }
+
+    private void OnOrientationChanged(object? sender, OrientationChangedEventArgs e)
+    {
+        Dispatcher.Invoke(() => ApplyOrientation(e.NewOrientation));
+    }
+
+    private void ApplyOrientation(ScreenOrientation orientation)
+    {
+        bool isLandscape = orientation == ScreenOrientation.LandscapeLeft ||
+                          orientation == ScreenOrientation.LandscapeRight;
+
+        if (isLandscape)
+        {
+            Width = 1560;
+            Height = 720;
+        }
+        else
+        {
+            Width = 720;
+            Height = 1560;
+        }
     }
 
     private async Task InitializeModemAsync()
@@ -329,6 +359,8 @@ public partial class MainWindow : Window
         _clockTimer.Stop();
         _statusTimer.Stop();
         _modem.Dispose();
+        OrientationService.Instance.OrientationChanged -= OnOrientationChanged;
+        OrientationService.Instance.Dispose();
         base.OnClosed(e);
     }
 }
