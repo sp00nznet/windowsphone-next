@@ -1,0 +1,236 @@
+<Window x:Class="WindowsPhoneCamera.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Camera"
+        Width="720" Height="1560"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        Background="{StaticResource BackgroundBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Top Controls -->
+        <Border Grid.Row="0" Background="#80000000" Padding="16,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Close Button -->
+                <Button Grid.Column="0" Content="✕"
+                        Style="{StaticResource ControlButtonStyle}"
+                        Click="Close_Click"/>
+
+                <!-- Flash Toggle -->
+                <Button x:Name="FlashButton" Grid.Column="2" Content="⚡"
+                        Style="{StaticResource ControlButtonStyle}"
+                        Click="Flash_Click"/>
+            </Grid>
+        </Border>
+
+        <!-- Camera Viewfinder -->
+        <Grid Grid.Row="1">
+            <!-- Camera Preview -->
+            <Image x:Name="CameraPreview"
+                   Stretch="UniformToFill"/>
+
+            <!-- Placeholder when no camera -->
+            <Border x:Name="CameraPlaceholder"
+                    Background="{StaticResource SurfaceBrush}"
+                    Visibility="Visible">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock Text="📷" FontSize="96" HorizontalAlignment="Center"
+                               Margin="0,0,0,20"/>
+                    <TextBlock Text="Camera Preview"
+                               FontSize="24"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="CameraStatus"
+                               Text="Initializing camera..."
+                               FontSize="14"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               HorizontalAlignment="Center"
+                               Margin="0,8,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Focus Indicator -->
+            <Border x:Name="FocusIndicator"
+                    Width="80" Height="80"
+                    BorderBrush="{StaticResource AccentBrush}"
+                    BorderThickness="2"
+                    CornerRadius="4"
+                    Visibility="Collapsed"
+                    IsHitTestVisible="False"/>
+
+            <!-- Recording Indicator -->
+            <Border x:Name="RecordingIndicator"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Margin="20"
+                    Padding="12,6"
+                    Background="#CC000000"
+                    CornerRadius="4"
+                    Visibility="Collapsed">
+                <StackPanel Orientation="Horizontal">
+                    <Ellipse Width="12" Height="12" Fill="{StaticResource RecordBrush}"
+                             Margin="0,0,8,0"/>
+                    <TextBlock x:Name="RecordingTime" Text="00:00"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               FontSize="16" FontWeight="SemiBold"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Grid Lines (optional) -->
+            <Canvas x:Name="GridLines" Visibility="Collapsed" IsHitTestVisible="False">
+                <Line X1="240" Y1="0" X2="240" Y2="1000" Stroke="#40FFFFFF" StrokeThickness="1"/>
+                <Line X1="480" Y1="0" X2="480" Y2="1000" Stroke="#40FFFFFF" StrokeThickness="1"/>
+                <Line X1="0" Y1="333" X2="720" Y2="333" Stroke="#40FFFFFF" StrokeThickness="1"/>
+                <Line X1="0" Y1="666" X2="720" Y2="666" Stroke="#40FFFFFF" StrokeThickness="1"/>
+            </Canvas>
+        </Grid>
+
+        <!-- Mode Selector -->
+        <Border Grid.Row="2" Background="#80000000" Padding="0,12">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button x:Name="PhotoModeBtn" Content="PHOTO"
+                        Style="{StaticResource ModeButtonStyle}"
+                        Foreground="{StaticResource TextPrimaryBrush}"
+                        FontWeight="SemiBold"
+                        Click="PhotoMode_Click"/>
+                <Button x:Name="VideoModeBtn" Content="VIDEO"
+                        Style="{StaticResource ModeButtonStyle}"
+                        Click="VideoMode_Click"/>
+                <Button x:Name="PortraitModeBtn" Content="PORTRAIT"
+                        Style="{StaticResource ModeButtonStyle}"
+                        Click="PortraitMode_Click"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Bottom Controls -->
+        <Border Grid.Row="3" Background="#80000000" Padding="20,24">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Gallery Thumbnail -->
+                <Button Grid.Column="0" HorizontalAlignment="Center"
+                        Style="{StaticResource ControlButtonStyle}"
+                        Width="56" Height="56"
+                        Click="Gallery_Click">
+                    <Border Style="{StaticResource ThumbnailStyle}">
+                        <Image x:Name="LastPhotoThumbnail" Stretch="UniformToFill"/>
+                    </Border>
+                </Button>
+
+                <!-- Capture Button -->
+                <Button x:Name="CaptureButton" Grid.Column="1"
+                        Style="{StaticResource CaptureButtonStyle}"
+                        Click="Capture_Click"/>
+
+                <!-- Camera Switch -->
+                <Button Grid.Column="2" Content="🔄"
+                        HorizontalAlignment="Center"
+                        Style="{StaticResource ControlButtonStyle}"
+                        Click="SwitchCamera_Click"/>
+            </Grid>
+        </Border>
+
+        <!-- Settings Panel (Overlay) -->
+        <Border x:Name="SettingsPanel" Grid.Row="1" Grid.RowSpan="3"
+                Background="#E0000000"
+                Visibility="Collapsed">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="24">
+                    <TextBlock Text="Camera Settings"
+                               FontSize="24" FontWeight="SemiBold"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               Margin="0,0,0,24"/>
+
+                    <!-- Grid Lines Toggle -->
+                    <Grid Margin="0,8">
+                        <TextBlock Text="Grid Lines"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   FontSize="16"
+                                   VerticalAlignment="Center"/>
+                        <CheckBox x:Name="GridLinesToggle"
+                                  HorizontalAlignment="Right"
+                                  Checked="GridLines_Changed"
+                                  Unchecked="GridLines_Changed"/>
+                    </Grid>
+
+                    <!-- Timer -->
+                    <TextBlock Text="Self-Timer"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               FontSize="14"
+                               Margin="0,16,0,8"/>
+                    <StackPanel Orientation="Horizontal">
+                        <RadioButton x:Name="TimerOff" Content="Off" GroupName="Timer"
+                                     IsChecked="True" Foreground="{StaticResource TextPrimaryBrush}"
+                                     Margin="0,0,16,0"/>
+                        <RadioButton x:Name="Timer3s" Content="3s" GroupName="Timer"
+                                     Foreground="{StaticResource TextPrimaryBrush}"
+                                     Margin="0,0,16,0"/>
+                        <RadioButton x:Name="Timer10s" Content="10s" GroupName="Timer"
+                                     Foreground="{StaticResource TextPrimaryBrush}"/>
+                    </StackPanel>
+
+                    <!-- Resolution -->
+                    <TextBlock Text="Photo Resolution"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               FontSize="14"
+                               Margin="0,16,0,8"/>
+                    <ComboBox x:Name="ResolutionCombo"
+                              SelectedIndex="0"
+                              Background="{StaticResource SurfaceBrush}"
+                              Foreground="{StaticResource TextPrimaryBrush}">
+                        <ComboBoxItem Content="12 MP (4032 x 3024)"/>
+                        <ComboBoxItem Content="8 MP (3264 x 2448)"/>
+                        <ComboBoxItem Content="5 MP (2592 x 1944)"/>
+                        <ComboBoxItem Content="2 MP (1600 x 1200)"/>
+                    </ComboBox>
+
+                    <!-- Close Settings -->
+                    <Button Content="Close Settings"
+                            Margin="0,32,0,0"
+                            Padding="16,12"
+                            Background="{StaticResource SurfaceBrush}"
+                            Foreground="{StaticResource TextPrimaryBrush}"
+                            BorderThickness="0"
+                            Click="CloseSettings_Click"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Countdown Overlay -->
+        <Border x:Name="CountdownOverlay" Grid.RowSpan="4"
+                Background="#80000000"
+                Visibility="Collapsed">
+            <TextBlock x:Name="CountdownText"
+                       Text="3"
+                       FontSize="144"
+                       FontWeight="Bold"
+                       Foreground="{StaticResource TextPrimaryBrush}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"/>
+        </Border>
+
+        <!-- Capture Flash Effect -->
+        <Border x:Name="FlashOverlay" Grid.RowSpan="4"
+                Background="White"
+                Opacity="0"
+                IsHitTestVisible="False"/>
+
+    </Grid>
+</Window>

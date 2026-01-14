@@ -17,8 +17,10 @@ namespace WindowsPhoneNext.ClaudeCode
         private readonly string _settingsFilePath;
         private readonly ObservableCollection<ChatMessage> _messages = new();
         private readonly ObservableCollection<SavedRepository> _savedRepos = new();
+        private readonly ObservableCollection<QueuedTask> _taskQueue = new();
         private SpeechRecognitionEngine? _speechRecognizer;
         private bool _isListening;
+        private bool _isClaudeWorking;
         private string _selectedProvider = "github";
         private SavedRepository? _currentRepo;
         private Process? _claudeProcess;
@@ -38,9 +40,11 @@ namespace WindowsPhoneNext.ClaudeCode
             // Bind collections
             ChatMessages.ItemsSource = _messages;
             SavedReposList.ItemsSource = _savedRepos;
+            TaskQueueList.ItemsSource = _taskQueue;
 
             LoadSettings();
             InitializeSpeechRecognition();
+            UpdateQueueUI();
 
             // Welcome message
             AddMessage("Hello! I'm Claude Code. Tell me which repository you'd like to work with, or tap the settings icon to configure one. You can type or use voice input!", false);
@@ -187,6 +191,49 @@ namespace WindowsPhoneNext.ClaudeCode
             ProcessUserMessage(text);
         }
 
+        private void AddToQueue()
+        {
+            var text = MessageInput.Text.Trim();
+            if (string.IsNullOrEmpty(text)) return;
+
+            var task = new QueuedTask
+            {
+                Prompt = text,
+                AddedAt = DateTime.Now
+            };
+
+            _taskQueue.Add(task);
+            UpdateQueueUI();
+
+            AddMessage($"📋 Added to queue: \"{text}\"", true);
+            MessageInput.Text = "";
+            SendButton.IsEnabled = false;
+        }
+
+        private void UpdateQueueUI()
+        {
+            // Update queue visibility and count
+            QueuePanel.Visibility = _taskQueue.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+            QueueCountText.Text = $"{_taskQueue.Count} task{(_taskQueue.Count == 1 ? "" : "s")} in queue";
+
+            // Show/hide queue button based on Claude working state
+            QueueButton.Visibility = _isClaudeWorking ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private async void ProcessNextQueuedTask()
+        {
+            if (_taskQueue.Count == 0) return;
+
+            var nextTask = _taskQueue[0];
+            _taskQueue.RemoveAt(0);
+            UpdateQueueUI();
+
+            AddMessage($"⏳ Processing queued task: \"{nextTask.Prompt}\"", false);
+
+            // Send to Claude Code
+            await SendToClaudeCode(nextTask.Prompt);
+        }
+
         private async void ProcessUserMessage(string message)
         {
             // Check if user is trying to set a repo
@@ -222,6 +269,9 @@ namespace WindowsPhoneNext.ClaudeCode
 
         private async System.Threading.Tasks.Task SendToClaudeCode(string prompt)
         {
+            _isClaudeWorking = true;
+            UpdateQueueUI();
+
             TypingIndicator.Visibility = Visibility.Visible;
             StatusText.Text = "Claude is working...";
 
@@ -296,9 +346,18 @@ namespace WindowsPhoneNext.ClaudeCode
             {
                 Dispatcher.Invoke(() =>
                 {
+                    _isClaudeWorking = false;
                     TypingIndicator.Visibility = Visibility.Collapsed;
                     StatusText.Text = _currentRepo != null ? $"Connected: {_currentRepo.Name}" : "Ready";
                     _claudeProcess = null;
+                    UpdateQueueUI();
+
+                    // Process next queued task if any
+                    if (_taskQueue.Count > 0)
+                    {
+                        AddMessage($"✅ Task complete! Processing next item from queue ({_taskQueue.Count} remaining)...", false);
+                        ProcessNextQueuedTask();
+                    }
                 });
             }
         }
@@ -306,6 +365,29 @@ namespace WindowsPhoneNext.ClaudeCode
         private void SendButton_Click(object sender, RoutedEventArgs e)
         {
             SendMessage();
+        }
+
+        private void QueueButton_Click(object sender, RoutedEventArgs e)
+        {
+            AddToQueue();
+        }
+
+        private void RemoveFromQueue_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is QueuedTask task)
+            {
+                _taskQueue.Remove(task);
+                UpdateQueueUI();
+                AddMessage($"🗑️ Removed from queue: \"{task.Prompt}\"", false);
+            }
+        }
+
+        private void ClearQueue_Click(object sender, RoutedEventArgs e)
+        {
+            var count = _taskQueue.Count;
+            _taskQueue.Clear();
+            UpdateQueueUI();
+            AddMessage($"🗑️ Cleared {count} task{(count == 1 ? "" : "s")} from queue", false);
         }
 
         private void MessageInput_KeyDown(object sender, KeyEventArgs e)
@@ -657,6 +739,14 @@ namespace WindowsPhoneNext.ClaudeCode
         public string Url { get; set; } = "";
         public string Name { get; set; } = "";
         public string? Path { get; set; }
+    }
+
+    public class QueuedTask
+    {
+        public string Prompt { get; set; } = "";
+        public DateTime AddedAt { get; set; }
+        public string TimeString => AddedAt.ToString("HH:mm");
+        public string ShortPrompt => Prompt.Length > 50 ? Prompt.Substring(0, 47) + "..." : Prompt;
     }
 
     public class ClaudeCodeSettings

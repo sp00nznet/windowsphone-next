@@ -14,6 +14,7 @@
             <RowDefinition Height="60"/>      <!-- Header -->
             <RowDefinition Height="Auto"/>    <!-- Repo Info -->
             <RowDefinition Height="*"/>       <!-- Chat Messages -->
+            <RowDefinition Height="Auto"/>    <!-- Queue Panel -->
             <RowDefinition Height="Auto"/>    <!-- Input Area -->
             <RowDefinition Height="100"/>     <!-- Bottom Navigation -->
         </Grid.RowDefinitions>
@@ -138,11 +139,89 @@
             </Border>
         </Border>
 
+        <!-- Queue Panel (shows when there are queued tasks) -->
+        <Border x:Name="QueuePanel"
+               Grid.Row="3"
+               Background="{StaticResource CardBrush}"
+               Margin="12,0,12,8"
+               CornerRadius="8"
+               Padding="12"
+               Visibility="Collapsed">
+            <StackPanel>
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0"
+                              Text="📋"
+                              FontSize="16"
+                              VerticalAlignment="Center"
+                              Margin="0,0,8,0"/>
+                    <TextBlock x:Name="QueueCountText"
+                              Grid.Column="1"
+                              Text="0 tasks in queue"
+                              FontSize="14"
+                              FontWeight="SemiBold"
+                              Foreground="{StaticResource TextPrimaryBrush}"
+                              VerticalAlignment="Center"/>
+                    <Button Grid.Column="2"
+                           Content="Clear All"
+                           Style="{StaticResource SecondaryButtonStyle}"
+                           Padding="8,4"
+                           FontSize="12"
+                           Click="ClearQueue_Click"/>
+                </Grid>
+                <ItemsControl x:Name="TaskQueueList" MaxHeight="150">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="{StaticResource SurfaceBrush}"
+                                   CornerRadius="6"
+                                   Padding="10,8"
+                                   Margin="0,0,0,4">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding ShortPrompt}"
+                                                  FontSize="13"
+                                                  Foreground="{StaticResource TextPrimaryBrush}"
+                                                  TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding TimeString}"
+                                                  FontSize="11"
+                                                  Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="1"
+                                              Text="⏳"
+                                              FontSize="14"
+                                              VerticalAlignment="Center"
+                                              Margin="8,0"/>
+                                    <Button Grid.Column="2"
+                                           Content="✕"
+                                           Style="{StaticResource SecondaryButtonStyle}"
+                                           Padding="6,2"
+                                           FontSize="12"
+                                           Tag="{Binding}"
+                                           Click="RemoveFromQueue_Click"
+                                           ToolTip="Remove from queue"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Border>
+
         <!-- Input Area -->
-        <Border Grid.Row="3" Margin="12,0,12,8">
+        <Border Grid.Row="4" Margin="12,0,12,8">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
@@ -153,8 +232,20 @@
                         KeyDown="MessageInput_KeyDown"
                         TextChanged="MessageInput_TextChanged"/>
 
-                <Button x:Name="SendButton"
+                <Button x:Name="QueueButton"
                        Grid.Column="1"
+                       Style="{StaticResource IconButtonStyle}"
+                       Width="48"
+                       Height="48"
+                       Margin="8,0,0,0"
+                       Click="QueueButton_Click"
+                       Visibility="Collapsed"
+                       ToolTip="Add to Queue (Claude is busy)">
+                    <TextBlock Text="📋" FontSize="18"/>
+                </Button>
+
+                <Button x:Name="SendButton"
+                       Grid.Column="2"
                        Style="{StaticResource IconButtonStyle}"
                        Width="48"
                        Height="48"
@@ -166,7 +257,7 @@
                 </Button>
 
                 <Button x:Name="MicButton"
-                       Grid.Column="2"
+                       Grid.Column="3"
                        Style="{StaticResource MicButtonStyle}"
                        Width="48"
                        Height="48"
@@ -179,7 +270,7 @@
         </Border>
 
         <!-- Bottom Navigation -->
-        <Border Grid.Row="4" Background="{StaticResource SurfaceBrush}">
+        <Border Grid.Row="5" Background="{StaticResource SurfaceBrush}">
             <Grid Margin="40,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -215,7 +306,7 @@
 
         <!-- Settings Panel Overlay -->
         <Border x:Name="SettingsPanel"
-               Grid.RowSpan="5"
+               Grid.RowSpan="6"
                Background="#CC000000"
                Visibility="Collapsed"
                MouseDown="SettingsPanel_MouseDown">

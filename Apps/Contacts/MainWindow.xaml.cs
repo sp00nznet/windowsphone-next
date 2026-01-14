@@ -5,6 +5,8 @@ using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
+using WindowsPhone.Shared;
 
 namespace WindowsPhoneNext.Contacts;
 
@@ -142,8 +144,60 @@ public partial class MainWindow : Window
             EmailSection.Visibility = Visibility.Collapsed;
         }
 
+        // Update block status UI
+        UpdateBlockStatusUI(contact.Phone);
+
         ContactListView.Visibility = Visibility.Collapsed;
         ContactDetailView.Visibility = Visibility.Visible;
+    }
+
+    private void UpdateBlockStatusUI(string phoneNumber)
+    {
+        var isBlocked = BlockingService.Instance.IsBlocked(phoneNumber);
+
+        BlockedBanner.Visibility = isBlocked ? Visibility.Visible : Visibility.Collapsed;
+
+        if (isBlocked)
+        {
+            BlockButton.Content = "✓ Unblock Contact";
+            BlockButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#166534"));
+        }
+        else
+        {
+            BlockButton.Content = "🚫 Block Contact";
+            BlockButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#991B1B"));
+        }
+    }
+
+    private void BlockContact_Click(object sender, RoutedEventArgs e)
+    {
+        if (_selectedContact == null) return;
+
+        var isBlocked = BlockingService.Instance.IsBlocked(_selectedContact.Phone);
+
+        if (isBlocked)
+        {
+            // Unblock
+            BlockingService.Instance.Unblock(_selectedContact.Phone);
+        }
+        else
+        {
+            // Block
+            var result = MessageBox.Show(
+                $"Block {_selectedContact.Name}?\n\nThey won't be able to call or message you.",
+                "Block Contact",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (result != MessageBoxResult.Yes) return;
+
+            BlockingService.Instance.Block(
+                _selectedContact.Phone,
+                _selectedContact.Name,
+                "Blocked from Contacts app");
+        }
+
+        UpdateBlockStatusUI(_selectedContact.Phone);
     }
 
     private void BackToList_Click(object sender, RoutedEventArgs e)

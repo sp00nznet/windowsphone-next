@@ -245,12 +245,36 @@
                         </StackPanel>
                     </Border>
 
+                    <!-- Block Status Banner -->
+                    <Border x:Name="BlockedBanner"
+                            Background="#7F1D1D"
+                            CornerRadius="8"
+                            Padding="12"
+                            Margin="0,16,0,0"
+                            Visibility="Collapsed">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <TextBlock Text="🚫" FontSize="16" Margin="0,0,8,0"/>
+                            <TextBlock Text="This contact is blocked"
+                                      FontSize="14"
+                                      Foreground="#FCA5A5"/>
+                        </StackPanel>
+                    </Border>
+
                     <!-- Edit Button -->
                     <Button Style="{StaticResource PrimaryButtonStyle}"
                            Content="Edit Contact"
                            HorizontalAlignment="Stretch"
                            Margin="0,24,0,0"
                            Click="EditContact_Click"/>
+
+                    <!-- Block/Unblock Button -->
+                    <Button x:Name="BlockButton"
+                           Style="{StaticResource PrimaryButtonStyle}"
+                           Content="🚫 Block Contact"
+                           HorizontalAlignment="Stretch"
+                           Margin="0,12,0,0"
+                           Background="#991B1B"
+                           Click="BlockContact_Click"/>
                 </StackPanel>
             </ScrollViewer>
         </Grid>
