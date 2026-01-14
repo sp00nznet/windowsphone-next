@@ -27,15 +27,15 @@ public partial class MainWindow : Window
         {
             new AppInfo { Name = "Phone", Icon = "\U0001F4DE", AppPath = "Dialer", Shortcut = Key.P },
             new AppInfo { Name = "Messages", Icon = "\U0001F4AC", AppPath = "Messaging", Shortcut = Key.M },
+            new AppInfo { Name = "Contacts", Icon = "\U0001F464", AppPath = "Contacts", Shortcut = Key.O },
             new AppInfo { Name = "Browser", Icon = "\U0001F310", AppPath = "Browser", Shortcut = Key.B },
+            new AppInfo { Name = "Gmail", Icon = "\U0001F4E7", AppPath = "Gmail", Shortcut = Key.E },
             new AppInfo { Name = "Maps", Icon = "\U0001F5FA\uFE0F", AppPath = "Maps", Shortcut = Key.N },
             new AppInfo { Name = "Music", Icon = "\U0001F3B5", AppPath = "Music", Shortcut = Key.U },
             new AppInfo { Name = "Calendar", Icon = "\U0001F4C5", AppPath = "Calendar", Shortcut = Key.C },
             new AppInfo { Name = "Gallery", Icon = "\U0001F5BC\uFE0F", AppPath = "Gallery", Shortcut = Key.G },
             new AppInfo { Name = "Camera", Icon = "\U0001F4F7", AppPath = "Camera", Shortcut = Key.None },
             new AppInfo { Name = "Settings", Icon = "\u2699\uFE0F", AppPath = "Settings", Shortcut = Key.S },
-            new AppInfo { Name = "Clock", Icon = "\U0001F552", AppPath = "Clock", Shortcut = Key.None },
-            new AppInfo { Name = "Notes", Icon = "\U0001F4DD", AppPath = "Notes", Shortcut = Key.None },
             new AppInfo { Name = "Files", Icon = "\U0001F4C2", AppPath = "Files", Shortcut = Key.None }
         };
 

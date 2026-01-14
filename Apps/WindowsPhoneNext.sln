@@ -21,6 +21,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsPhoneCalendar", "Cal
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsPhoneGallery", "Gallery\WindowsPhoneGallery.csproj", "{C9D0E1F2-A3B4-5678-CDEF-901234567890}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsPhoneContacts", "Contacts\WindowsPhoneContacts.csproj", "{D0E1F2A3-B4C5-6789-DEFA-012345678901}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsPhoneGmail", "Gmail\WindowsPhoneGmail.csproj", "{E1F2A3B4-C5D6-7890-EFAB-123456789012}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,5 +67,13 @@ Global
 		{C9D0E1F2-A3B4-5678-CDEF-901234567890}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C9D0E1F2-A3B4-5678-CDEF-901234567890}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C9D0E1F2-A3B4-5678-CDEF-901234567890}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0E1F2A3-B4C5-6789-DEFA-012345678901}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0E1F2A3-B4C5-6789-DEFA-012345678901}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0E1F2A3-B4C5-6789-DEFA-012345678901}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0E1F2A3-B4C5-6789-DEFA-012345678901}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1F2A3B4-C5D6-7890-EFAB-123456789012}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1F2A3B4-C5D6-7890-EFAB-123456789012}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1F2A3B4-C5D6-7890-EFAB-123456789012}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1F2A3B4-C5D6-7890-EFAB-123456789012}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
