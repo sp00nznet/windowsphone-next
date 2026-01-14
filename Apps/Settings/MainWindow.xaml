@@ -45,12 +45,372 @@
                      Padding="20">
             <StackPanel>
 
-                <!-- Display Section -->
-                <TextBlock Text="Display"
-                          FontSize="14"
-                          FontWeight="SemiBold"
-                          Foreground="{StaticResource TextSecondaryBrush}"
+                <!-- ==================== BLUETOOTH SECTION ==================== -->
+                <TextBlock Text="Bluetooth"
+                          Style="{StaticResource SectionHeaderStyle}"
                           Margin="0,0,0,12"/>
+
+                <!-- Bluetooth Toggle -->
+                <Border Style="{StaticResource SettingsItemStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Bluetooth"
+                                      FontSize="16"
+                                      FontWeight="SemiBold"
+                                      Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <TextBlock x:Name="BluetoothStatusText"
+                                      Text="Off"
+                                      FontSize="12"
+                                      Foreground="{StaticResource TextSecondaryBrush}"
+                                      Margin="0,4,0,0"/>
+                        </StackPanel>
+                        <CheckBox x:Name="BluetoothToggle"
+                                 Grid.Column="1"
+                                 Style="{StaticResource ToggleSwitchStyle}"
+                                 Checked="BluetoothToggle_Changed"
+                                 Unchecked="BluetoothToggle_Changed"
+                                 VerticalAlignment="Center"/>
+                    </Grid>
+                </Border>
+
+                <!-- Bluetooth Scan Button -->
+                <Button x:Name="BluetoothScanButton"
+                       Style="{StaticResource PrimaryButtonStyle}"
+                       Click="BluetoothScan_Click"
+                       Margin="0,0,0,12"
+                       IsEnabled="False"
+                       HorizontalAlignment="Stretch">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#x1F50D;" FontSize="16" Margin="0,0,8,0"/>
+                        <TextBlock x:Name="BluetoothScanButtonText" Text="Scan for Devices"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- Paired Devices -->
+                <Border Style="{StaticResource SettingsItemStyle}">
+                    <StackPanel>
+                        <TextBlock Text="Paired Devices"
+                                  FontSize="14"
+                                  FontWeight="SemiBold"
+                                  Foreground="{StaticResource TextPrimaryBrush}"
+                                  Margin="0,0,0,12"/>
+                        <ItemsControl x:Name="PairedBluetoothDevices">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource DeviceItemStyle}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0"
+                                                      Text="&#x1F4F1;"
+                                                      FontSize="20"
+                                                      Foreground="{StaticResource BluetoothBrush}"
+                                                      VerticalAlignment="Center"
+                                                      Margin="0,0,12,0"/>
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Name}"
+                                                          FontSize="14"
+                                                          Foreground="{StaticResource TextPrimaryBrush}"/>
+                                                <TextBlock Text="{Binding Status}"
+                                                          FontSize="12"
+                                                          Foreground="{StaticResource TextSecondaryBrush}"/>
+                                            </StackPanel>
+                                            <Button Grid.Column="2"
+                                                   Content="Forget"
+                                                   Style="{StaticResource DangerButtonStyle}"
+                                                   Padding="12,6"
+                                                   FontSize="12"
+                                                   Tag="{Binding Id}"
+                                                   Click="ForgetBluetoothDevice_Click"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock x:Name="NoPairedBluetoothText"
+                                  Text="No paired devices"
+                                  FontSize="14"
+                                  Foreground="{StaticResource TextSecondaryBrush}"
+                                  HorizontalAlignment="Center"
+                                  Visibility="Visible"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Available Devices -->
+                <Border x:Name="AvailableBluetoothSection"
+                       Style="{StaticResource SettingsItemStyle}"
+                       Visibility="Collapsed">
+                    <StackPanel>
+                        <TextBlock Text="Available Devices"
+                                  FontSize="14"
+                                  FontWeight="SemiBold"
+                                  Foreground="{StaticResource TextPrimaryBrush}"
+                                  Margin="0,0,0,12"/>
+                        <ItemsControl x:Name="AvailableBluetoothDevices">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource DeviceItemStyle}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0"
+                                                      Text="&#x1F4F1;"
+                                                      FontSize="20"
+                                                      Foreground="{StaticResource TextSecondaryBrush}"
+                                                      VerticalAlignment="Center"
+                                                      Margin="0,0,12,0"/>
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Name}"
+                                                          FontSize="14"
+                                                          Foreground="{StaticResource TextPrimaryBrush}"/>
+                                                <TextBlock Text="{Binding Address}"
+                                                          FontSize="12"
+                                                          Foreground="{StaticResource TextSecondaryBrush}"/>
+                                            </StackPanel>
+                                            <Button Grid.Column="2"
+                                                   Content="Pair"
+                                                   Style="{StaticResource PrimaryButtonStyle}"
+                                                   Padding="12,6"
+                                                   FontSize="12"
+                                                   Tag="{Binding Id}"
+                                                   Click="PairBluetoothDevice_Click"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock x:Name="NoAvailableBluetoothText"
+                                  Text="Scanning..."
+                                  FontSize="14"
+                                  Foreground="{StaticResource TextSecondaryBrush}"
+                                  HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- ==================== WIFI SECTION ==================== -->
+                <TextBlock Text="Wi-Fi"
+                          Style="{StaticResource SectionHeaderStyle}"/>
+
+                <!-- WiFi Toggle -->
+                <Border Style="{StaticResource SettingsItemStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Wi-Fi"
+                                      FontSize="16"
+                                      FontWeight="SemiBold"
+                                      Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <TextBlock x:Name="WifiStatusText"
+                                      Text="Off"
+                                      FontSize="12"
+                                      Foreground="{StaticResource TextSecondaryBrush}"
+                                      Margin="0,4,0,0"/>
+                        </StackPanel>
+                        <CheckBox x:Name="WifiToggle"
+                                 Grid.Column="1"
+                                 Style="{StaticResource ToggleSwitchStyle}"
+                                 Checked="WifiToggle_Changed"
+                                 Unchecked="WifiToggle_Changed"
+                                 VerticalAlignment="Center"/>
+                    </Grid>
+                </Border>
+
+                <!-- WiFi Scan Button -->
+                <Button x:Name="WifiScanButton"
+                       Style="{StaticResource PrimaryButtonStyle}"
+                       Click="WifiScan_Click"
+                       Margin="0,0,0,12"
+                       IsEnabled="False"
+                       HorizontalAlignment="Stretch">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#x1F50D;" FontSize="16" Margin="0,0,8,0"/>
+                        <TextBlock x:Name="WifiScanButtonText" Text="Scan for Networks"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- Connected Network -->
+                <Border x:Name="ConnectedWifiSection"
+                       Style="{StaticResource SettingsItemStyle}"
+                       Visibility="Collapsed">
+                    <StackPanel>
+                        <TextBlock Text="Connected"
+                                  FontSize="14"
+                                  FontWeight="SemiBold"
+                                  Foreground="{StaticResource TextPrimaryBrush}"
+                                  Margin="0,0,0,12"/>
+                        <Border Style="{StaticResource DeviceItemStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0"
+                                          Text="&#x1F4F6;"
+                                          FontSize="20"
+                                          Foreground="{StaticResource WifiBrush}"
+                                          VerticalAlignment="Center"
+                                          Margin="0,0,12,0"/>
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock x:Name="ConnectedWifiName"
+                                              Text="Network Name"
+                                              FontSize="14"
+                                              Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <TextBlock x:Name="ConnectedWifiStatus"
+                                              Text="Connected"
+                                              FontSize="12"
+                                              Foreground="{StaticResource AccentBrush}"/>
+                                </StackPanel>
+                                <Button Grid.Column="2"
+                                       Content="Disconnect"
+                                       Style="{StaticResource SecondaryButtonStyle}"
+                                       Padding="12,6"
+                                       FontSize="12"
+                                       Click="DisconnectWifi_Click"/>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <!-- Saved Networks -->
+                <Border Style="{StaticResource SettingsItemStyle}">
+                    <StackPanel>
+                        <TextBlock Text="Saved Networks"
+                                  FontSize="14"
+                                  FontWeight="SemiBold"
+                                  Foreground="{StaticResource TextPrimaryBrush}"
+                                  Margin="0,0,0,12"/>
+                        <ItemsControl x:Name="SavedWifiNetworks">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource DeviceItemStyle}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0"
+                                                      Text="&#x1F4F6;"
+                                                      FontSize="20"
+                                                      Foreground="{StaticResource TextSecondaryBrush}"
+                                                      VerticalAlignment="Center"
+                                                      Margin="0,0,12,0"/>
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Ssid}"
+                                                          FontSize="14"
+                                                          Foreground="{StaticResource TextPrimaryBrush}"/>
+                                                <TextBlock Text="Saved"
+                                                          FontSize="12"
+                                                          Foreground="{StaticResource TextSecondaryBrush}"/>
+                                            </StackPanel>
+                                            <Button Grid.Column="2"
+                                                   Content="Connect"
+                                                   Style="{StaticResource PrimaryButtonStyle}"
+                                                   Padding="12,6"
+                                                   FontSize="12"
+                                                   Tag="{Binding Ssid}"
+                                                   Click="ConnectSavedWifi_Click"
+                                                   Margin="0,0,8,0"/>
+                                            <Button Grid.Column="3"
+                                                   Content="Forget"
+                                                   Style="{StaticResource DangerButtonStyle}"
+                                                   Padding="12,6"
+                                                   FontSize="12"
+                                                   Tag="{Binding Ssid}"
+                                                   Click="ForgetWifi_Click"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock x:Name="NoSavedWifiText"
+                                  Text="No saved networks"
+                                  FontSize="14"
+                                  Foreground="{StaticResource TextSecondaryBrush}"
+                                  HorizontalAlignment="Center"
+                                  Visibility="Visible"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Available Networks -->
+                <Border x:Name="AvailableWifiSection"
+                       Style="{StaticResource SettingsItemStyle}"
+                       Visibility="Collapsed">
+                    <StackPanel>
+                        <TextBlock Text="Available Networks"
+                                  FontSize="14"
+                                  FontWeight="SemiBold"
+                                  Foreground="{StaticResource TextPrimaryBrush}"
+                                  Margin="0,0,0,12"/>
+                        <ItemsControl x:Name="AvailableWifiNetworks">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource DeviceItemStyle}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0"
+                                                      Text="&#x1F4F6;"
+                                                      FontSize="20"
+                                                      Foreground="{StaticResource TextSecondaryBrush}"
+                                                      VerticalAlignment="Center"
+                                                      Margin="0,0,12,0"/>
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Ssid}"
+                                                          FontSize="14"
+                                                          Foreground="{StaticResource TextPrimaryBrush}"/>
+                                                <TextBlock Text="{Binding Security}"
+                                                          FontSize="12"
+                                                          Foreground="{StaticResource TextSecondaryBrush}"/>
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="2"
+                                                      Text="{Binding SignalStrength}"
+                                                      FontSize="12"
+                                                      Foreground="{StaticResource TextSecondaryBrush}"
+                                                      VerticalAlignment="Center"
+                                                      Margin="0,0,12,0"/>
+                                            <Button Grid.Column="3"
+                                                   Content="Connect"
+                                                   Style="{StaticResource PrimaryButtonStyle}"
+                                                   Padding="12,6"
+                                                   FontSize="12"
+                                                   Tag="{Binding Ssid}"
+                                                   Click="ConnectWifi_Click"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock x:Name="NoAvailableWifiText"
+                                  Text="Scanning..."
+                                  FontSize="14"
+                                  Foreground="{StaticResource TextSecondaryBrush}"
+                                  HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- ==================== DISPLAY SECTION ==================== -->
+                <TextBlock Text="Display"
+                          Style="{StaticResource SectionHeaderStyle}"/>
 
                 <!-- Display Info -->
                 <Border Style="{StaticResource SettingsItemStyle}">
@@ -70,31 +430,9 @@
                     </StackPanel>
                 </Border>
 
-                <!-- System Section -->
+                <!-- ==================== SYSTEM SECTION ==================== -->
                 <TextBlock Text="System"
-                          FontSize="14"
-                          FontWeight="SemiBold"
-                          Foreground="{StaticResource TextSecondaryBrush}"
-                          Margin="0,20,0,12"/>
-
-                <!-- About -->
-                <Border Style="{StaticResource SettingsItemStyle}">
-                    <StackPanel>
-                        <TextBlock Text="About"
-                                  FontSize="16"
-                                  FontWeight="SemiBold"
-                                  Foreground="{StaticResource TextPrimaryBrush}"
-                                  Margin="0,0,0,8"/>
-
-                        <TextBlock Text="Windows Phone Next"
-                                  FontSize="14"
-                                  Foreground="{StaticResource TextSecondaryBrush}"/>
-                        <TextBlock Text="Version 1.0.0"
-                                  FontSize="12"
-                                  Foreground="{StaticResource TextSecondaryBrush}"
-                                  Margin="0,4,0,0"/>
-                    </StackPanel>
-                </Border>
+                          Style="{StaticResource SectionHeaderStyle}"/>
 
                 <!-- Storage Info -->
                 <Border Style="{StaticResource SettingsItemStyle}">
@@ -112,7 +450,123 @@
                     </StackPanel>
                 </Border>
 
+                <!-- ==================== ABOUT PHONE SECTION ==================== -->
+                <TextBlock Text="About Phone"
+                          Style="{StaticResource SectionHeaderStyle}"/>
+
+                <Border Style="{StaticResource SettingsItemStyle}">
+                    <StackPanel>
+                        <!-- Device Name -->
+                        <StackPanel Margin="0,0,0,16">
+                            <TextBlock Text="Device Name"
+                                      Style="{StaticResource InfoLabelStyle}"/>
+                            <TextBlock Text="Windows Phone Next"
+                                      Style="{StaticResource InfoValueStyle}"/>
+                        </StackPanel>
+
+                        <!-- Version -->
+                        <StackPanel Margin="0,0,0,16">
+                            <TextBlock Text="Version"
+                                      Style="{StaticResource InfoLabelStyle}"/>
+                            <TextBlock Text="1.0.0"
+                                      Style="{StaticResource InfoValueStyle}"/>
+                        </StackPanel>
+
+                        <!-- Phone Number -->
+                        <StackPanel Margin="0,0,0,16">
+                            <TextBlock Text="Phone Number"
+                                      Style="{StaticResource InfoLabelStyle}"/>
+                            <TextBlock x:Name="PhoneNumberText"
+                                      Text="Loading..."
+                                      Style="{StaticResource InfoValueStyle}"/>
+                        </StackPanel>
+
+                        <!-- IMEI -->
+                        <StackPanel Margin="0,0,0,16">
+                            <TextBlock Text="IMEI"
+                                      Style="{StaticResource InfoLabelStyle}"/>
+                            <TextBlock x:Name="ImeiText"
+                                      Text="Loading..."
+                                      Style="{StaticResource InfoValueStyle}"/>
+                        </StackPanel>
+
+                        <!-- Modem Info -->
+                        <StackPanel Margin="0,0,0,16">
+                            <TextBlock Text="Modem"
+                                      Style="{StaticResource InfoLabelStyle}"/>
+                            <TextBlock x:Name="ModemInfoText"
+                                      Text="Loading..."
+                                      Style="{StaticResource InfoValueStyle}"/>
+                        </StackPanel>
+
+                        <!-- Network Operator -->
+                        <StackPanel Margin="0,0,0,16">
+                            <TextBlock Text="Network Operator"
+                                      Style="{StaticResource InfoLabelStyle}"/>
+                            <TextBlock x:Name="OperatorText"
+                                      Text="Loading..."
+                                      Style="{StaticResource InfoValueStyle}"/>
+                        </StackPanel>
+
+                        <!-- Signal Strength -->
+                        <StackPanel Margin="0,0,0,0">
+                            <TextBlock Text="Signal Strength"
+                                      Style="{StaticResource InfoLabelStyle}"/>
+                            <TextBlock x:Name="SignalStrengthText"
+                                      Text="Loading..."
+                                      Style="{StaticResource InfoValueStyle}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Spacing at bottom -->
+                <Border Height="40"/>
+
             </StackPanel>
         </ScrollViewer>
+
+        <!-- WiFi Password Dialog Overlay -->
+        <Border x:Name="WifiPasswordDialog"
+               Grid.RowSpan="2"
+               Background="#CC000000"
+               Visibility="Collapsed">
+            <Border Background="{StaticResource CardBrush}"
+                   CornerRadius="16"
+                   Padding="24"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center"
+                   Width="600">
+                <StackPanel>
+                    <TextBlock Text="Enter Password"
+                              FontSize="20"
+                              FontWeight="SemiBold"
+                              Foreground="{StaticResource TextPrimaryBrush}"
+                              Margin="0,0,0,8"/>
+                    <TextBlock x:Name="WifiDialogNetworkName"
+                              Text="Network Name"
+                              FontSize="14"
+                              Foreground="{StaticResource TextSecondaryBrush}"
+                              Margin="0,0,0,20"/>
+
+                    <TextBlock Text="Password"
+                              FontSize="12"
+                              Foreground="{StaticResource TextSecondaryBrush}"
+                              Margin="0,0,0,8"/>
+                    <PasswordBox x:Name="WifiPasswordInput"
+                                Style="{StaticResource PasswordInputStyle}"
+                                Margin="0,0,0,20"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Cancel"
+                               Style="{StaticResource SecondaryButtonStyle}"
+                               Click="WifiPasswordCancel_Click"
+                               Margin="0,0,12,0"/>
+                        <Button Content="Connect"
+                               Style="{StaticResource PrimaryButtonStyle}"
+                               Click="WifiPasswordConnect_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
     </Grid>
 </Window>

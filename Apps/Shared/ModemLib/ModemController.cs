@@ -439,6 +439,23 @@ public class ModemController : IDisposable
     }
 
     /// <summary>
+    /// Get phone number from SIM
+    /// </summary>
+    public async Task<string?> GetPhoneNumberAsync()
+    {
+        // AT+CNUM returns the phone number stored on the SIM
+        var response = await SendCommandAsync("AT+CNUM");
+
+        var match = Regex.Match(response, @"\+CNUM:\s*""[^""]*"",""([^""]+)""");
+        if (match.Success)
+        {
+            return match.Groups[1].Value;
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Get modem model info
     /// </summary>
     public async Task<ModemInfo> GetModemInfoAsync()
