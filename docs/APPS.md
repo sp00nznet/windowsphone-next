@@ -25,6 +25,7 @@ The main home screen and entry point for the phone.
 | **U** | 🎵 Music | **V** | 🎬 Video |
 | **C** | 📅 Calendar | **G** | 🖼️ Gallery |
 | **S** | ⚙️ Settings | **A** | 📦 Android |
+| **T** | 🖥️ Terminal | **L** | 🤖 Claude |
 | **1-9** | Launch app by position | **Esc** | Exit app |
 
 ---
@@ -299,13 +300,140 @@ User's Pictures folder (`%USERPROFILE%\Pictures`)
 
 ## ⚙️ Settings
 
-System configuration and information display.
+Comprehensive system configuration and connectivity management.
 
 ### ✨ Features
-- 📊 Display information (resolution, aspect ratio)
-- 🖥️ System information
-- 🎭 Demo mode toggles for hardware-dependent apps
-- 🔧 Configuration options
+
+#### Bluetooth
+- 🔵 Toggle Bluetooth on/off
+- 🔍 Scan for nearby Bluetooth devices
+- 📱 View paired devices list
+- ➕ Pair with new devices
+- 🗑️ Forget/unpair devices
+- 💾 Persistent storage of paired devices
+
+#### Wi-Fi
+- 📶 Toggle Wi-Fi on/off
+- 🔍 Scan for available networks
+- 🔗 View currently connected network
+- 📋 Saved networks list with quick connect
+- 🔐 Password dialog for secured networks
+- 🗑️ Forget saved networks
+- 💾 Auto-save successful connections
+
+#### About Phone
+- 📱 Device name and version
+- 📞 Phone number (from SIM)
+- 🔢 IMEI number (from modem)
+- 📡 Modem manufacturer and model
+- 🏢 Network operator name
+- 📊 Signal strength indicator
+
+#### System
+- 📊 Display information (720x1560)
+- 💾 Storage usage statistics
+
+### 💾 Data Storage
+`%LocalAppData%\WindowsPhoneNext\connectivity_settings.json`
+
+### ⌨️ Keyboard Shortcuts
+| Key | Action |
+|:---:|--------|
+| **Esc** | Exit app |
+
+---
+
+## 🖥️ Terminal
+
+Tabbed terminal application supporting multiple shell environments.
+
+### ✨ Features
+- 📑 **Tabbed Interface** with three shells:
+  - **CMD** - Windows Command Prompt (dark gray theme)
+  - **PowerShell** - Windows PowerShell (navy blue theme)
+  - **WSL** - Windows Subsystem for Linux (purple theme)
+- ⌨️ Command input with history navigation
+- 📜 Scrollable output with auto-scroll
+- 🎨 Color-coded tabs and backgrounds for each shell
+- 🔄 Real command execution with output capture
+- ⏹️ Kill running processes (Ctrl+C)
+- 🗑️ Clear screen command
+
+### ⌨️ Keyboard Shortcuts
+| Key | Action |
+|:---:|--------|
+| **1** | Switch to CMD tab |
+| **2** | Switch to PowerShell tab |
+| **3** | Switch to WSL tab |
+| **Up/Down** | Navigate command history |
+| **Ctrl+C** | Kill current process |
+| **Enter** | Execute command |
+| **Esc** | Exit terminal |
+
+### 🎨 Shell Themes
+| Shell | Background Color |
+|-------|-----------------|
+| CMD | `#1E1E1E` (Dark Gray) |
+| PowerShell | `#012456` (Navy Blue) |
+| WSL | `#300A24` (Ubuntu Purple) |
+
+### 📝 Built-in Commands
+- `cd` - Change directory
+- `cls` / `clear` - Clear screen
+- `exit` - Close terminal
+
+---
+
+## 🤖 Claude Code
+
+AI-powered coding assistant with voice and text input for repository management.
+
+### ✨ Features
+- 💬 **Chat Interface** - Conversational interaction with Claude Code
+- 🎤 **Voice Input** - Speak commands using Windows Speech Recognition
+- ⌨️ **Text Input** - Type messages in chat field
+- 📁 **Repository Management**:
+  - GitHub repository support
+  - GitLab repository support
+  - Gitea repository support
+  - Local repository paths
+- 💾 **Saved Repositories** - Quick switch between projects
+- 🔧 **Configurable CLI Path** - Custom Claude Code installation path
+
+### 🎤 Voice Commands
+Simply tap the microphone button and speak naturally:
+- "Work on owner/repo"
+- "Open repo myproject"
+- "Switch to username/repository"
+- Any coding question or task
+
+### 🔗 Supported Git Providers
+| Provider | Format |
+|----------|--------|
+| **GitHub** | `owner/repo` or full URL |
+| **GitLab** | `owner/repo` or full URL |
+| **Gitea** | Full URL required |
+| **Local** | Full file path |
+
+### ⚙️ Settings Panel
+- Select git provider
+- Enter repository URL or path
+- Manage saved repositories
+- Configure Claude Code CLI path
+
+### 💾 Data Storage
+`%LocalAppData%\WindowsPhoneNext\claudecode_settings.json`
+
+### ⌨️ Keyboard Shortcuts
+| Key | Action |
+|:---:|--------|
+| **Enter** | Send message |
+| **Esc** | Close settings panel / Exit app |
+
+### 📋 Requirements
+- Claude Code CLI installed and accessible
+- Windows Speech Recognition (for voice input)
+- Internet connection (for remote repositories)
 
 ---
 

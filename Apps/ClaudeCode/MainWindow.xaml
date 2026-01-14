@@ -1,0 +1,407 @@
+<Window x:Class="WindowsPhoneNext.ClaudeCode.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Claude Code"
+        Width="720" Height="1560"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BackgroundBrush}"
+        KeyDown="Window_KeyDown">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>      <!-- Header -->
+            <RowDefinition Height="Auto"/>    <!-- Repo Info -->
+            <RowDefinition Height="*"/>       <!-- Chat Messages -->
+            <RowDefinition Height="Auto"/>    <!-- Input Area -->
+            <RowDefinition Height="100"/>     <!-- Bottom Navigation -->
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}">
+            <Grid Margin="12,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0"
+                       Style="{StaticResource BackButtonStyle}"
+                       Click="BackButton_Click">
+                    <TextBlock Text="&#x2190;" FontSize="24" Foreground="White"/>
+                </Button>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
+                    <TextBlock Text="Claude Code"
+                              FontSize="18"
+                              FontWeight="Bold"
+                              Foreground="{StaticResource AccentBrush}"/>
+                    <TextBlock x:Name="StatusText"
+                              Text="Ready"
+                              FontSize="12"
+                              Foreground="{StaticResource TextSecondaryBrush}"/>
+                </StackPanel>
+
+                <Button Grid.Column="2"
+                       Style="{StaticResource BackButtonStyle}"
+                       Click="SettingsButton_Click"
+                       ToolTip="Repository Settings">
+                    <TextBlock Text="&#x2699;" FontSize="20" Foreground="White"/>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- Current Repository Info -->
+        <Border Grid.Row="1" Background="{StaticResource CardBrush}" Margin="12,8,12,0" CornerRadius="8" Padding="12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                          Text="&#x1F4C1;"
+                          FontSize="24"
+                          VerticalAlignment="Center"
+                          Margin="0,0,12,0"/>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock x:Name="RepoNameText"
+                              Text="No repository selected"
+                              FontSize="14"
+                              FontWeight="SemiBold"
+                              Foreground="{StaticResource TextPrimaryBrush}"/>
+                    <TextBlock x:Name="RepoProviderText"
+                              Text="Tap settings to configure"
+                              FontSize="12"
+                              Foreground="{StaticResource TextSecondaryBrush}"/>
+                </StackPanel>
+
+                <Button Grid.Column="2"
+                       Content="Change"
+                       Style="{StaticResource SecondaryButtonStyle}"
+                       Padding="12,6"
+                       FontSize="12"
+                       Click="ChangeRepoButton_Click"/>
+            </Grid>
+        </Border>
+
+        <!-- Chat Messages -->
+        <ScrollViewer Grid.Row="2"
+                     x:Name="ChatScrollViewer"
+                     VerticalScrollBarVisibility="Auto"
+                     Margin="12,8,12,8">
+            <ItemsControl x:Name="ChatMessages">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Margin="0,4"
+                               HorizontalAlignment="{Binding Alignment}"
+                               MaxWidth="580">
+                            <Border Background="{Binding BackgroundBrush}"
+                                   CornerRadius="16"
+                                   Padding="16,12">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Content}"
+                                              FontSize="14"
+                                              Foreground="{StaticResource TextPrimaryBrush}"
+                                              TextWrapping="Wrap"/>
+                                    <TextBlock Text="{Binding Timestamp}"
+                                              FontSize="10"
+                                              Foreground="{StaticResource TextSecondaryBrush}"
+                                              HorizontalAlignment="Right"
+                                              Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- Typing Indicator -->
+        <Border x:Name="TypingIndicator"
+               Grid.Row="2"
+               VerticalAlignment="Bottom"
+               HorizontalAlignment="Left"
+               Margin="12,0,0,8"
+               Visibility="Collapsed">
+            <Border Background="{StaticResource CardBrush}"
+                   CornerRadius="12"
+                   Padding="12,8">
+                <TextBlock Text="Claude is thinking..."
+                          FontSize="12"
+                          Foreground="{StaticResource TextSecondaryBrush}"
+                          FontStyle="Italic"/>
+            </Border>
+        </Border>
+
+        <!-- Input Area -->
+        <Border Grid.Row="3" Margin="12,0,12,8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBox x:Name="MessageInput"
+                        Grid.Column="0"
+                        Style="{StaticResource ChatInputStyle}"
+                        KeyDown="MessageInput_KeyDown"
+                        TextChanged="MessageInput_TextChanged"/>
+
+                <Button x:Name="SendButton"
+                       Grid.Column="1"
+                       Style="{StaticResource IconButtonStyle}"
+                       Width="48"
+                       Height="48"
+                       Margin="8,0,0,0"
+                       Click="SendButton_Click"
+                       IsEnabled="False"
+                       ToolTip="Send Message">
+                    <TextBlock Text="&#x27A4;" FontSize="20"/>
+                </Button>
+
+                <Button x:Name="MicButton"
+                       Grid.Column="2"
+                       Style="{StaticResource MicButtonStyle}"
+                       Width="48"
+                       Height="48"
+                       Margin="8,0,0,0"
+                       Click="MicButton_Click"
+                       ToolTip="Voice Input">
+                    <TextBlock x:Name="MicIcon" Text="&#x1F3A4;" FontSize="20"/>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- Bottom Navigation -->
+        <Border Grid.Row="4" Background="{StaticResource SurfaceBrush}">
+            <Grid Margin="40,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0"
+                       Style="{StaticResource IconButtonStyle}"
+                       Click="ClearChatButton_Click"
+                       HorizontalAlignment="Center"
+                       ToolTip="Clear Chat">
+                    <TextBlock Text="&#x1F5D1;" FontSize="20"/>
+                </Button>
+
+                <Button Grid.Column="1"
+                       Style="{StaticResource IconButtonStyle}"
+                       Click="HomeButton_Click"
+                       HorizontalAlignment="Center"
+                       ToolTip="Home">
+                    <TextBlock Text="O" FontSize="28"/>
+                </Button>
+
+                <Button Grid.Column="2"
+                       Style="{StaticResource IconButtonStyle}"
+                       Click="HistoryButton_Click"
+                       HorizontalAlignment="Center"
+                       ToolTip="Chat History">
+                    <TextBlock Text="&#x1F4DC;" FontSize="20"/>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- Settings Panel Overlay -->
+        <Border x:Name="SettingsPanel"
+               Grid.RowSpan="5"
+               Background="#CC000000"
+               Visibility="Collapsed"
+               MouseDown="SettingsPanel_MouseDown">
+            <Border Background="{StaticResource BackgroundBrush}"
+                   Width="650"
+                   HorizontalAlignment="Right"
+                   VerticalAlignment="Stretch">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="60"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Settings Header -->
+                    <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}">
+                        <Grid Margin="16,0">
+                            <TextBlock Text="Repository Settings"
+                                      FontSize="18"
+                                      FontWeight="SemiBold"
+                                      Foreground="{StaticResource TextPrimaryBrush}"
+                                      VerticalAlignment="Center"/>
+                            <Button HorizontalAlignment="Right"
+                                   Style="{StaticResource BackButtonStyle}"
+                                   Click="CloseSettingsButton_Click">
+                                <TextBlock Text="&#x2715;" FontSize="18" Foreground="White"/>
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    <!-- Settings Content -->
+                    <ScrollViewer Grid.Row="1" Padding="16">
+                        <StackPanel>
+                            <!-- Git Provider Selection -->
+                            <TextBlock Text="Git Provider"
+                                      FontSize="14"
+                                      FontWeight="SemiBold"
+                                      Foreground="{StaticResource TextSecondaryBrush}"
+                                      Margin="0,0,0,12"/>
+
+                            <StackPanel x:Name="ProviderList">
+                                <Button Style="{StaticResource RepoSelectButtonStyle}"
+                                       Tag="github"
+                                       Click="ProviderButton_Click"
+                                       Margin="0,0,0,8">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#x1F5C3;" FontSize="20" Margin="0,0,12,0"/>
+                                        <TextBlock Text="GitHub" FontSize="14" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Style="{StaticResource RepoSelectButtonStyle}"
+                                       Tag="gitlab"
+                                       Click="ProviderButton_Click"
+                                       Margin="0,0,0,8">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#x1F98A;" FontSize="20" Margin="0,0,12,0"/>
+                                        <TextBlock Text="GitLab" FontSize="14" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Style="{StaticResource RepoSelectButtonStyle}"
+                                       Tag="gitea"
+                                       Click="ProviderButton_Click"
+                                       Margin="0,0,0,8">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#x2615;" FontSize="20" Margin="0,0,12,0"/>
+                                        <TextBlock Text="Gitea" FontSize="14" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Style="{StaticResource RepoSelectButtonStyle}"
+                                       Tag="local"
+                                       Click="ProviderButton_Click"
+                                       Margin="0,0,0,8">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#x1F4C1;" FontSize="20" Margin="0,0,12,0"/>
+                                        <TextBlock Text="Local Path" FontSize="14" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+
+                            <!-- Repository URL/Path -->
+                            <TextBlock Text="Repository"
+                                      FontSize="14"
+                                      FontWeight="SemiBold"
+                                      Foreground="{StaticResource TextSecondaryBrush}"
+                                      Margin="0,20,0,12"/>
+
+                            <TextBox x:Name="RepoUrlInput"
+                                    Style="{StaticResource ChatInputStyle}"
+                                    Text=""
+                                    Margin="0,0,0,8"/>
+                            <TextBlock x:Name="RepoUrlHint"
+                                      Text="e.g., owner/repo or full URL"
+                                      FontSize="12"
+                                      Foreground="{StaticResource TextSecondaryBrush}"
+                                      Margin="8,0,0,0"/>
+
+                            <!-- Saved Repositories -->
+                            <TextBlock Text="Saved Repositories"
+                                      FontSize="14"
+                                      FontWeight="SemiBold"
+                                      Foreground="{StaticResource TextSecondaryBrush}"
+                                      Margin="0,20,0,12"/>
+
+                            <ItemsControl x:Name="SavedReposList">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Style="{StaticResource RepoItemStyle}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Name}"
+                                                              FontSize="14"
+                                                              Foreground="{StaticResource TextPrimaryBrush}"/>
+                                                    <TextBlock Text="{Binding Provider}"
+                                                              FontSize="12"
+                                                              Foreground="{StaticResource TextSecondaryBrush}"/>
+                                                </StackPanel>
+                                                <Button Grid.Column="1"
+                                                       Content="Select"
+                                                       Style="{StaticResource PrimaryButtonStyle}"
+                                                       Padding="12,6"
+                                                       FontSize="12"
+                                                       Tag="{Binding}"
+                                                       Click="SelectSavedRepo_Click"
+                                                       Margin="0,0,8,0"/>
+                                                <Button Grid.Column="2"
+                                                       Content="&#x1F5D1;"
+                                                       Style="{StaticResource SecondaryButtonStyle}"
+                                                       Padding="8,6"
+                                                       FontSize="14"
+                                                       Tag="{Binding}"
+                                                       Click="DeleteSavedRepo_Click"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <TextBlock x:Name="NoSavedReposText"
+                                      Text="No saved repositories"
+                                      FontSize="14"
+                                      Foreground="{StaticResource TextSecondaryBrush}"
+                                      HorizontalAlignment="Center"
+                                      Margin="0,8,0,0"/>
+
+                            <!-- Save Button -->
+                            <Button Content="Save &amp; Select Repository"
+                                   Style="{StaticResource PrimaryButtonStyle}"
+                                   Click="SaveRepoButton_Click"
+                                   Margin="0,20,0,0"
+                                   HorizontalAlignment="Stretch"/>
+
+                            <!-- Claude Code Path -->
+                            <TextBlock Text="Claude Code CLI Path"
+                                      FontSize="14"
+                                      FontWeight="SemiBold"
+                                      Foreground="{StaticResource TextSecondaryBrush}"
+                                      Margin="0,24,0,12"/>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="ClaudeCodePathInput"
+                                        Grid.Column="0"
+                                        Style="{StaticResource ChatInputStyle}"
+                                        Text="claude"/>
+                                <Button Grid.Column="1"
+                                       Content="Browse"
+                                       Style="{StaticResource SecondaryButtonStyle}"
+                                       Click="BrowseClaudePath_Click"
+                                       Margin="8,0,0,0"/>
+                            </Grid>
+                            <TextBlock Text="Path to Claude Code CLI (default: 'claude' if in PATH)"
+                                      FontSize="12"
+                                      Foreground="{StaticResource TextSecondaryBrush}"
+                                      Margin="8,4,0,0"/>
+
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </Border>
+    </Grid>
+</Window>

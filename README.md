@@ -19,6 +19,9 @@ A custom Windows 11 phone platform for embedded single-board computers. Experien
 - 🤖 **Android App Support** - Sideload APKs via Windows Subsystem for Android
 - 🎮 **Touch Games** - Solitaire and Mahjong for entertainment
 - 📊 **Status Bar** - Signal strength, battery, network status
+- 🖥️ **Terminal** - Tabbed terminal with CMD, PowerShell, and WSL support
+- 🤖 **Claude Code Integration** - Voice/text chat with AI for repository management
+- 📡 **Connectivity Settings** - Bluetooth and WiFi management with scan/pair/forget
 
 ---
 
@@ -63,13 +66,15 @@ A custom Windows 11 phone platform for embedded single-board computers. Experien
 | App | Icon | Description |
 |-----|:----:|-------------|
 | **Calendar** | 📅 | Month/day/year views with date marking |
-| **Settings** | ⚙️ | System configuration, display info, demo modes |
+| **Settings** | ⚙️ | Bluetooth, WiFi, About Phone, system configuration |
+| **Terminal** | 🖥️ | Tabbed terminal with CMD, PowerShell, WSL support |
 | **Files** | 📂 | File browser *(placeholder)* |
 | **Camera** | 📷 | Camera capture *(placeholder)* |
 
-### 🤖 Android Integration
+### 🤖 AI & Android Integration
 | App | Icon | Description |
 |-----|:----:|-------------|
+| **Claude** | 🤖 | Voice/text chat with Claude Code for repo management |
 | **Android** | 📦 | Sideload APK files via WSA, manage Android apps |
 
 > 💡 **Tip:** Apps requiring hardware (Dialer, Maps) include **demo mode toggles** for testing without devices!
@@ -86,6 +91,7 @@ A custom Windows 11 phone platform for embedded single-board computers. Experien
 | **U** | 🎵 Music | **V** | 🎬 Video |
 | **C** | 📅 Calendar | **G** | 🖼️ Gallery |
 | **S** | ⚙️ Settings | **A** | 📦 Android |
+| **T** | 🖥️ Terminal | **L** | 🤖 Claude |
 | **1-9** | Quick launch by position | **Esc** | Exit app |
 
 ---
@@ -169,7 +175,9 @@ Apps/
 ├── Video/             # 🎬 Video player
 ├── Calendar/          # 📅 Calendar
 ├── Gallery/           # 🖼️ Image viewer
-├── Settings/          # ⚙️ System settings
+├── Settings/          # ⚙️ System settings (Bluetooth, WiFi, About Phone)
+├── Terminal/          # 🖥️ Tabbed terminal (CMD, PowerShell, WSL)
+├── ClaudeCode/        # 🤖 AI assistant for code repositories
 ├── AndroidApps/       # 📦 APK sideloader
 ├── Solitaire/         # 🃏 Card game
 ├── Mahjong/           # 🀄 Tile game

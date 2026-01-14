@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsPhoneAndroidApps", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsPhoneTerminal", "Terminal\WindowsPhoneTerminal.csproj", "{D6E7F8A9-B0C1-2345-DEFA-678901234567}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsPhoneClaudeCode", "ClaudeCode\WindowsPhoneClaudeCode.csproj", "{E7F8A9B0-C1D2-3456-EFAB-789012345678}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,5 +107,9 @@ Global
 		{D6E7F8A9-B0C1-2345-DEFA-678901234567}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D6E7F8A9-B0C1-2345-DEFA-678901234567}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6E7F8A9-B0C1-2345-DEFA-678901234567}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7F8A9B0-C1D2-3456-EFAB-789012345678}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7F8A9B0-C1D2-3456-EFAB-789012345678}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7F8A9B0-C1D2-3456-EFAB-789012345678}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7F8A9B0-C1D2-3456-EFAB-789012345678}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
