@@ -1,59 +1,96 @@
-# Windows Phone Next
+# 📱 Windows Phone Next
 
-A custom Windows 11 phone platform for embedded single-board computers.
+A custom Windows 11 phone platform for embedded single-board computers. Experience a modern mobile interface with full telephony, messaging, and a rich app ecosystem!
 
 ![Platform](https://img.shields.io/badge/platform-Windows%2011-blue)
 ![.NET](https://img.shields.io/badge/.NET-8.0-purple)
-![License](https://img.shields.io/badge/license-Personal%20Use-green)
+![Display](https://img.shields.io/badge/display-720x1560-green)
+![License](https://img.shields.io/badge/license-Personal%20Use-orange)
 
 ---
 
-## Hardware
+## ✨ Features
+
+- 📞 **Full Phone Functionality** - Voice calls, SMS messaging, contacts
+- 🌐 **Web Browsing** - Chromium-based browser with mobile optimization
+- 📧 **Gmail Integration** - Dedicated Gmail app (domain-locked for security)
+- 🗺️ **GPS Navigation** - OpenStreetMap routing with turn-by-turn directions
+- 🎵 **Media Playback** - Music player with 64-bar spectrum visualizer + video player
+- 🤖 **Android App Support** - Sideload APKs via Windows Subsystem for Android
+- 🎮 **Touch Games** - Solitaire and Mahjong for entertainment
+- 📊 **Status Bar** - Signal strength, battery, network status
+
+---
+
+## 🖥️ Hardware
 
 | Component | Description |
 |-----------|-------------|
 | **SBC** | [LattePanda 3 Delta](https://www.lattepanda.com/lattepanda-3-delta) (x86-64 with Windows 11) |
 | **Power** | [PiSugar2 Plus](https://www.pisugar.com/products/pisugar2-plus-5000-mah-raspberry-pi-ups) 5000mAh UPS |
-| **Display** | Waveshare 6.25" LCD 720x1560 IPS touch |
+| **Display** | Waveshare 6.25" LCD **720x1560** IPS touch |
 | **Modem** | [Quectel EM06-A](https://www.quectel.com/product/lte-a-em06-series/) LTE Cat 6 M.2 |
 | **GPS** | VK-172 USB GPS/GLONASS *(optional)* |
 
 ---
 
-## Apps
+## 📲 Apps
 
-| App | Description |
-|-----|-------------|
-| **Launcher** | Home screen with status bar, app grid, and quick navigation |
-| **Dialer** | Voice calls with dialpad, call history, and in-call controls |
-| **Messaging** | SMS with conversation view and chat bubbles |
-| **Browser** | Chromium-based web browser with tabs |
-| **Music** | Audio player with 64-bar spectrum visualizer |
-| **Maps** | GPS navigation with OpenStreetMap routing |
-| **Calendar** | Month/day/year views with date marking |
-| **Gallery** | Image viewer with thumbnail strip |
-| **Settings** | System configuration and display info |
+### 📱 Communication
+| App | Icon | Description |
+|-----|:----:|-------------|
+| **Phone** | 📞 | Voice calls with dialpad, call history, mute/speaker controls |
+| **Messages** | 💬 | SMS messaging with conversation view and chat bubbles |
+| **Contacts** | 👤 | Contact management with search, add/edit/delete |
+| **Gmail** | 📧 | Gmail-only browser (secure, domain-locked) |
 
-> Apps requiring hardware (Dialer, Maps) include **demo mode toggles** in their settings menus for testing without devices.
+### 🌐 Internet & Navigation
+| App | Icon | Description |
+|-----|:----:|-------------|
+| **Browser** | 🌐 | Chromium WebView2 with tabs, bookmarks, mobile UA |
+| **Maps** | 🗺️ | GPS navigation with OpenStreetMap, turn-by-turn routing |
 
-### Keyboard Shortcuts
+### 🎬 Media & Entertainment
+| App | Icon | Description |
+|-----|:----:|-------------|
+| **Music** | 🎵 | Audio player with 64-bar spectrum visualizer, shuffle/repeat |
+| **Video** | 🎬 | Video player with progress seeking, 10s skip, fullscreen |
+| **Gallery** | 🖼️ | Image viewer with thumbnail strip navigation |
+| **Solitaire** | 🃏 | Classic Klondike with undo and auto-complete |
+| **Mahjong** | 🀄 | Tile matching game with hints and shuffle |
 
-| Key | Action |
-|-----|--------|
-| **P** | Phone |
-| **M** | Messages |
-| **B** | Browser |
-| **N** | Maps (Navigation) |
-| **U** | Music |
-| **C** | Calendar |
-| **G** | Gallery |
-| **S** | Settings |
-| **1-9** | Quick launch apps (by grid position) |
-| **Esc** | Exit current app / Close settings |
+### 🛠️ Utilities
+| App | Icon | Description |
+|-----|:----:|-------------|
+| **Calendar** | 📅 | Month/day/year views with date marking |
+| **Settings** | ⚙️ | System configuration, display info, demo modes |
+| **Files** | 📂 | File browser *(placeholder)* |
+| **Camera** | 📷 | Camera capture *(placeholder)* |
+
+### 🤖 Android Integration
+| App | Icon | Description |
+|-----|:----:|-------------|
+| **Android** | 📦 | Sideload APK files via WSA, manage Android apps |
+
+> 💡 **Tip:** Apps requiring hardware (Dialer, Maps) include **demo mode toggles** for testing without devices!
 
 ---
 
-## Quick Start
+## ⌨️ Keyboard Shortcuts
+
+| Key | App | Key | App |
+|:---:|-----|:---:|-----|
+| **P** | 📞 Phone | **M** | 💬 Messages |
+| **O** | 👤 Contacts | **B** | 🌐 Browser |
+| **E** | 📧 Gmail | **N** | 🗺️ Maps |
+| **U** | 🎵 Music | **V** | 🎬 Video |
+| **C** | 📅 Calendar | **G** | 🖼️ Gallery |
+| **S** | ⚙️ Settings | **A** | 📦 Android |
+| **1-9** | Quick launch by position | **Esc** | Exit app |
+
+---
+
+## 🚀 Quick Start
 
 ```powershell
 # Build all apps
@@ -62,13 +99,14 @@ A custom Windows 11 phone platform for embedded single-board computers.
 # Output in Dist/ folder
 ```
 
-### Requirements
+### 📋 Requirements
 - Windows 11
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- *(Optional)* Windows Subsystem for Android (for APK sideloading)
 
 ---
 
-## Installation
+## 📦 Installation
 
 ```powershell
 # 1. Build the project
@@ -85,13 +123,65 @@ A custom Windows 11 phone platform for embedded single-board computers.
 
 ---
 
-## Documentation
+## 🤖 Android App Sideloading
+
+Windows Phone Next supports running Android apps through Windows Subsystem for Android (WSA):
+
+1. **Install WSA** from the Microsoft Store
+2. Open the **Android** app from the launcher
+3. Tap **Install APK** to sideload any Android app
+4. Installed apps appear in the list and can be launched directly
+
+> ⚠️ **Note:** WSA must be running to launch Android apps. The Android app will show connection status.
+
+---
+
+## 📖 Documentation
 
 - **[Application Guide](docs/APPS.md)** - Detailed app features and usage
 - **[Development Guide](docs/DEVELOPMENT.md)** - API reference, AT commands, theming
 
 ---
 
-## License
+## 🎨 UI Specifications
+
+| Property | Value |
+|----------|-------|
+| **Resolution** | 720 × 1560 pixels |
+| **Aspect Ratio** | 9:19.5 (tall phone format) |
+| **UI Framework** | WPF (.NET 8) |
+| **Theme** | Dark mode with Windows accent colors |
+
+---
+
+## 📁 Project Structure
+
+```
+Apps/
+├── Launcher/          # 🏠 Home screen
+├── Dialer/            # 📞 Phone calls
+├── Messaging/         # 💬 SMS
+├── Contacts/          # 👤 Contact management
+├── Browser/           # 🌐 Web browser
+├── Gmail/             # 📧 Gmail client
+├── Maps/              # 🗺️ Navigation
+├── Music/             # 🎵 Audio player
+├── Video/             # 🎬 Video player
+├── Calendar/          # 📅 Calendar
+├── Gallery/           # 🖼️ Image viewer
+├── Settings/          # ⚙️ System settings
+├── AndroidApps/       # 📦 APK sideloader
+├── Solitaire/         # 🃏 Card game
+├── Mahjong/           # 🀄 Tile game
+└── Shared/ModemLib/   # 📡 Modem communication library
+```
+
+---
+
+## 📜 License
 
 This project is provided as-is for educational and personal use.
+
+---
+
+Made with ❤️ for mobile enthusiasts
