@@ -1,0 +1,357 @@
+<Window x:Class="WindowsPhoneNext.Contacts.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Contacts"
+        Width="720" Height="1560"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BackgroundBrush}"
+        KeyDown="Window_KeyDown">
+
+    <Grid>
+        <!-- Main Contact List View -->
+        <Grid x:Name="ContactListView">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60"/>
+                <RowDefinition Height="60"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}">
+                <Grid Margin="16,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0"
+                           Style="{StaticResource BackButtonStyle}"
+                           Content="&#x2190;"
+                           FontSize="24"
+                           Click="CloseButton_Click"/>
+
+                    <TextBlock Grid.Column="1"
+                              Text="Contacts"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              FontSize="20"
+                              FontWeight="SemiBold"
+                              Foreground="{StaticResource TextPrimaryBrush}"/>
+                </Grid>
+            </Border>
+
+            <!-- Search Bar -->
+            <Border Grid.Row="1" Padding="16,8">
+                <TextBox x:Name="SearchBox"
+                        Style="{StaticResource SearchBoxStyle}"
+                        Text=""
+                        TextChanged="SearchBox_TextChanged">
+                    <TextBox.Resources>
+                        <VisualBrush x:Key="HintBrush" TileMode="None" Opacity="0.5" Stretch="None" AlignmentX="Left">
+                            <VisualBrush.Visual>
+                                <TextBlock Text="Search contacts..." FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" Margin="4,0,0,0"/>
+                            </VisualBrush.Visual>
+                        </VisualBrush>
+                    </TextBox.Resources>
+                    <TextBox.Style>
+                        <Style TargetType="TextBox" BasedOn="{StaticResource SearchBoxStyle}">
+                            <Style.Triggers>
+                                <Trigger Property="Text" Value="">
+                                    <Setter Property="Background">
+                                        <Setter.Value>
+                                            <VisualBrush TileMode="None" Opacity="0.5" Stretch="None" AlignmentX="Left">
+                                                <VisualBrush.Visual>
+                                                    <Grid Background="#1F2937">
+                                                        <TextBlock Text="  Search contacts..." FontSize="14" Foreground="#9CA3AF" VerticalAlignment="Center" Margin="12,0,0,0"/>
+                                                    </Grid>
+                                                </VisualBrush.Visual>
+                                            </VisualBrush>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
+            </Border>
+
+            <!-- Contact List -->
+            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Hidden" Padding="16,0">
+                <ItemsControl x:Name="ContactList">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Style="{StaticResource ContactButtonStyle}"
+                                   Tag="{Binding Id}"
+                                   Click="ContactItem_Click"
+                                   Margin="0,0,0,8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Avatar -->
+                                    <Border Grid.Column="0"
+                                           Width="44" Height="44"
+                                           CornerRadius="22"
+                                           Background="{StaticResource PrimaryBrush}">
+                                        <TextBlock Text="{Binding Initial}"
+                                                  FontSize="18"
+                                                  FontWeight="SemiBold"
+                                                  Foreground="{StaticResource TextPrimaryBrush}"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"/>
+                                    </Border>
+
+                                    <!-- Name and Phone -->
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Name}"
+                                                  FontSize="16"
+                                                  Foreground="{StaticResource TextPrimaryBrush}"/>
+                                        <TextBlock Text="{Binding Phone}"
+                                                  FontSize="13"
+                                                  Foreground="{StaticResource TextSecondaryBrush}"
+                                                  Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- Add Contact FAB -->
+            <Button Grid.Row="2"
+                   Style="{StaticResource ActionButtonStyle}"
+                   Content="+"
+                   HorizontalAlignment="Right"
+                   VerticalAlignment="Bottom"
+                   Margin="0,0,24,24"
+                   Click="AddContact_Click"/>
+        </Grid>
+
+        <!-- Contact Detail View -->
+        <Grid x:Name="ContactDetailView" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}">
+                <Grid Margin="16,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0"
+                           Style="{StaticResource BackButtonStyle}"
+                           Content="&#x2190;"
+                           FontSize="24"
+                           Click="BackToList_Click"/>
+
+                    <TextBlock Grid.Column="1"
+                              Text="Contact"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              FontSize="20"
+                              FontWeight="SemiBold"
+                              Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                    <Button Grid.Column="2"
+                           Style="{StaticResource BackButtonStyle}"
+                           Content="&#x1F5D1;"
+                           FontSize="18"
+                           Click="DeleteContact_Click"/>
+                </Grid>
+            </Border>
+
+            <!-- Contact Details -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden">
+                <StackPanel Margin="24">
+                    <!-- Avatar Large -->
+                    <Border Width="100" Height="100"
+                           CornerRadius="50"
+                           Background="{StaticResource PrimaryBrush}"
+                           HorizontalAlignment="Center"
+                           Margin="0,20,0,16">
+                        <TextBlock x:Name="DetailInitial"
+                                  Text="JD"
+                                  FontSize="36"
+                                  FontWeight="SemiBold"
+                                  Foreground="{StaticResource TextPrimaryBrush}"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"/>
+                    </Border>
+
+                    <TextBlock x:Name="DetailName"
+                              Text="John Doe"
+                              FontSize="24"
+                              FontWeight="SemiBold"
+                              Foreground="{StaticResource TextPrimaryBrush}"
+                              HorizontalAlignment="Center"
+                              Margin="0,0,0,32"/>
+
+                    <!-- Phone -->
+                    <Border Style="{StaticResource ContactCardStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Phone"
+                                          FontSize="12"
+                                          Foreground="{StaticResource TextSecondaryBrush}"/>
+                                <TextBlock x:Name="DetailPhone"
+                                          Text="+1 234 567 8900"
+                                          FontSize="16"
+                                          Foreground="{StaticResource TextPrimaryBrush}"
+                                          Margin="0,4,0,0"/>
+                            </StackPanel>
+
+                            <Button Grid.Column="1"
+                                   Style="{StaticResource BackButtonStyle}"
+                                   Content="&#x1F4DE;"
+                                   FontSize="20"
+                                   Click="CallContact_Click"
+                                   Margin="8,0"/>
+
+                            <Button Grid.Column="2"
+                                   Style="{StaticResource BackButtonStyle}"
+                                   Content="&#x1F4AC;"
+                                   FontSize="20"
+                                   Click="MessageContact_Click"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Email -->
+                    <Border x:Name="EmailSection" Style="{StaticResource ContactCardStyle}" Visibility="Collapsed">
+                        <StackPanel>
+                            <TextBlock Text="Email"
+                                      FontSize="12"
+                                      Foreground="{StaticResource TextSecondaryBrush}"/>
+                            <TextBlock x:Name="DetailEmail"
+                                      Text="john@example.com"
+                                      FontSize="16"
+                                      Foreground="{StaticResource TextPrimaryBrush}"
+                                      Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Edit Button -->
+                    <Button Style="{StaticResource PrimaryButtonStyle}"
+                           Content="Edit Contact"
+                           HorizontalAlignment="Stretch"
+                           Margin="0,24,0,0"
+                           Click="EditContact_Click"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- Add/Edit Contact View -->
+        <Grid x:Name="EditContactView" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}">
+                <Grid Margin="16,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0"
+                           Style="{StaticResource BackButtonStyle}"
+                           Content="&#x2715;"
+                           FontSize="20"
+                           Click="CancelEdit_Click"/>
+
+                    <TextBlock x:Name="EditTitle"
+                              Grid.Column="1"
+                              Text="New Contact"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              FontSize="20"
+                              FontWeight="SemiBold"
+                              Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                    <Button Grid.Column="2"
+                           Style="{StaticResource BackButtonStyle}"
+                           Content="&#x2714;"
+                           FontSize="20"
+                           Foreground="{StaticResource SuccessBrush}"
+                           Click="SaveContact_Click"/>
+                </Grid>
+            </Border>
+
+            <!-- Edit Form -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden">
+                <StackPanel Margin="24">
+                    <!-- Avatar -->
+                    <Border Width="80" Height="80"
+                           CornerRadius="40"
+                           Background="{StaticResource PrimaryBrush}"
+                           HorizontalAlignment="Center"
+                           Margin="0,20,0,32">
+                        <TextBlock x:Name="EditInitial"
+                                  Text="?"
+                                  FontSize="32"
+                                  FontWeight="SemiBold"
+                                  Foreground="{StaticResource TextPrimaryBrush}"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"/>
+                    </Border>
+
+                    <!-- First Name -->
+                    <TextBlock Text="First Name"
+                              FontSize="12"
+                              Foreground="{StaticResource TextSecondaryBrush}"
+                              Margin="0,0,0,8"/>
+                    <TextBox x:Name="EditFirstName"
+                            Style="{StaticResource TextInputStyle}"
+                            Margin="0,0,0,16"
+                            TextChanged="EditName_TextChanged"/>
+
+                    <!-- Last Name -->
+                    <TextBlock Text="Last Name"
+                              FontSize="12"
+                              Foreground="{StaticResource TextSecondaryBrush}"
+                              Margin="0,0,0,8"/>
+                    <TextBox x:Name="EditLastName"
+                            Style="{StaticResource TextInputStyle}"
+                            Margin="0,0,0,16"
+                            TextChanged="EditName_TextChanged"/>
+
+                    <!-- Phone -->
+                    <TextBlock Text="Phone"
+                              FontSize="12"
+                              Foreground="{StaticResource TextSecondaryBrush}"
+                              Margin="0,0,0,8"/>
+                    <TextBox x:Name="EditPhone"
+                            Style="{StaticResource TextInputStyle}"
+                            Margin="0,0,0,16"/>
+
+                    <!-- Email -->
+                    <TextBlock Text="Email"
+                              FontSize="12"
+                              Foreground="{StaticResource TextSecondaryBrush}"
+                              Margin="0,0,0,8"/>
+                    <TextBox x:Name="EditEmail"
+                            Style="{StaticResource TextInputStyle}"
+                            Margin="0,0,0,16"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</Window>

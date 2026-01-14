@@ -1,0 +1,219 @@
+<Window x:Class="WindowsPhoneNext.Video.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Video"
+        Width="720" Height="1560"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Background="Black"
+        Loaded="Window_Loaded"
+        KeyDown="Window_KeyDown"
+        MouseMove="Window_MouseMove">
+
+    <Grid x:Name="MainGrid">
+        <!-- Video Display -->
+        <MediaElement x:Name="VideoPlayer"
+                     LoadedBehavior="Manual"
+                     UnloadedBehavior="Stop"
+                     Stretch="Uniform"
+                     MediaOpened="VideoPlayer_MediaOpened"
+                     MediaEnded="VideoPlayer_MediaEnded"
+                     MediaFailed="VideoPlayer_MediaFailed"/>
+
+        <!-- No Video Placeholder -->
+        <StackPanel x:Name="NoVideoPlaceholder"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center">
+            <TextBlock Text="&#127909;"
+                      FontSize="80"
+                      Foreground="#4B5563"
+                      HorizontalAlignment="Center"/>
+            <TextBlock Text="No Video"
+                      FontSize="24"
+                      Foreground="#9CA3AF"
+                      HorizontalAlignment="Center"
+                      Margin="0,16,0,0"/>
+            <TextBlock Text="Tap to open a video file"
+                      FontSize="14"
+                      Foreground="#6B7280"
+                      HorizontalAlignment="Center"
+                      Margin="0,8,0,0"/>
+        </StackPanel>
+
+        <!-- Controls Overlay (auto-hide) -->
+        <Grid x:Name="ControlsOverlay">
+            <!-- Top Bar -->
+            <Border VerticalAlignment="Top"
+                   Height="60"
+                   Background="#80000000">
+                <Grid Margin="16,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0"
+                           Content="&#x2190;"
+                           Background="Transparent"
+                           Foreground="White"
+                           BorderThickness="0"
+                           FontSize="24"
+                           Cursor="Hand"
+                           Click="BackButton_Click"/>
+
+                    <TextBlock x:Name="TitleText"
+                              Grid.Column="1"
+                              Text="Video"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              FontSize="18"
+                              FontWeight="SemiBold"
+                              Foreground="White"
+                              TextTrimming="CharacterEllipsis"
+                              MaxWidth="500"/>
+
+                    <Button Grid.Column="2"
+                           Content="&#128193;"
+                           Background="Transparent"
+                           Foreground="White"
+                           BorderThickness="0"
+                           FontSize="20"
+                           Cursor="Hand"
+                           Click="OpenFileButton_Click"/>
+                </Grid>
+            </Border>
+
+            <!-- Bottom Controls -->
+            <Border VerticalAlignment="Bottom"
+                   Height="160"
+                   Background="#80000000">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Progress Bar -->
+                    <Grid Grid.Row="0" Margin="20,16,20,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock x:Name="CurrentTimeText"
+                                  Grid.Column="0"
+                                  Text="0:00"
+                                  FontSize="12"
+                                  Foreground="#9CA3AF"
+                                  VerticalAlignment="Center"
+                                  Margin="0,0,12,0"/>
+
+                        <Slider x:Name="ProgressSlider"
+                               Grid.Column="1"
+                               Minimum="0" Maximum="100"
+                               Value="0"
+                               IsMoveToPointEnabled="True"
+                               ValueChanged="ProgressSlider_ValueChanged"
+                               PreviewMouseDown="ProgressSlider_PreviewMouseDown"
+                               PreviewMouseUp="ProgressSlider_PreviewMouseUp"/>
+
+                        <TextBlock x:Name="TotalTimeText"
+                                  Grid.Column="2"
+                                  Text="0:00"
+                                  FontSize="12"
+                                  Foreground="#9CA3AF"
+                                  VerticalAlignment="Center"
+                                  Margin="12,0,0,0"/>
+                    </Grid>
+
+                    <!-- Transport Controls -->
+                    <StackPanel Grid.Row="1"
+                               Orientation="Horizontal"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center">
+
+                        <!-- Rewind 10s -->
+                        <Button Background="Transparent"
+                               Foreground="White"
+                               BorderThickness="0"
+                               Width="60" Height="60"
+                               Cursor="Hand"
+                               Click="Rewind_Click">
+                            <StackPanel>
+                                <TextBlock Text="&#9194;" FontSize="24" HorizontalAlignment="Center"/>
+                                <TextBlock Text="10" FontSize="10" HorizontalAlignment="Center" Margin="0,-4,0,0"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Play/Pause -->
+                        <Button x:Name="PlayPauseButton"
+                               Background="#0078D4"
+                               Foreground="White"
+                               BorderThickness="0"
+                               Width="70" Height="70"
+                               Margin="20,0"
+                               Cursor="Hand"
+                               Click="PlayPauseButton_Click">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}"
+                                           CornerRadius="35">
+                                        <ContentPresenter HorizontalAlignment="Center"
+                                                         VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                            <TextBlock x:Name="PlayPauseIcon" Text="&#9654;" FontSize="28"/>
+                        </Button>
+
+                        <!-- Forward 10s -->
+                        <Button Background="Transparent"
+                               Foreground="White"
+                               BorderThickness="0"
+                               Width="60" Height="60"
+                               Cursor="Hand"
+                               Click="Forward_Click">
+                            <StackPanel>
+                                <TextBlock Text="&#9193;" FontSize="24" HorizontalAlignment="Center"/>
+                                <TextBlock Text="10" FontSize="10" HorizontalAlignment="Center" Margin="0,-4,0,0"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Fullscreen Toggle -->
+                        <Button x:Name="FullscreenButton"
+                               Background="Transparent"
+                               Foreground="White"
+                               BorderThickness="0"
+                               Width="60" Height="60"
+                               Margin="20,0,0,0"
+                               Cursor="Hand"
+                               Click="FullscreenButton_Click">
+                            <TextBlock x:Name="FullscreenIcon" Text="&#9974;" FontSize="24"/>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Loading Overlay -->
+        <Border x:Name="LoadingOverlay"
+               Background="#80000000"
+               Visibility="Collapsed">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="Loading..."
+                          FontSize="18"
+                          Foreground="White"
+                          HorizontalAlignment="Center"/>
+                <ProgressBar IsIndeterminate="True"
+                            Width="200"
+                            Height="4"
+                            Margin="0,16,0,0"
+                            Background="#374151"
+                            Foreground="#0078D4"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
