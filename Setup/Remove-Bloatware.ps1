@@ -5,9 +5,12 @@
 .DESCRIPTION
     Removes unnecessary Windows apps and services to create a minimal phone-like environment.
     Installs Windows Subsystem for Android (WSA) for Android app sideloading.
+    Installs Windows Subsystem for Linux (WSL) with Ubuntu for development/terminal access.
     Preserves touch input, on-screen keyboard, and essential system components.
 .PARAMETER SkipWSA
     Skip Windows Subsystem for Android installation
+.PARAMETER SkipWSL
+    Skip Windows Subsystem for Linux and Ubuntu installation
 .PARAMETER SkipADB
     Skip ADB (Android Debug Bridge) installation
 .PARAMETER WhatIf
@@ -16,17 +19,18 @@
     Attempt to restore previously removed apps
 .EXAMPLE
     .\Remove-Bloatware.ps1
-    Removes bloatware and installs WSA + ADB
+    Removes bloatware and installs WSA + WSL/Ubuntu + ADB
 .EXAMPLE
     .\Remove-Bloatware.ps1 -WhatIf
     Shows what would be removed without making changes
 .EXAMPLE
-    .\Remove-Bloatware.ps1 -SkipWSA
-    Remove bloatware only, skip Android support
+    .\Remove-Bloatware.ps1 -SkipWSA -SkipWSL
+    Remove bloatware only, skip Android and Linux support
 #>
 
 param(
     [switch]$SkipWSA,
+    [switch]$SkipWSL,
     [switch]$SkipADB,
     [switch]$WhatIf,
     [switch]$Restore
@@ -518,6 +522,137 @@ function Install-ADB {
     }
 }
 
+function Install-WSL {
+    if ($SkipWSL) {
+        Write-Status "Skipping WSL installation (--SkipWSL)" -Type "Info"
+        return
+    }
+
+    Write-Host ""
+    Write-Status "Checking Windows Subsystem for Linux..." -Type "Header"
+    Write-Host ""
+
+    # Check if WSL is already installed
+    $wslInstalled = $false
+    try {
+        $wslVersion = wsl --version 2>$null
+        if ($LASTEXITCODE -eq 0) {
+            $wslInstalled = $true
+            Write-Status "WSL is already installed" -Type "Success"
+        }
+    }
+    catch {
+        $wslInstalled = $false
+    }
+
+    # Check if Ubuntu is installed
+    $ubuntuInstalled = $false
+    try {
+        $distros = wsl --list --quiet 2>$null
+        if ($distros -match "Ubuntu") {
+            $ubuntuInstalled = $true
+            Write-Status "Ubuntu is already installed" -Type "Success"
+        }
+    }
+    catch {
+        $ubuntuInstalled = $false
+    }
+
+    if ($wslInstalled -and $ubuntuInstalled) {
+        return
+    }
+
+    if ($WhatIf) {
+        if (-not $wslInstalled) {
+            Write-Status "Would install Windows Subsystem for Linux" -Type "Info"
+        }
+        if (-not $ubuntuInstalled) {
+            Write-Status "Would install Ubuntu distribution" -Type "Info"
+        }
+        return
+    }
+
+    # Enable required Windows features for WSL
+    Write-Status "Enabling WSL Windows features..." -Type "Info"
+
+    # Enable WSL feature
+    $wslFeature = Get-WindowsOptionalFeature -Online -FeatureName "Microsoft-Windows-Subsystem-Linux" -ErrorAction SilentlyContinue
+    if ($wslFeature.State -ne "Enabled") {
+        Write-Status "Enabling Windows Subsystem for Linux feature..." -Type "Info"
+        Enable-WindowsOptionalFeature -Online -FeatureName "Microsoft-Windows-Subsystem-Linux" -NoRestart -ErrorAction SilentlyContinue
+    }
+
+    # Enable Virtual Machine Platform (required for WSL 2)
+    $vmPlatform = Get-WindowsOptionalFeature -Online -FeatureName "VirtualMachinePlatform" -ErrorAction SilentlyContinue
+    if ($vmPlatform.State -ne "Enabled") {
+        Write-Status "Enabling Virtual Machine Platform..." -Type "Info"
+        Enable-WindowsOptionalFeature -Online -FeatureName "VirtualMachinePlatform" -NoRestart -ErrorAction SilentlyContinue
+    }
+
+    # Install WSL if not present
+    if (-not $wslInstalled) {
+        Write-Status "Installing WSL..." -Type "Info"
+        try {
+            # Use wsl --install which handles everything
+            wsl --install --no-distribution 2>$null
+            Write-Status "WSL installed successfully" -Type "Success"
+        }
+        catch {
+            Write-Status "WSL installation may require a restart" -Type "Warning"
+        }
+    }
+
+    # Set WSL 2 as default
+    Write-Status "Setting WSL 2 as default version..." -Type "Info"
+    try {
+        wsl --set-default-version 2 2>$null
+    }
+    catch {
+        # May fail if restart is needed
+    }
+
+    # Install Ubuntu
+    if (-not $ubuntuInstalled) {
+        Write-Status "Installing Ubuntu..." -Type "Info"
+
+        # Try using wsl --install with Ubuntu
+        try {
+            wsl --install -d Ubuntu 2>$null
+
+            if ($LASTEXITCODE -eq 0) {
+                Write-Status "Ubuntu installation initiated" -Type "Success"
+            }
+        }
+        catch {
+            # Fallback: try winget
+            $winget = Get-Command winget -ErrorAction SilentlyContinue
+            if ($winget) {
+                Write-Status "Trying winget to install Ubuntu..." -Type "Info"
+                try {
+                    winget install --id "Canonical.Ubuntu.2204" --source winget --accept-package-agreements --accept-source-agreements 2>$null
+                    Write-Status "Ubuntu installation initiated via winget" -Type "Success"
+                }
+                catch {
+                    Write-Status "Please install Ubuntu manually from Microsoft Store" -Type "Warning"
+                }
+            }
+            else {
+                # Open Microsoft Store
+                Write-Status "Opening Microsoft Store to install Ubuntu..." -Type "Info"
+                Start-Process "ms-windows-store://pdp/?ProductId=9PDXGNCFSCZV"
+                Write-Status "Please complete Ubuntu installation in the Microsoft Store" -Type "Warning"
+            }
+        }
+    }
+
+    Write-Host ""
+    Write-Host "After installation:" -ForegroundColor Yellow
+    Write-Host "1. Restart your computer if prompted" -ForegroundColor Gray
+    Write-Host "2. Launch Ubuntu from Start menu to complete setup" -ForegroundColor Gray
+    Write-Host "3. Create your Linux username and password" -ForegroundColor Gray
+    Write-Host "4. Use the Terminal app in Windows Phone to access Ubuntu" -ForegroundColor Gray
+}
+
 function Disable-Telemetry {
     Write-Host ""
     Write-Status "Disabling telemetry and tracking..." -Type "Header"
@@ -602,12 +737,24 @@ function Show-Summary {
         Write-Host ""
     }
 
+    if (-not $SkipWSL) {
+        Write-Host "Linux support:" -ForegroundColor Cyan
+        Write-Host "  [+] Windows Subsystem for Linux (WSL 2)" -ForegroundColor DarkCyan
+        Write-Host "  [+] Ubuntu distribution" -ForegroundColor DarkCyan
+        Write-Host ""
+    }
+
     Write-Host "Next steps:" -ForegroundColor Yellow
     Write-Host "  1. Restart your device to apply all changes" -ForegroundColor Gray
     Write-Host "  2. Run Build.ps1 to compile Windows Phone apps" -ForegroundColor Gray
     Write-Host "  3. Run Setup\Install-WindowsPhone.ps1 to configure startup" -ForegroundColor Gray
+    $step = 4
     if (-not $SkipWSA) {
-        Write-Host "  4. Enable 'Developer mode' in WSA settings for APK installs" -ForegroundColor Gray
+        Write-Host "  $step. Enable 'Developer mode' in WSA settings for APK installs" -ForegroundColor Gray
+        $step++
+    }
+    if (-not $SkipWSL) {
+        Write-Host "  $step. Launch Ubuntu from Start menu to complete initial setup" -ForegroundColor Gray
     }
     Write-Host ""
 }
@@ -649,6 +796,7 @@ Disable-UnnecessaryServices
 Enable-TouchSupport
 Disable-Telemetry
 Install-WSA
+Install-WSL
 Install-ADB
 Optimize-ForPhone
 

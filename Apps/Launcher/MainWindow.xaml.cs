@@ -39,6 +39,7 @@ public partial class MainWindow : Window
             new AppInfo { Name = "Settings", Icon = "\u2699\uFE0F", AppPath = "Settings", Shortcut = Key.S },
             new AppInfo { Name = "Files", Icon = "\U0001F4C2", AppPath = "Files", Shortcut = Key.None },
             new AppInfo { Name = "Android", Icon = "\U0001F4E6", AppPath = "AndroidApps", Shortcut = Key.A },
+            new AppInfo { Name = "Terminal", Icon = "\U0001F427", AppPath = "Terminal", Shortcut = Key.T },
             new AppInfo { Name = "Solitaire", Icon = "\U0001F0CF", AppPath = "Solitaire", Shortcut = Key.None },
             new AppInfo { Name = "Mahjong", Icon = "\U0001F004", AppPath = "Mahjong", Shortcut = Key.None }
         };
