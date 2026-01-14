@@ -9,4 +9,8 @@
     <AssemblyName>WindowsPhoneSettings</AssemblyName>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\ModemLib\ModemLib.csproj" />
+  </ItemGroup>
+
 </Project>
