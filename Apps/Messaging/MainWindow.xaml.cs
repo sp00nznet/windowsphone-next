@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using WindowsPhoneNext.ModemLib;
+using WindowsPhone.Shared;
 
 namespace WindowsPhoneNext.Messaging;
 
@@ -92,6 +93,12 @@ public partial class MainWindow : Window
 
         foreach (var group in groupedMessages)
         {
+            // Skip blocked senders
+            if (BlockingService.Instance.IsBlockedForMessages(group.Key))
+            {
+                continue;
+            }
+
             var existingConv = _conversations.FirstOrDefault(c => c.PhoneNumber == group.Key);
 
             if (existingConv == null)
@@ -305,6 +312,17 @@ public partial class MainWindow : Window
     {
         if (_currentConversation == null) return;
 
+        // Check if contact is blocked
+        if (BlockingService.Instance.IsBlockedForMessages(_currentConversation.PhoneNumber))
+        {
+            MessageBox.Show(
+                "This contact is blocked. Unblock them from Contacts to send messages.",
+                "Contact Blocked",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+            return;
+        }
+
         var messageText = MessageInput.Text.Trim();
         if (string.IsNullOrEmpty(messageText)) return;
 
@@ -355,6 +373,17 @@ public partial class MainWindow : Window
 
         if (string.IsNullOrEmpty(recipient) || string.IsNullOrEmpty(messageText))
             return;
+
+        // Check if recipient is blocked
+        if (BlockingService.Instance.IsBlockedForMessages(recipient))
+        {
+            MessageBox.Show(
+                "This number is blocked. Unblock them from Contacts to send messages.",
+                "Number Blocked",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+            return;
+        }
 
         var conversation = _conversations.FirstOrDefault(c => c.PhoneNumber == recipient);
         if (conversation == null)
@@ -411,6 +440,12 @@ public partial class MainWindow : Window
 
     private void Modem_SmsReceived(object? sender, SmsReceivedEventArgs e)
     {
+        // Check if sender is blocked - silently ignore if so
+        if (BlockingService.Instance.IsBlockedForMessages(e.Sender))
+        {
+            return;
+        }
+
         Dispatcher.Invoke(async () =>
         {
             await LoadMessagesAsync();

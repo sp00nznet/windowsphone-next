@@ -10,4 +10,8 @@
     <AssemblyName>WindowsPhoneContacts</AssemblyName>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\BlockingService\BlockingService.csproj" />
+  </ItemGroup>
+
 </Project>

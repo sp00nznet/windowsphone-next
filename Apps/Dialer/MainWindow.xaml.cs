@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using WindowsPhoneNext.ModemLib;
+using WindowsPhone.Shared;
 
 namespace WindowsPhoneNext.Dialer;
 
@@ -170,6 +171,17 @@ public partial class MainWindow : Window
 
     private async Task MakeCallAsync(string number)
     {
+        // Check if number is blocked
+        if (BlockingService.Instance.IsBlockedForCalls(number))
+        {
+            MessageBox.Show(
+                "This number is blocked. Unblock them from Contacts to call.",
+                "Number Blocked",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+            return;
+        }
+
         ShowActiveCallView(number);
         CallStatusText.Text = "Calling...";
 
@@ -374,8 +386,31 @@ public partial class MainWindow : Window
 
     #region Modem Events
 
-    private void Modem_IncomingCall(object? sender, IncomingCallEventArgs e)
+    private async void Modem_IncomingCall(object? sender, IncomingCallEventArgs e)
     {
+        // Check if caller is blocked
+        if (BlockingService.Instance.IsBlockedForCalls(e.CallerId))
+        {
+            // Reject the call silently
+            try
+            {
+                await _modem.HangUpAsync();
+            }
+            catch { }
+
+            // Add to recent calls as blocked
+            Dispatcher.Invoke(() =>
+            {
+                _recentCalls.Insert(0, new CallRecord
+                {
+                    PhoneNumber = e.CallerId,
+                    CallType = "Blocked",
+                    Time = "Just now"
+                });
+            });
+            return;
+        }
+
         Dispatcher.Invoke(() =>
         {
             ShowActiveCallView(e.CallerId);
