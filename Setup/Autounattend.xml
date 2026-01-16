@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<unattend xmlns="urn:schemas-microsoft-com:unattend">
+
+    <!-- Windows PE Phase - Disk Configuration -->
+    <settings pass="windowsPE">
+        <component name="Microsoft-Windows-International-Core-WinPE" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <SetupUILanguage>
+                <UILanguage>en-US</UILanguage>
+            </SetupUILanguage>
+            <InputLocale>en-US</InputLocale>
+            <SystemLocale>en-US</SystemLocale>
+            <UILanguage>en-US</UILanguage>
+            <UserLocale>en-US</UserLocale>
+        </component>
+
+        <component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <DiskConfiguration>
+                <Disk wcm:action="add">
+                    <DiskID>0</DiskID>
+                    <WillWipeDisk>true</WillWipeDisk>
+                    <CreatePartitions>
+                        <!-- EFI System Partition -->
+                        <CreatePartition wcm:action="add">
+                            <Order>1</Order>
+                            <Size>100</Size>
+                            <Type>EFI</Type>
+                        </CreatePartition>
+                        <!-- Microsoft Reserved Partition -->
+                        <CreatePartition wcm:action="add">
+                            <Order>2</Order>
+                            <Size>16</Size>
+                            <Type>MSR</Type>
+                        </CreatePartition>
+                        <!-- Windows Partition -->
+                        <CreatePartition wcm:action="add">
+                            <Order>3</Order>
+                            <Extend>true</Extend>
+                            <Type>Primary</Type>
+                        </CreatePartition>
+                    </CreatePartitions>
+                    <ModifyPartitions>
+                        <ModifyPartition wcm:action="add">
+                            <Order>1</Order>
+                            <PartitionID>1</PartitionID>
+                            <Label>System</Label>
+                            <Format>FAT32</Format>
+                        </ModifyPartition>
+                        <ModifyPartition wcm:action="add">
+                            <Order>2</Order>
+                            <PartitionID>2</PartitionID>
+                        </ModifyPartition>
+                        <ModifyPartition wcm:action="add">
+                            <Order>3</Order>
+                            <PartitionID>3</PartitionID>
+                            <Label>Windows</Label>
+                            <Format>NTFS</Format>
+                            <Letter>C</Letter>
+                        </ModifyPartition>
+                    </ModifyPartitions>
+                </Disk>
+            </DiskConfiguration>
+
+            <ImageInstall>
+                <OSImage>
+                    <InstallTo>
+                        <DiskID>0</DiskID>
+                        <PartitionID>3</PartitionID>
+                    </InstallTo>
+                </OSImage>
+            </ImageInstall>
+
+            <UserData>
+                <AcceptEula>true</AcceptEula>
+                <FullName>Windows Phone Next</FullName>
+                <Organization>Windows Phone Next</Organization>
+            </UserData>
+        </component>
+    </settings>
+
+    <!-- Specialize Phase - System Configuration -->
+    <settings pass="specialize">
+        <component name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <InputLocale>en-US</InputLocale>
+            <SystemLocale>en-US</SystemLocale>
+            <UILanguage>en-US</UILanguage>
+            <UserLocale>en-US</UserLocale>
+        </component>
+
+        <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <ComputerName>WindowsPhoneNext</ComputerName>
+            <TimeZone>Pacific Standard Time</TimeZone>
+            <RegisteredOrganization>Windows Phone Next</RegisteredOrganization>
+            <RegisteredOwner>User</RegisteredOwner>
+        </component>
+
+        <!-- Disable Windows Defender for better performance on embedded device -->
+        <component name="Microsoft-Windows-Security-SPP-UX" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <SkipAutoActivation>true</SkipAutoActivation>
+        </component>
+
+        <!-- Disable unnecessary services -->
+        <component name="Microsoft-Windows-Deployment" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <RunSynchronous>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>1</Order>
+                    <Path>cmd /c reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" /v NoAutoUpdate /t REG_DWORD /d 1 /f</Path>
+                    <Description>Disable Windows Update</Description>
+                </RunSynchronousCommand>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>2</Order>
+                    <Path>cmd /c reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender" /v DisableAntiSpyware /t REG_DWORD /d 1 /f</Path>
+                    <Description>Disable Windows Defender</Description>
+                </RunSynchronousCommand>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>3</Order>
+                    <Path>powershell -Command "Disable-WindowsOptionalFeature -Online -FeatureName 'SearchEngine-Client-Package' -NoRestart"</Path>
+                    <Description>Disable Windows Search</Description>
+                </RunSynchronousCommand>
+            </RunSynchronous>
+        </component>
+    </settings>
+
+    <!-- OOBE Phase - User Setup -->
+    <settings pass="oobeSystem">
+        <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <OOBE>
+                <HideEULAPage>true</HideEULAPage>
+                <HideLocalAccountScreen>true</HideLocalAccountScreen>
+                <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
+                <HideOnlineAccountScreens>true</HideOnlineAccountScreens>
+                <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
+                <NetworkLocation>Home</NetworkLocation>
+                <ProtectYourPC>3</ProtectYourPC>
+                <SkipMachineOOBE>true</SkipMachineOOBE>
+                <SkipUserOOBE>true</SkipUserOOBE>
+            </OOBE>
+
+            <!-- Auto-login user account -->
+            <UserAccounts>
+                <LocalAccounts>
+                    <LocalAccount wcm:action="add">
+                        <Password>
+                            <Value></Value>
+                            <PlainText>true</PlainText>
+                        </Password>
+                        <Description>Windows Phone Next User</Description>
+                        <DisplayName>User</DisplayName>
+                        <Group>Administrators</Group>
+                        <Name>User</Name>
+                    </LocalAccount>
+                </LocalAccounts>
+            </UserAccounts>
+
+            <AutoLogon>
+                <Password>
+                    <Value></Value>
+                    <PlainText>true</PlainText>
+                </Password>
+                <Enabled>true</Enabled>
+                <Username>User</Username>
+            </AutoLogon>
+
+            <!-- First logon commands - Run setup scripts -->
+            <FirstLogonCommands>
+                <SynchronousCommand wcm:action="add">
+                    <Order>1</Order>
+                    <CommandLine>cmd /c mkdir C:\WindowsPhoneNext\Logs</CommandLine>
+                    <Description>Create logs directory</Description>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <Order>2</Order>
+                    <CommandLine>powershell -ExecutionPolicy Bypass -File C:\WindowsPhoneNext\Setup\setup.ps1 >> C:\WindowsPhoneNext\Logs\setup.log 2>&1</CommandLine>
+                    <Description>Run Windows Phone Next setup</Description>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <Order>3</Order>
+                    <CommandLine>powershell -ExecutionPolicy Bypass -File C:\WindowsPhoneNext\Setup\configure-autostart.ps1</CommandLine>
+                    <Description>Configure launcher autostart</Description>
+                </SynchronousCommand>
+                <SynchronousCommand wcm:action="add">
+                    <Order>4</Order>
+                    <CommandLine>shutdown /r /t 10 /c "Windows Phone Next setup complete. Restarting..."</CommandLine>
+                    <Description>Restart to complete setup</Description>
+                </SynchronousCommand>
+            </FirstLogonCommands>
+        </component>
+
+        <component name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <InputLocale>en-US</InputLocale>
+            <SystemLocale>en-US</SystemLocale>
+            <UILanguage>en-US</UILanguage>
+            <UserLocale>en-US</UserLocale>
+        </component>
+    </settings>
+
+</unattend>
