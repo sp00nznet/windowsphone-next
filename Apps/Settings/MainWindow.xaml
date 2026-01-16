@@ -9,15 +9,18 @@
         Background="{StaticResource BackgroundBrush}"
         KeyDown="Window_KeyDown">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="60"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <!-- Bezel-safe container with curved corners -->
+    <Border Style="{StaticResource BezelWindowBorderStyle}"
+            Background="{StaticResource BackgroundBrush}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <!-- Top Bar -->
-        <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}">
-            <Grid Margin="12,0">
+            <!-- Top Bar with bezel-safe margins -->
+            <Border Grid.Row="0" Style="{StaticResource BezelStatusBarStyle}" Background="{StaticResource SurfaceBrush}">
+                <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
@@ -39,10 +42,11 @@
             </Grid>
         </Border>
 
-        <!-- Settings Content -->
-        <ScrollViewer Grid.Row="1"
-                     VerticalScrollBarVisibility="Auto"
-                     Padding="20">
+            <!-- Settings Content with bezel-safe margins -->
+            <ScrollViewer Grid.Row="1"
+                         VerticalScrollBarVisibility="Auto"
+                         Padding="20"
+                         Margin="12,0,12,16">
             <StackPanel>
 
                 <!-- ==================== BLUETOOTH SECTION ==================== -->
@@ -568,5 +572,6 @@
                 </StackPanel>
             </Border>
         </Border>
-    </Grid>
+        </Grid>
+    </Border>
 </Window>

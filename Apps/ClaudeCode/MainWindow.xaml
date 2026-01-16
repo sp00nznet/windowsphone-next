@@ -9,19 +9,22 @@
         Background="{StaticResource BackgroundBrush}"
         KeyDown="Window_KeyDown">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="60"/>      <!-- Header -->
-            <RowDefinition Height="Auto"/>    <!-- Repo Info -->
-            <RowDefinition Height="*"/>       <!-- Chat Messages -->
-            <RowDefinition Height="Auto"/>    <!-- Queue Panel -->
-            <RowDefinition Height="Auto"/>    <!-- Input Area -->
-            <RowDefinition Height="100"/>     <!-- Bottom Navigation -->
-        </Grid.RowDefinitions>
+    <!-- Bezel-safe container with curved corners -->
+    <Border Style="{StaticResource BezelWindowBorderStyle}"
+            Background="{StaticResource BackgroundBrush}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60"/>      <!-- Header -->
+                <RowDefinition Height="Auto"/>    <!-- Repo Info -->
+                <RowDefinition Height="*"/>       <!-- Chat Messages -->
+                <RowDefinition Height="Auto"/>    <!-- Queue Panel -->
+                <RowDefinition Height="Auto"/>    <!-- Input Area -->
+                <RowDefinition Height="100"/>     <!-- Bottom Navigation -->
+            </Grid.RowDefinitions>
 
-        <!-- Header -->
-        <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}">
-            <Grid Margin="12,0">
+            <!-- Header with bezel-safe margins -->
+            <Border Grid.Row="0" Style="{StaticResource BezelStatusBarStyle}" Background="{StaticResource SurfaceBrush}">
+                <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>

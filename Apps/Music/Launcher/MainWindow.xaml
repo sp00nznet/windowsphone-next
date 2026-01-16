@@ -10,16 +10,19 @@
         Loaded="Window_Loaded"
         KeyDown="Window_KeyDown">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="180"/>
-        </Grid.RowDefinitions>
+    <!-- Bezel-safe container with curved corners -->
+    <Border Style="{StaticResource BezelWindowBorderStyle}"
+            Background="{StaticResource BackgroundBrush}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="180"/>
+            </Grid.RowDefinitions>
 
-        <!-- Top Bar with Back Button -->
-        <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}">
-            <Grid Margin="16,0">
+            <!-- Top Bar with bezel-safe margins -->
+            <Border Grid.Row="0" Style="{StaticResource BezelStatusBarStyle}" Background="{StaticResource SurfaceBrush}">
+                <Grid>
                 <Button Content="&#x2190;"
                        HorizontalAlignment="Left"
                        Background="Transparent"
@@ -76,8 +79,8 @@
             </StackPanel>
         </Grid>
 
-        <!-- Player Controls -->
-        <Grid Grid.Row="2" Background="{StaticResource SurfaceBrush}">
+            <!-- Player Controls with bezel-safe margins -->
+            <Grid Grid.Row="2" Style="{StaticResource BezelBottomNavStyle}" Background="{StaticResource SurfaceBrush}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
@@ -180,5 +183,6 @@
                 </Button>
             </Grid>
         </Grid>
-    </Grid>
+        </Grid>
+    </Border>
 </Window>

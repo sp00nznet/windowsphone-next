@@ -11,7 +11,10 @@
         KeyDown="Window_KeyDown"
         MouseMove="Window_MouseMove">
 
-    <Grid x:Name="MainGrid">
+    <!-- Bezel-safe container with curved corners -->
+    <Border Style="{StaticResource BezelWindowBorderStyle}"
+            Background="Black">
+        <Grid x:Name="MainGrid">
         <!-- Video Display -->
         <MediaElement x:Name="VideoPlayer"
                      LoadedBehavior="Manual"
@@ -215,5 +218,6 @@
                             Foreground="#0078D4"/>
             </StackPanel>
         </Border>
-    </Grid>
+        </Grid>
+    </Border>
 </Window>
