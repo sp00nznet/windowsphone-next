@@ -7,16 +7,19 @@
         ResizeMode="NoResize"
         Background="{StaticResource BackgroundBrush}">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <!-- Bezel-safe container with curved corners -->
+    <Border Style="{StaticResource BezelWindowBorderStyle}"
+            Background="{StaticResource BackgroundBrush}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <!-- Status Bar -->
-        <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}" Padding="16,8">
+            <!-- Status Bar with bezel-safe margins -->
+            <Border Grid.Row="0" Style="{StaticResource BezelStatusBarStyle}" Background="{StaticResource SurfaceBrush}">
             <Grid>
                 <TextBlock Text="12:00" FontSize="14" Foreground="{StaticResource TextPrimaryBrush}"
                            HorizontalAlignment="Left"/>

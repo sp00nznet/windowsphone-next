@@ -11,16 +11,19 @@
         Loaded="Window_Loaded"
         KeyDown="Window_KeyDown">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <!-- Bezel-safe container with curved corners -->
+    <Border Style="{StaticResource BezelWindowBorderStyle}"
+            Background="{StaticResource BackgroundBrush}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <!-- Top Bar -->
-        <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}">
-            <Grid Margin="12,0">
+            <!-- Top Bar with bezel-safe margins -->
+            <Border Grid.Row="0" Style="{StaticResource BezelStatusBarStyle}" Background="{StaticResource SurfaceBrush}">
+                <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
@@ -45,8 +48,8 @@
             </Grid>
         </Border>
 
-        <!-- Navigation Bar -->
-        <Border Grid.Row="1" Background="{StaticResource SurfaceBrush}" Padding="8,0">
+            <!-- Navigation Bar with bezel-safe margins -->
+            <Border Grid.Row="1" Background="{StaticResource SurfaceBrush}" Padding="8,0" Margin="12,0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -103,8 +106,8 @@
             </Grid>
         </Border>
 
-        <!-- WebView Container -->
-        <Grid Grid.Row="2">
+            <!-- WebView Container with bezel-safe margins -->
+            <Grid Grid.Row="2" Margin="12,0,12,16">
             <!-- WebView2 -->
             <wv2:WebView2 x:Name="WebView"
                          DefaultBackgroundColor="Transparent"/>
@@ -220,5 +223,6 @@
                 </ListView>
             </Grid>
         </Border>
-    </Grid>
+        </Grid>
+    </Border>
 </Window>

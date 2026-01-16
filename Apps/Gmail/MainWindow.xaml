@@ -11,15 +11,18 @@
         Loaded="Window_Loaded"
         KeyDown="Window_KeyDown">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <!-- Bezel-safe container with curved corners -->
+    <Border Style="{StaticResource BezelWindowBorderStyle}"
+            Background="{StaticResource BackgroundBrush}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <!-- Top Bar -->
-        <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}">
-            <Grid Margin="12,0">
+            <!-- Top Bar with bezel-safe margins -->
+            <Border Grid.Row="0" Style="{StaticResource BezelStatusBarStyle}" Background="{StaticResource SurfaceBrush}">
+                <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
@@ -55,8 +58,8 @@
             </Grid>
         </Border>
 
-        <!-- WebView Container -->
-        <Grid Grid.Row="1">
+            <!-- WebView Container with bezel-safe margins -->
+            <Grid Grid.Row="1" Margin="12,0,12,16">
             <!-- WebView2 -->
             <wv2:WebView2 x:Name="WebView"
                          DefaultBackgroundColor="Transparent"/>
@@ -106,5 +109,6 @@
                 </StackPanel>
             </Border>
         </Grid>
-    </Grid>
+        </Grid>
+    </Border>
 </Window>

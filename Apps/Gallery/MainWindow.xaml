@@ -10,16 +10,19 @@
         Loaded="Window_Loaded"
         KeyDown="Window_KeyDown">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="60"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="140"/>
-        </Grid.RowDefinitions>
+    <!-- Bezel-safe container with curved corners -->
+    <Border Style="{StaticResource BezelWindowBorderStyle}"
+            Background="{StaticResource BackgroundBrush}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="140"/>
+            </Grid.RowDefinitions>
 
-        <!-- Top Bar -->
-        <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}">
-            <Grid Margin="12,0">
+            <!-- Top Bar with bezel-safe margins -->
+            <Border Grid.Row="0" Style="{StaticResource BezelStatusBarStyle}" Background="{StaticResource SurfaceBrush}">
+                <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
@@ -156,8 +159,8 @@
             </Border>
         </Grid>
 
-        <!-- Thumbnail Strip -->
-        <Border Grid.Row="2" Background="{StaticResource SurfaceBrush}">
+            <!-- Thumbnail Strip with bezel-safe margins -->
+            <Border Grid.Row="2" Style="{StaticResource BezelBottomNavStyle}" Background="{StaticResource SurfaceBrush}">
             <ScrollViewer x:Name="ThumbnailScroller"
                          HorizontalScrollBarVisibility="Auto"
                          VerticalScrollBarVisibility="Disabled"
@@ -246,5 +249,6 @@
                 </StackPanel>
             </Border>
         </Border>
-    </Grid>
+        </Grid>
+    </Border>
 </Window>

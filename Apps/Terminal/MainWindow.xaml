@@ -9,17 +9,20 @@
         Background="{StaticResource BackgroundBrush}"
         KeyDown="Window_KeyDown">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="60"/>      <!-- Header -->
-            <RowDefinition Height="60"/>      <!-- Tab Bar -->
-            <RowDefinition Height="*"/>       <!-- Terminal Content -->
-            <RowDefinition Height="80"/>      <!-- Input Area -->
-            <RowDefinition Height="100"/>     <!-- Bottom Navigation -->
-        </Grid.RowDefinitions>
+    <!-- Bezel-safe container with curved corners -->
+    <Border Style="{StaticResource BezelWindowBorderStyle}"
+            Background="{StaticResource BackgroundBrush}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60"/>      <!-- Header -->
+                <RowDefinition Height="60"/>      <!-- Tab Bar -->
+                <RowDefinition Height="*"/>       <!-- Terminal Content -->
+                <RowDefinition Height="80"/>      <!-- Input Area -->
+                <RowDefinition Height="100"/>     <!-- Bottom Navigation -->
+            </Grid.RowDefinitions>
 
-        <!-- Header -->
-        <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}" Padding="20,0">
+            <!-- Header with bezel-safe margins -->
+            <Border Grid.Row="0" Style="{StaticResource BezelStatusBarStyle}" Background="{StaticResource SurfaceBrush}">
             <Grid>
                 <TextBlock Text="Terminal"
                            FontSize="{StaticResource FontSizeXLarge}"
@@ -112,8 +115,8 @@
             </Grid>
         </Border>
 
-        <!-- Bottom Navigation -->
-        <Border Grid.Row="4" Background="{StaticResource SurfaceBrush}">
+            <!-- Bottom Navigation with bezel-safe margins -->
+            <Border Grid.Row="4" Style="{StaticResource BezelBottomNavStyle}" Background="{StaticResource SurfaceBrush}">
             <Grid Margin="40,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -150,5 +153,6 @@
                 </Button>
             </Grid>
         </Border>
-    </Grid>
+        </Grid>
+    </Border>
 </Window>

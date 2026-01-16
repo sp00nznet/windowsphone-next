@@ -1,0 +1,134 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:System="clr-namespace:System;assembly=mscorlib">
+
+    <!--
+    Curved Bezel Theme
+    ==================
+    This theme provides resources for handling curved screen bezels.
+    The screen has a slight curve at the corners which requires content
+    to be inset from the edges to prevent clipping.
+    -->
+
+    <!-- Bezel Curve Measurements -->
+    <!-- Corner radius of the physical screen bezel -->
+    <CornerRadius x:Key="BezelCornerRadius">32</CornerRadius>
+
+    <!-- Inner corner radius for content areas (slightly smaller than bezel) -->
+    <CornerRadius x:Key="BezelInnerCornerRadius">28</CornerRadius>
+
+    <!-- Margins to keep content safe from the curved bezel -->
+    <!-- Top/Bottom need more margin due to corner curves, sides need less -->
+    <Thickness x:Key="BezelSafeMargin">12,16,12,16</Thickness>
+
+    <!-- Padding for content inside the safe area -->
+    <Thickness x:Key="BezelSafePadding">8,8,8,8</Thickness>
+
+    <!-- Status bar specific margins (accounts for top bezel curve) -->
+    <Thickness x:Key="BezelStatusBarMargin">16,8,16,0</Thickness>
+
+    <!-- Bottom navigation specific margins (accounts for bottom bezel curve) -->
+    <Thickness x:Key="BezelBottomNavMargin">16,0,16,12</Thickness>
+
+    <!-- Corner radius values as doubles for individual use -->
+    <System:Double x:Key="BezelCornerRadiusValue">32</System:Double>
+    <System:Double x:Key="BezelInnerCornerRadiusValue">28</System:Double>
+
+    <!-- Bezel curve indicator color (subtle edge gradient for visual feedback) -->
+    <Color x:Key="BezelEdgeColor">#0A000000</Color>
+    <SolidColorBrush x:Key="BezelEdgeBrush" Color="{StaticResource BezelEdgeColor}"/>
+
+    <!-- Gradient for bezel edge effect (creates subtle shadow at curved corners) -->
+    <RadialGradientBrush x:Key="BezelCornerGradient"
+                         GradientOrigin="0,0"
+                         Center="0,0"
+                         RadiusX="1"
+                         RadiusY="1">
+        <GradientStop Color="#15000000" Offset="0.7"/>
+        <GradientStop Color="#00000000" Offset="1"/>
+    </RadialGradientBrush>
+
+    <!-- Main Window Border Style - wraps entire window content with bezel-aware corners -->
+    <Style x:Key="BezelWindowBorderStyle" TargetType="Border">
+        <Setter Property="CornerRadius" Value="{StaticResource BezelCornerRadius}"/>
+        <Setter Property="ClipToBounds" Value="True"/>
+    </Style>
+
+    <!-- Content Container Style - provides safe area for main content -->
+    <Style x:Key="BezelSafeAreaStyle" TargetType="Border">
+        <Setter Property="Margin" Value="{StaticResource BezelSafeMargin}"/>
+        <Setter Property="Padding" Value="{StaticResource BezelSafePadding}"/>
+    </Style>
+
+    <!-- Full-bleed content style (for backgrounds that should extend to bezel) -->
+    <Style x:Key="BezelFullBleedStyle" TargetType="Border">
+        <Setter Property="CornerRadius" Value="{StaticResource BezelCornerRadius}"/>
+        <Setter Property="ClipToBounds" Value="True"/>
+    </Style>
+
+    <!-- Status Bar with Bezel Awareness -->
+    <Style x:Key="BezelStatusBarStyle" TargetType="Border">
+        <Setter Property="Margin" Value="{StaticResource BezelStatusBarMargin}"/>
+        <Setter Property="Padding" Value="8,8"/>
+    </Style>
+
+    <!-- Bottom Navigation with Bezel Awareness -->
+    <Style x:Key="BezelBottomNavStyle" TargetType="Border">
+        <Setter Property="Margin" Value="{StaticResource BezelBottomNavMargin}"/>
+        <Setter Property="CornerRadius" Value="24,24,24,24"/>
+    </Style>
+
+    <!-- Scrollable content area style -->
+    <Style x:Key="BezelScrollAreaStyle" TargetType="ScrollViewer">
+        <Setter Property="Margin" Value="8,0"/>
+        <Setter Property="Padding" Value="4,0"/>
+    </Style>
+
+    <!-- List item style with bezel-safe horizontal margins -->
+    <Style x:Key="BezelListItemStyle" TargetType="Border">
+        <Setter Property="Margin" Value="12,4,12,4"/>
+    </Style>
+
+    <!-- Corner overlay elements for visual bezel indication (optional) -->
+    <!-- These can be placed at corners to show where the bezel curve is -->
+    <Style x:Key="BezelCornerIndicatorTopLeft" TargetType="Border">
+        <Setter Property="Width" Value="32"/>
+        <Setter Property="Height" Value="32"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="CornerRadius" Value="0,0,32,0"/>
+        <Setter Property="Background" Value="{StaticResource BezelEdgeBrush}"/>
+        <Setter Property="IsHitTestVisible" Value="False"/>
+    </Style>
+
+    <Style x:Key="BezelCornerIndicatorTopRight" TargetType="Border">
+        <Setter Property="Width" Value="32"/>
+        <Setter Property="Height" Value="32"/>
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="CornerRadius" Value="0,0,0,32"/>
+        <Setter Property="Background" Value="{StaticResource BezelEdgeBrush}"/>
+        <Setter Property="IsHitTestVisible" Value="False"/>
+    </Style>
+
+    <Style x:Key="BezelCornerIndicatorBottomLeft" TargetType="Border">
+        <Setter Property="Width" Value="32"/>
+        <Setter Property="Height" Value="32"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Bottom"/>
+        <Setter Property="CornerRadius" Value="0,32,0,0"/>
+        <Setter Property="Background" Value="{StaticResource BezelEdgeBrush}"/>
+        <Setter Property="IsHitTestVisible" Value="False"/>
+    </Style>
+
+    <Style x:Key="BezelCornerIndicatorBottomRight" TargetType="Border">
+        <Setter Property="Width" Value="32"/>
+        <Setter Property="Height" Value="32"/>
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="VerticalAlignment" Value="Bottom"/>
+        <Setter Property="CornerRadius" Value="32,0,0,0"/>
+        <Setter Property="Background" Value="{StaticResource BezelEdgeBrush}"/>
+        <Setter Property="IsHitTestVisible" Value="False"/>
+    </Style>
+
+</ResourceDictionary>

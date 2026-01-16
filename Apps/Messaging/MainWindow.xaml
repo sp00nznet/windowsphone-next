@@ -10,15 +10,18 @@
         Loaded="Window_Loaded"
         KeyDown="Window_KeyDown">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <!-- Bezel-safe container with curved corners -->
+    <Border Style="{StaticResource BezelWindowBorderStyle}"
+            Background="{StaticResource BackgroundBrush}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <!-- Top Bar -->
-        <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}">
-            <Grid Margin="16,0">
+            <!-- Top Bar with bezel-safe margins -->
+            <Border Grid.Row="0" Style="{StaticResource BezelStatusBarStyle}" Background="{StaticResource SurfaceBrush}">
+                <Grid>
                 <Button x:Name="BackButton"
                        Content="&#x2190;"
                        HorizontalAlignment="Left"
@@ -38,8 +41,8 @@
             </Grid>
         </Border>
 
-        <!-- Content Area -->
-        <Grid Grid.Row="1">
+            <!-- Content Area with bezel-safe margins -->
+            <Grid Grid.Row="1" Margin="12,0,12,12">
             <!-- Conversations List View -->
             <Grid x:Name="ConversationsView">
                 <Grid.RowDefinitions>
@@ -298,5 +301,6 @@
                 </Border>
             </Grid>
         </Grid>
-    </Grid>
+        </Grid>
+    </Border>
 </Window>

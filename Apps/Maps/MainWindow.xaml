@@ -11,17 +11,20 @@
         Loaded="Window_Loaded"
         KeyDown="Window_KeyDown">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="60"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <!-- Bezel-safe container with curved corners -->
+    <Border Style="{StaticResource BezelWindowBorderStyle}"
+            Background="{StaticResource BackgroundBrush}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <!-- Top Bar with Search -->
-        <Border Grid.Row="0"
-               Background="{StaticResource SurfaceBrush}"
-               Padding="12,8"
-               Panel.ZIndex="100">
+            <!-- Top Bar with Search and bezel-safe margins -->
+            <Border Grid.Row="0"
+                   Style="{StaticResource BezelStatusBarStyle}"
+                   Background="{StaticResource SurfaceBrush}"
+                   Panel.ZIndex="100">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -107,8 +110,8 @@
             </Grid>
         </Border>
 
-        <!-- Map Area -->
-        <Grid Grid.Row="1">
+            <!-- Map Area with bezel-safe margins -->
+            <Grid Grid.Row="1" Margin="0,0,0,16">
             <!-- Map WebView -->
             <wv2:WebView2 x:Name="MapView"
                          Source="about:blank"
@@ -274,5 +277,6 @@
                 </StackPanel>
             </Border>
         </Border>
-    </Grid>
+        </Grid>
+    </Border>
 </Window>

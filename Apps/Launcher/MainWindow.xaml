@@ -13,15 +13,18 @@
         Loaded="Window_Loaded"
         KeyDown="Window_KeyDown">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="60"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="100"/>
-        </Grid.RowDefinitions>
+    <!-- Bezel-safe container with curved corners -->
+    <Border Style="{StaticResource BezelWindowBorderStyle}"
+            Background="{StaticResource BackgroundBrush}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="100"/>
+            </Grid.RowDefinitions>
 
-        <!-- Status Bar -->
-        <Border Grid.Row="0" Style="{StaticResource StatusBarStyle}">
+            <!-- Status Bar with bezel-safe margins -->
+            <Border Grid.Row="0" Style="{StaticResource BezelStatusBarStyle}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -97,9 +100,9 @@
             </Grid>
         </Border>
 
-        <!-- Main Content Area -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <Grid Margin="20">
+        <!-- Main Content Area with bezel-safe horizontal margins -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Style="{StaticResource BezelScrollAreaStyle}">
+                <Grid Margin="12,20,12,20">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -201,11 +204,11 @@
             </Grid>
         </ScrollViewer>
 
-        <!-- Bottom Navigation -->
-        <Border Grid.Row="2"
-               Background="{StaticResource SurfaceBrush}"
-               CornerRadius="24,24,0,0">
-            <Grid Margin="60,0">
+        <!-- Bottom Navigation with bezel-safe margins -->
+            <Border Grid.Row="2"
+                   Style="{StaticResource BezelBottomNavStyle}"
+                   Background="{StaticResource SurfaceBrush}">
+                <Grid Margin="44,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
@@ -284,5 +287,6 @@
                 </StackPanel>
             </Grid>
         </Border>
-    </Grid>
+        </Grid>
+    </Border>
 </Window>
