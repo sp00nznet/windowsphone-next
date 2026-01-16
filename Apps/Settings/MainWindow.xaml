@@ -434,6 +434,99 @@
                     </StackPanel>
                 </Border>
 
+                <!-- ==================== APPEARANCE SECTION ==================== -->
+                <TextBlock Text="Appearance"
+                          Style="{StaticResource SectionHeaderStyle}"/>
+
+                <!-- Current Theme -->
+                <Border Style="{StaticResource SettingsItemStyle}">
+                    <StackPanel>
+                        <TextBlock Text="Theme"
+                                  FontSize="16"
+                                  FontWeight="SemiBold"
+                                  Foreground="{StaticResource TextPrimaryBrush}"
+                                  Margin="0,0,0,4"/>
+                        <TextBlock x:Name="CurrentThemeText"
+                                  Text="Dark"
+                                  FontSize="14"
+                                  Foreground="{StaticResource AccentBrush}"
+                                  Margin="0,0,0,16"/>
+
+                        <!-- Theme Grid -->
+                        <ItemsControl x:Name="ThemeGrid">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="3" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Style="{StaticResource ThemeButtonStyle}"
+                                           Click="ThemeButton_Click"
+                                           Tag="{Binding Name}"
+                                           Margin="4">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="60"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+
+                                            <!-- Theme Preview -->
+                                            <Border Grid.Row="0"
+                                                   CornerRadius="8"
+                                                   Background="{Binding PreviewBackground}"
+                                                   BorderBrush="{Binding PreviewBorder}"
+                                                   BorderThickness="2">
+                                                <Grid Margin="8">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="*"/>
+                                                    </Grid.RowDefinitions>
+                                                    <!-- Mini header bar -->
+                                                    <Border Grid.Row="0"
+                                                           Background="{Binding PreviewSurface}"
+                                                           CornerRadius="4"
+                                                           Height="12"
+                                                           Margin="0,0,0,4"/>
+                                                    <!-- Accent stripe -->
+                                                    <Border Grid.Row="1"
+                                                           Background="{Binding PreviewAccent}"
+                                                           CornerRadius="4"
+                                                           Height="16"
+                                                           VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </Border>
+
+                                            <!-- Theme Name -->
+                                            <TextBlock Grid.Row="1"
+                                                      Text="{Binding DisplayName}"
+                                                      FontSize="11"
+                                                      Foreground="{StaticResource TextPrimaryBrush}"
+                                                      HorizontalAlignment="Center"
+                                                      Margin="0,6,0,0"
+                                                      TextTrimming="CharacterEllipsis"/>
+
+                                            <!-- Selected Indicator -->
+                                            <Border Grid.Row="0"
+                                                   x:Name="SelectedIndicator"
+                                                   CornerRadius="8"
+                                                   BorderBrush="{StaticResource AccentBrush}"
+                                                   BorderThickness="3"
+                                                   Visibility="{Binding IsSelected}"/>
+                                        </Grid>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Text="Theme changes apply to all apps. Some apps may require restart."
+                                  FontSize="11"
+                                  Foreground="{StaticResource TextSecondaryBrush}"
+                                  TextWrapping="Wrap"
+                                  Margin="0,12,0,0"/>
+                    </StackPanel>
+                </Border>
+
                 <!-- ==================== SYSTEM SECTION ==================== -->
                 <TextBlock Text="System"
                           Style="{StaticResource SectionHeaderStyle}"/>

@@ -10,4 +10,8 @@
     <RootNamespace>WindowsPhoneNext.Gallery</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\Services\SharedServices.csproj" />
+  </ItemGroup>
+
 </Project>

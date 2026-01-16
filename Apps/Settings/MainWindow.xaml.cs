@@ -7,7 +7,9 @@ using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using WindowsPhoneNext.ModemLib;
+using WindowsPhoneNext.Shared.Services;
 
 namespace WindowsPhoneNext.Settings;
 
@@ -19,6 +21,7 @@ public partial class MainWindow : Window
     private readonly ObservableCollection<BluetoothDeviceInfo> _availableBluetoothDevices = new();
     private readonly ObservableCollection<WifiNetworkInfo> _savedWifiNetworks = new();
     private readonly ObservableCollection<WifiNetworkInfo> _availableWifiNetworks = new();
+    private readonly ObservableCollection<ThemeDisplayInfo> _themes = new();
     private string? _pendingWifiSsid;
     private bool _isScanning;
 
@@ -40,9 +43,11 @@ public partial class MainWindow : Window
         AvailableBluetoothDevices.ItemsSource = _availableBluetoothDevices;
         SavedWifiNetworks.ItemsSource = _savedWifiNetworks;
         AvailableWifiNetworks.ItemsSource = _availableWifiNetworks;
+        ThemeGrid.ItemsSource = _themes;
 
         LoadSettings();
         LoadStorageInfo();
+        LoadThemes();
         _ = InitializeAsync();
     }
 
@@ -69,6 +74,81 @@ public partial class MainWindow : Window
         {
             StorageInfoText.Text = "Unable to read storage info";
         }
+    }
+
+    #endregion
+
+    #region Themes
+
+    private void LoadThemes()
+    {
+        _themes.Clear();
+        var currentTheme = ThemeManager.CurrentTheme;
+        CurrentThemeText.Text = ThemeManager.GetCurrentThemeDefinition().DisplayName;
+
+        foreach (var theme in ThemeManager.AvailableThemes.Values)
+        {
+            _themes.Add(new ThemeDisplayInfo
+            {
+                Name = theme.Name,
+                DisplayName = theme.DisplayName,
+                Description = theme.Description,
+                PreviewBackground = new SolidColorBrush(ColorFromHex(theme.BackgroundColor)),
+                PreviewSurface = new SolidColorBrush(ColorFromHex(theme.SurfaceColor)),
+                PreviewAccent = new SolidColorBrush(ColorFromHex(theme.AccentColor)),
+                PreviewBorder = new SolidColorBrush(ColorFromHex(theme.BorderColor)),
+                IsSelected = theme.Name == currentTheme ? Visibility.Visible : Visibility.Collapsed
+            });
+        }
+    }
+
+    private void ThemeButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is string themeName)
+        {
+            ThemeManager.SetTheme(themeName);
+
+            // Update current theme display
+            CurrentThemeText.Text = ThemeManager.GetCurrentThemeDefinition().DisplayName;
+
+            // Update selection indicators
+            foreach (var theme in _themes)
+            {
+                theme.IsSelected = theme.Name == themeName ? Visibility.Visible : Visibility.Collapsed;
+            }
+
+            // Refresh the theme grid to show selection
+            ThemeGrid.Items.Refresh();
+
+            // Apply theme to current window
+            ThemeManager.ApplyTheme(Application.Current.Resources);
+        }
+    }
+
+    private static Color ColorFromHex(string hex)
+    {
+        if (hex.StartsWith("#"))
+        {
+            hex = hex.Substring(1);
+        }
+
+        if (hex.Length == 6)
+        {
+            return Color.FromRgb(
+                Convert.ToByte(hex.Substring(0, 2), 16),
+                Convert.ToByte(hex.Substring(2, 2), 16),
+                Convert.ToByte(hex.Substring(4, 2), 16));
+        }
+        else if (hex.Length == 8)
+        {
+            return Color.FromArgb(
+                Convert.ToByte(hex.Substring(0, 2), 16),
+                Convert.ToByte(hex.Substring(2, 2), 16),
+                Convert.ToByte(hex.Substring(4, 2), 16),
+                Convert.ToByte(hex.Substring(6, 2), 16));
+        }
+
+        return Colors.White;
     }
 
     #endregion
@@ -885,6 +965,18 @@ public class ConnectivitySettings
 {
     public List<BluetoothDeviceInfo> PairedBluetoothDevices { get; set; } = new();
     public List<WifiNetworkInfo> SavedWifiNetworks { get; set; } = new();
+}
+
+public class ThemeDisplayInfo
+{
+    public string Name { get; set; } = "";
+    public string DisplayName { get; set; } = "";
+    public string Description { get; set; } = "";
+    public SolidColorBrush PreviewBackground { get; set; } = Brushes.Gray;
+    public SolidColorBrush PreviewSurface { get; set; } = Brushes.DarkGray;
+    public SolidColorBrush PreviewAccent { get; set; } = Brushes.Blue;
+    public SolidColorBrush PreviewBorder { get; set; } = Brushes.Gray;
+    public Visibility IsSelected { get; set; } = Visibility.Collapsed;
 }
 
 #endregion

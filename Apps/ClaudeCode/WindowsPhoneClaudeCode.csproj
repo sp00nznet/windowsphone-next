@@ -14,4 +14,8 @@
     <Reference Include="System.Speech" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\Services\SharedServices.csproj" />
+  </ItemGroup>
+
 </Project>
