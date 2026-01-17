@@ -1,0 +1,127 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+    Theme Colors - Centralized color definitions for all apps
+    These are the BASE colors that get overridden by the active theme.
+    Apps should reference these resources for consistent theming.
+    -->
+
+    <!-- ========== DARK THEME (Default) ========== -->
+    <Color x:Key="Dark_BackgroundColor">#1A1A2E</Color>
+    <Color x:Key="Dark_SurfaceColor">#16213E</Color>
+    <Color x:Key="Dark_CardColor">#1F2937</Color>
+    <Color x:Key="Dark_PrimaryColor">#0078D4</Color>
+    <Color x:Key="Dark_AccentColor">#00B4D8</Color>
+    <Color x:Key="Dark_TextPrimaryColor">#FFFFFF</Color>
+    <Color x:Key="Dark_TextSecondaryColor">#9CA3AF</Color>
+    <Color x:Key="Dark_BorderColor">#374151</Color>
+    <Color x:Key="Dark_SuccessColor">#10B981</Color>
+    <Color x:Key="Dark_ErrorColor">#EF4444</Color>
+    <Color x:Key="Dark_WarningColor">#F59E0B</Color>
+
+    <!-- ========== LIGHT THEME ========== -->
+    <Color x:Key="Light_BackgroundColor">#F5F5F5</Color>
+    <Color x:Key="Light_SurfaceColor">#FFFFFF</Color>
+    <Color x:Key="Light_CardColor">#E5E7EB</Color>
+    <Color x:Key="Light_PrimaryColor">#0078D4</Color>
+    <Color x:Key="Light_AccentColor">#0078D4</Color>
+    <Color x:Key="Light_TextPrimaryColor">#1F2937</Color>
+    <Color x:Key="Light_TextSecondaryColor">#6B7280</Color>
+    <Color x:Key="Light_BorderColor">#D1D5DB</Color>
+    <Color x:Key="Light_SuccessColor">#059669</Color>
+    <Color x:Key="Light_ErrorColor">#DC2626</Color>
+    <Color x:Key="Light_WarningColor">#D97706</Color>
+
+    <!-- ========== MIDNIGHT BLUE THEME ========== -->
+    <Color x:Key="MidnightBlue_BackgroundColor">#0F172A</Color>
+    <Color x:Key="MidnightBlue_SurfaceColor">#1E293B</Color>
+    <Color x:Key="MidnightBlue_CardColor">#334155</Color>
+    <Color x:Key="MidnightBlue_PrimaryColor">#3B82F6</Color>
+    <Color x:Key="MidnightBlue_AccentColor">#60A5FA</Color>
+    <Color x:Key="MidnightBlue_TextPrimaryColor">#F8FAFC</Color>
+    <Color x:Key="MidnightBlue_TextSecondaryColor">#94A3B8</Color>
+    <Color x:Key="MidnightBlue_BorderColor">#475569</Color>
+    <Color x:Key="MidnightBlue_SuccessColor">#22C55E</Color>
+    <Color x:Key="MidnightBlue_ErrorColor">#EF4444</Color>
+    <Color x:Key="MidnightBlue_WarningColor">#F59E0B</Color>
+
+    <!-- ========== FOREST GREEN THEME ========== -->
+    <Color x:Key="Forest_BackgroundColor">#14231A</Color>
+    <Color x:Key="Forest_SurfaceColor">#1C3326</Color>
+    <Color x:Key="Forest_CardColor">#264534</Color>
+    <Color x:Key="Forest_PrimaryColor">#22C55E</Color>
+    <Color x:Key="Forest_AccentColor">#4ADE80</Color>
+    <Color x:Key="Forest_TextPrimaryColor">#F0FDF4</Color>
+    <Color x:Key="Forest_TextSecondaryColor">#86EFAC</Color>
+    <Color x:Key="Forest_BorderColor">#166534</Color>
+    <Color x:Key="Forest_SuccessColor">#4ADE80</Color>
+    <Color x:Key="Forest_ErrorColor">#F87171</Color>
+    <Color x:Key="Forest_WarningColor">#FBBF24</Color>
+
+    <!-- ========== PURPLE NIGHT THEME ========== -->
+    <Color x:Key="Purple_BackgroundColor">#1E1B2E</Color>
+    <Color x:Key="Purple_SurfaceColor">#2D2640</Color>
+    <Color x:Key="Purple_CardColor">#3D3455</Color>
+    <Color x:Key="Purple_PrimaryColor">#A855F7</Color>
+    <Color x:Key="Purple_AccentColor">#C084FC</Color>
+    <Color x:Key="Purple_TextPrimaryColor">#FAF5FF</Color>
+    <Color x:Key="Purple_TextSecondaryColor">#C4B5FD</Color>
+    <Color x:Key="Purple_BorderColor">#6B21A8</Color>
+    <Color x:Key="Purple_SuccessColor">#34D399</Color>
+    <Color x:Key="Purple_ErrorColor">#F87171</Color>
+    <Color x:Key="Purple_WarningColor">#FBBF24</Color>
+
+    <!-- ========== SUNSET ORANGE THEME ========== -->
+    <Color x:Key="Sunset_BackgroundColor">#1C1410</Color>
+    <Color x:Key="Sunset_SurfaceColor">#2D1F18</Color>
+    <Color x:Key="Sunset_CardColor">#3D2C22</Color>
+    <Color x:Key="Sunset_PrimaryColor">#F97316</Color>
+    <Color x:Key="Sunset_AccentColor">#FB923C</Color>
+    <Color x:Key="Sunset_TextPrimaryColor">#FFF7ED</Color>
+    <Color x:Key="Sunset_TextSecondaryColor">#FDBA74</Color>
+    <Color x:Key="Sunset_BorderColor">#C2410C</Color>
+    <Color x:Key="Sunset_SuccessColor">#4ADE80</Color>
+    <Color x:Key="Sunset_ErrorColor">#F87171</Color>
+    <Color x:Key="Sunset_WarningColor">#FCD34D</Color>
+
+    <!-- ========== ROSE PINK THEME ========== -->
+    <Color x:Key="Rose_BackgroundColor">#1C1418</Color>
+    <Color x:Key="Rose_SurfaceColor">#2D1F26</Color>
+    <Color x:Key="Rose_CardColor">#3D2C35</Color>
+    <Color x:Key="Rose_PrimaryColor">#EC4899</Color>
+    <Color x:Key="Rose_AccentColor">#F472B6</Color>
+    <Color x:Key="Rose_TextPrimaryColor">#FDF2F8</Color>
+    <Color x:Key="Rose_TextSecondaryColor">#F9A8D4</Color>
+    <Color x:Key="Rose_BorderColor">#BE185D</Color>
+    <Color x:Key="Rose_SuccessColor">#4ADE80</Color>
+    <Color x:Key="Rose_ErrorColor">#FCA5A5</Color>
+    <Color x:Key="Rose_WarningColor">#FBBF24</Color>
+
+    <!-- ========== OCEAN TEAL THEME ========== -->
+    <Color x:Key="Ocean_BackgroundColor">#0F1419</Color>
+    <Color x:Key="Ocean_SurfaceColor">#162025</Color>
+    <Color x:Key="Ocean_CardColor">#1E2D33</Color>
+    <Color x:Key="Ocean_PrimaryColor">#14B8A6</Color>
+    <Color x:Key="Ocean_AccentColor">#2DD4BF</Color>
+    <Color x:Key="Ocean_TextPrimaryColor">#F0FDFA</Color>
+    <Color x:Key="Ocean_TextSecondaryColor">#5EEAD4</Color>
+    <Color x:Key="Ocean_BorderColor">#0F766E</Color>
+    <Color x:Key="Ocean_SuccessColor">#4ADE80</Color>
+    <Color x:Key="Ocean_ErrorColor">#F87171</Color>
+    <Color x:Key="Ocean_WarningColor">#FBBF24</Color>
+
+    <!-- ========== HIGH CONTRAST THEME ========== -->
+    <Color x:Key="HighContrast_BackgroundColor">#000000</Color>
+    <Color x:Key="HighContrast_SurfaceColor">#1A1A1A</Color>
+    <Color x:Key="HighContrast_CardColor">#2A2A2A</Color>
+    <Color x:Key="HighContrast_PrimaryColor">#00FF00</Color>
+    <Color x:Key="HighContrast_AccentColor">#00FFFF</Color>
+    <Color x:Key="HighContrast_TextPrimaryColor">#FFFFFF</Color>
+    <Color x:Key="HighContrast_TextSecondaryColor">#CCCCCC</Color>
+    <Color x:Key="HighContrast_BorderColor">#FFFFFF</Color>
+    <Color x:Key="HighContrast_SuccessColor">#00FF00</Color>
+    <Color x:Key="HighContrast_ErrorColor">#FF0000</Color>
+    <Color x:Key="HighContrast_WarningColor">#FFFF00</Color>
+
+</ResourceDictionary>

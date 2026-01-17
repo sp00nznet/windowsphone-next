@@ -440,12 +440,7 @@ public partial class MainWindow : Window
 
     private void Modem_SmsReceived(object? sender, SmsReceivedEventArgs e)
     {
-        // Check if sender is blocked - silently ignore if so
-        if (BlockingService.Instance.IsBlockedForMessages(e.Sender))
-        {
-            return;
-        }
-
+        // Reload messages - blocking is handled in ProcessSmsMessages
         Dispatcher.Invoke(async () =>
         {
             await LoadMessagesAsync();

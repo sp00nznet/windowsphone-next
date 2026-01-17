@@ -10,4 +10,8 @@
     <AssemblyName>WindowsPhoneVideo</AssemblyName>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\Services\SharedServices.csproj" />
+  </ItemGroup>
+
 </Project>

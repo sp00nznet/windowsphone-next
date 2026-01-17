@@ -8,4 +8,8 @@
     <ApplicationIcon>..\..\Assets\icon.ico</ApplicationIcon>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\Services\SharedServices.csproj" />
+  </ItemGroup>
+
 </Project>
