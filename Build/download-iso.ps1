@@ -143,85 +143,39 @@ Write-Host ""
 $downloadSuccess = $false
 $tempFile = "$OutputFile.downloading"
 
-# Method 1: Try BITS transfer (best for large files, supports resume)
-$bitsAvailable = Get-Command Start-BitsTransfer -ErrorAction SilentlyContinue
+# Remove any existing temp file
+if (Test-Path $tempFile) {
+    Remove-Item $tempFile -Force
+}
 
-if ($bitsAvailable) {
-    Write-Host "Using BITS transfer (supports resume if interrupted)..." -ForegroundColor Gray
+# Method 1: curl.exe (best progress display, available on Windows 10+)
+$curlPath = Get-Command curl.exe -ErrorAction SilentlyContinue
+
+if ($curlPath -and -not $downloadSuccess) {
+    Write-Host "Downloading with curl (shows progress)..." -ForegroundColor Gray
     Write-Host ""
 
     try {
-        # Remove any existing temp file
-        if (Test-Path $tempFile) {
-            Remove-Item $tempFile -Force
-        }
+        & curl.exe -L --progress-bar -o $tempFile $IsoDownloadUrl
 
-        Start-BitsTransfer -Source $IsoDownloadUrl -Destination $tempFile -DisplayName "Windows 11 IoT LTSC 2024" -Description "Downloading from archive.org"
-
-        if (Test-Path $tempFile) {
+        if ($LASTEXITCODE -eq 0 -and (Test-Path $tempFile)) {
             Move-Item $tempFile $OutputFile -Force
             $downloadSuccess = $true
         }
     }
     catch {
-        Write-Host "BITS transfer failed: $_" -ForegroundColor Yellow
-        Write-Host "Falling back to direct download..." -ForegroundColor Yellow
+        Write-Host "curl download failed: $_" -ForegroundColor Yellow
     }
 }
 
-# Method 2: Invoke-WebRequest with progress
+# Method 2: Invoke-WebRequest (fallback)
 if (-not $downloadSuccess) {
-    Write-Host "Using direct download..." -ForegroundColor Gray
+    Write-Host "Using PowerShell download..." -ForegroundColor Gray
     Write-Host ""
 
     try {
-        # Remove any existing temp file
-        if (Test-Path $tempFile) {
-            Remove-Item $tempFile -Force
-        }
-
         $ProgressPreference = 'Continue'
-
-        # Use .NET WebClient for better progress and performance
-        $webClient = New-Object System.Net.WebClient
-        $webClient.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) WindowsPhoneNext-Downloader/1.0")
-
-        # Progress tracking
-        $downloadStart = Get-Date
-        $lastProgress = 0
-
-        $webClient.DownloadProgressChanged += {
-            param($sender, $e)
-            if ($e.ProgressPercentage -ne $lastProgress) {
-                $lastProgress = $e.ProgressPercentage
-                $elapsed = (Get-Date) - $downloadStart
-                $speed = if ($elapsed.TotalSeconds -gt 0) { $e.BytesReceived / $elapsed.TotalSeconds / 1MB } else { 0 }
-                Write-Progress -Activity "Downloading Windows 11 IoT Enterprise LTSC 2024" `
-                    -Status "$($e.ProgressPercentage)% - $([math]::Round($speed, 1)) MB/s" `
-                    -PercentComplete $e.ProgressPercentage
-            }
-        }
-
-        $webClient.DownloadFileCompleted += {
-            param($sender, $e)
-            Write-Progress -Activity "Downloading" -Completed
-            if ($e.Error) {
-                throw $e.Error
-            }
-        }
-
-        # Start async download and wait
-        $downloadTask = $webClient.DownloadFileTaskAsync($IsoDownloadUrl, $tempFile)
-
-        while (-not $downloadTask.IsCompleted) {
-            Start-Sleep -Milliseconds 500
-        }
-
-        if ($downloadTask.IsFaulted) {
-            throw $downloadTask.Exception
-        }
-
-        $webClient.Dispose()
+        Invoke-WebRequest -Uri $IsoDownloadUrl -OutFile $tempFile -UseBasicParsing
 
         if (Test-Path $tempFile) {
             Move-Item $tempFile $OutputFile -Force
@@ -229,33 +183,28 @@ if (-not $downloadSuccess) {
         }
     }
     catch {
-        Write-Host "WebClient download failed: $_" -ForegroundColor Yellow
+        Write-Host "PowerShell download failed: $_" -ForegroundColor Yellow
     }
 }
 
-# Method 3: curl.exe (available on Windows 10+)
+# Method 3: BITS transfer (last resort, can be slow to start)
 if (-not $downloadSuccess) {
-    $curlPath = Get-Command curl.exe -ErrorAction SilentlyContinue
+    $bitsAvailable = Get-Command Start-BitsTransfer -ErrorAction SilentlyContinue
 
-    if ($curlPath) {
-        Write-Host "Using curl..." -ForegroundColor Gray
+    if ($bitsAvailable) {
+        Write-Host "Using BITS transfer..." -ForegroundColor Gray
         Write-Host ""
 
         try {
-            # Remove any existing temp file
+            Start-BitsTransfer -Source $IsoDownloadUrl -Destination $tempFile -DisplayName "Windows 11 IoT LTSC 2024"
+
             if (Test-Path $tempFile) {
-                Remove-Item $tempFile -Force
-            }
-
-            & curl.exe -L -# -o $tempFile $IsoDownloadUrl
-
-            if ($LASTEXITCODE -eq 0 -and (Test-Path $tempFile)) {
                 Move-Item $tempFile $OutputFile -Force
                 $downloadSuccess = $true
             }
         }
         catch {
-            Write-Host "curl download failed: $_" -ForegroundColor Yellow
+            Write-Host "BITS transfer failed: $_" -ForegroundColor Yellow
         }
     }
 }
