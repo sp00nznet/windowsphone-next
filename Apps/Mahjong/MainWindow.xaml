@@ -149,4 +149,5 @@
             </StackPanel>
         </Border>
     </Grid>
+    </Border>
 </Window>

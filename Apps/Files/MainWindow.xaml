@@ -23,8 +23,8 @@
             <Grid>
                 <TextBlock Text="12:00" FontSize="14" Foreground="{StaticResource TextPrimaryBrush}"
                            HorizontalAlignment="Left"/>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-                    <TextBlock Text="📶" FontSize="12"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock Text="📶" FontSize="12" Margin="0,0,8,0"/>
                     <TextBlock Text="🔋" FontSize="12"/>
                 </StackPanel>
             </Grid>
