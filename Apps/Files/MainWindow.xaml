@@ -69,7 +69,6 @@
 
                 <!-- Search Box -->
                 <TextBox x:Name="SearchBox" Grid.Row="1"
-                         Style="{StaticResource SearchBoxStyle}"
                          TextChanged="SearchBox_TextChanged">
                     <TextBox.Resources>
                         <VisualBrush x:Key="HintBrush" TileMode="None" Stretch="None" AlignmentX="Left">
