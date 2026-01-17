@@ -2,8 +2,10 @@
 .SYNOPSIS
     Master deployment script for Windows Phone Next
 .DESCRIPTION
-    Builds all applications, downloads drivers, and creates a deployable image
+    Builds all applications, downloads drivers, and creates a deployable image.
+    Can automatically download Windows 11 IoT Enterprise LTSC from Microsoft.
 .EXAMPLE
+    .\deploy.ps1 -DownloadIso
     .\deploy.ps1 -IsoPath "C:\Windows11.iso"
     .\deploy.ps1 -BuildOnly
 #>
@@ -13,10 +15,16 @@ param(
     [string]$IsoPath,
 
     [Parameter()]
+    [switch]$DownloadIso,
+
+    [Parameter()]
     [switch]$BuildOnly,
 
     [Parameter()]
     [switch]$SkipDrivers,
+
+    [Parameter()]
+    [switch]$SkipBuild,
 
     [Parameter()]
     [switch]$Clean
@@ -42,26 +50,63 @@ function Write-Step {
 
 Write-Banner "Windows Phone Next - Deployment System"
 
-$TotalSteps = 4
-if ($BuildOnly) { $TotalSteps = 1 }
-
 $BuildDir = $PSScriptRoot
 $ProjectRoot = Resolve-Path "$BuildDir\.."
+$IsoDir = Join-Path $ProjectRoot "ISO"
 
-# Step 1: Build all applications
-Write-Step 1 $TotalSteps "Building all applications"
+# Calculate total steps
+$TotalSteps = 4
+if ($BuildOnly) { $TotalSteps = 1 }
+if ($DownloadIso) { $TotalSteps = 5 }
+if ($SkipBuild -and -not $BuildOnly) { $TotalSteps-- }
 
-$buildArgs = @()
-if ($Clean) { $buildArgs += "-Clean" }
+$CurrentStep = 0
 
-& "$BuildDir\build-all.ps1" @buildArgs
+# Step: Download ISO (if requested)
+if ($DownloadIso) {
+    $CurrentStep++
+    Write-Step $CurrentStep $TotalSteps "Downloading Windows 11 IoT Enterprise LTSC"
 
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "Build failed! Please fix errors and try again." -ForegroundColor Red
-    exit 1
+    # Create ISO directory
+    if (-not (Test-Path $IsoDir)) {
+        New-Item -ItemType Directory -Path $IsoDir -Force | Out-Null
+    }
+
+    # Run download script
+    $downloadResult = & "$BuildDir\download-iso.ps1" -OutputPath $IsoDir
+
+    if ($downloadResult -and (Test-Path $downloadResult)) {
+        $IsoPath = $downloadResult
+        Write-Host "ISO ready: $IsoPath" -ForegroundColor Green
+    }
+    else {
+        Write-Host "ISO download was not completed." -ForegroundColor Red
+        Write-Host "Please download manually and run:" -ForegroundColor Yellow
+        Write-Host "  .\deploy.ps1 -IsoPath 'C:\path\to\windows.iso'" -ForegroundColor Yellow
+        exit 1
+    }
 }
 
-Write-Host "Build completed successfully!" -ForegroundColor Green
+# Step: Build all applications
+if (-not $SkipBuild) {
+    $CurrentStep++
+    Write-Step $CurrentStep $TotalSteps "Building all applications"
+
+    $buildArgs = @()
+    if ($Clean) { $buildArgs += "-Clean" }
+
+    & "$BuildDir\build-all.ps1" @buildArgs
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Build failed! Please fix errors and try again." -ForegroundColor Red
+        exit 1
+    }
+
+    Write-Host "Build completed successfully!" -ForegroundColor Green
+}
+else {
+    Write-Host "Skipping build (using existing build output)" -ForegroundColor Yellow
+}
 
 if ($BuildOnly) {
     Write-Banner "Build Complete"
@@ -69,9 +114,10 @@ if ($BuildOnly) {
     exit 0
 }
 
-# Step 2: Download drivers
+# Step: Download drivers
 if (-not $SkipDrivers) {
-    Write-Step 2 $TotalSteps "Downloading LattePanda 3 Delta drivers"
+    $CurrentStep++
+    Write-Step $CurrentStep $TotalSteps "Downloading LattePanda 3 Delta drivers"
 
     & "$BuildDir\download-drivers.ps1"
 
@@ -80,23 +126,27 @@ if (-not $SkipDrivers) {
     Write-Host "Skipping driver download (using existing drivers)" -ForegroundColor Yellow
 }
 
-# Step 3: Verify ISO
-Write-Step 3 $TotalSteps "Verifying Windows ISO"
+# Step: Verify ISO
+$CurrentStep++
+Write-Step $CurrentStep $TotalSteps "Verifying Windows ISO"
 
 if (-not $IsoPath) {
     Write-Host ""
     Write-Host "Windows ISO not specified." -ForegroundColor Yellow
     Write-Host ""
-    Write-Host "To create a full deployment image, you need a Windows 11 LTSC ISO."
-    Write-Host "You can obtain it from:"
+    Write-Host "To create a full deployment image, you need a Windows 11 IoT Enterprise LTSC ISO."
+    Write-Host ""
+    Write-Host "OPTION 1 - Automatic download (recommended):" -ForegroundColor Cyan
+    Write-Host "  .\deploy.ps1 -DownloadIso"
+    Write-Host ""
+    Write-Host "OPTION 2 - Manual download:" -ForegroundColor Cyan
+    Write-Host "  1. Visit: https://www.microsoft.com/en-us/evalcenter/evaluate-windows-11-iot-enterprise-ltsc"
+    Write-Host "  2. Fill out the form and download the ISO"
+    Write-Host "  3. Run: .\deploy.ps1 -IsoPath 'C:\path\to\windows.iso'"
+    Write-Host ""
+    Write-Host "Other ISO sources:"
     Write-Host "  - Microsoft Volume Licensing Service Center (VLSC)"
     Write-Host "  - Visual Studio Subscriptions"
-    Write-Host "  - Microsoft Evaluation Center (90-day trial)"
-    Write-Host ""
-    Write-Host "Evaluation Center: https://www.microsoft.com/en-us/evalcenter/evaluate-windows-11-enterprise"
-    Write-Host ""
-    Write-Host "Once you have the ISO, run:"
-    Write-Host "  .\deploy.ps1 -IsoPath 'C:\path\to\windows.iso'"
     Write-Host ""
 
     # Create manual deployment package
@@ -179,8 +229,9 @@ if (-not (Test-Path $IsoPath)) {
 
 Write-Host "Using ISO: $IsoPath" -ForegroundColor Green
 
-# Step 4: Create deployment image
-Write-Step 4 $TotalSteps "Creating deployment image"
+# Step: Create deployment image
+$CurrentStep++
+Write-Step $CurrentStep $TotalSteps "Creating deployment image"
 
 & "$BuildDir\create-image.ps1" -IsoPath $IsoPath
 
