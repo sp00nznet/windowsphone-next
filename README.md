@@ -1,195 +1,262 @@
-# 📱 Windows Phone Next
+# Windows Phone Next
 
-A custom Windows 11 phone platform for embedded single-board computers. Experience a modern mobile interface with full telephony, messaging, and a rich app ecosystem!
+A custom Windows 11 phone platform for embedded single-board computers. Experience a modern mobile interface with full telephony, messaging, and a rich app ecosystem.
 
-![Platform](https://img.shields.io/badge/platform-Windows%2011-blue)
+![Platform](https://img.shields.io/badge/platform-Windows%2011%20LTSC-blue)
 ![.NET](https://img.shields.io/badge/.NET-8.0-purple)
 ![Display](https://img.shields.io/badge/display-720x1560-green)
 ![License](https://img.shields.io/badge/license-Personal%20Use-orange)
 
 ---
 
-## ✨ Features
+## Features
 
-- 📞 **Full Phone Functionality** - Voice calls, SMS messaging, contacts
-- 🌐 **Web Browsing** - Chromium-based browser with mobile optimization
-- 📧 **Gmail Integration** - Dedicated Gmail app (domain-locked for security)
-- 🗺️ **GPS Navigation** - OpenStreetMap routing with turn-by-turn directions
-- 🎵 **Media Playback** - Music player with 64-bar spectrum visualizer + video player
-- 🤖 **Android App Support** - Sideload APKs via Windows Subsystem for Android
-- 🎮 **Touch Games** - Solitaire and Mahjong for entertainment
-- 📊 **Status Bar** - Signal strength, battery, network status
-- 🖥️ **Terminal** - Tabbed terminal with CMD, PowerShell, and WSL support
-- 🤖 **Claude Code Integration** - Voice/text chat with AI for repository management
-- 📡 **Connectivity Settings** - Bluetooth and WiFi management with scan/pair/forget
+### Core Functionality
+- **Full Phone Functionality** - Voice calls, SMS messaging, contacts with call/message blocking
+- **Web Browsing** - Chromium-based browser with tabs, bookmarks, mobile optimization
+- **Gmail Integration** - Dedicated Gmail app (domain-locked for security)
+- **GPS Navigation** - OpenStreetMap routing with turn-by-turn directions
+
+### Media & Entertainment
+- **Music Player** - 64-bar spectrum visualizer, shuffle/repeat, playlist support
+- **Video Player** - Progress seeking, 10s skip, fullscreen mode
+- **Gallery** - Image viewer with thumbnail navigation
+- **Games** - Solitaire and Mahjong with touch controls
+
+### System Features
+- **9 Built-in Themes** - Dark, Light, Midnight Blue, Forest Green, Purple Night, Sunset Orange, Rose Pink, Ocean Teal, High Contrast
+- **Curved Bezel Support** - UI adapts to curved screen edges
+- **Kiosk Mode** - Auto-boot directly into the launcher
+- **Settings App** - Bluetooth, WiFi, themes, system info
+
+### Developer Tools
+- **Terminal** - Tabbed terminal with CMD, PowerShell, and WSL support
+- **Claude Code** - Voice/text AI chat for repository management
+- **Android Support** - Sideload APKs via Windows Subsystem for Android
+
+### Deployment
+- **Automated Build System** - Single command builds all 19 applications
+- **Custom Image Creator** - Create bootable Windows 11 installation with apps pre-installed
+- **Driver Integration** - LattePanda 3 Delta drivers included
 
 ---
 
-## 🖥️ Hardware
+## Hardware
 
-| Component | Description |
-|-----------|-------------|
-| **SBC** | [LattePanda 3 Delta](https://www.lattepanda.com/lattepanda-3-delta) (x86-64 with Windows 11) |
-| **Power** | [PiSugar2 Plus](https://www.pisugar.com/products/pisugar2-plus-5000-mah-raspberry-pi-ups) 5000mAh UPS |
-| **Display** | Waveshare 6.25" LCD **720x1560** IPS touch |
-| **Modem** | [Quectel EM06-A](https://www.quectel.com/product/lte-a-em06-series/) LTE Cat 6 M.2 |
+| Component | Specification |
+|-----------|---------------|
+| **SBC** | [LattePanda 3 Delta](https://www.lattepanda.com/lattepanda-3-delta) (Intel N5105, 8GB RAM) |
+| **Display** | Waveshare 6.25" IPS LCD (720x1560, touch) |
+| **Power** | [PiSugar2 Plus](https://www.pisugar.com/) 5000mAh UPS |
+| **Modem** | [Quectel EM06-A](https://www.quectel.com/) LTE Cat 6 M.2 |
 | **GPS** | VK-172 USB GPS/GLONASS *(optional)* |
 
 ---
 
-## 📲 Apps
+## Applications
 
-### 📱 Communication
-| App | Icon | Description |
-|-----|:----:|-------------|
-| **Phone** | 📞 | Voice calls with dialpad, call history, mute/speaker controls |
-| **Messages** | 💬 | SMS messaging with conversation view and chat bubbles |
-| **Contacts** | 👤 | Contact management with search, add/edit/delete |
-| **Gmail** | 📧 | Gmail-only browser (secure, domain-locked) |
+### Communication
+| App | Description |
+|-----|-------------|
+| **Phone** | Voice calls with dialpad, call history, mute/speaker controls |
+| **Messages** | SMS messaging with conversation view, contact blocking |
+| **Contacts** | Contact management with search, call/message blocking |
+| **Gmail** | Gmail-only browser (secure, domain-locked) |
 
-### 🌐 Internet & Navigation
-| App | Icon | Description |
-|-----|:----:|-------------|
-| **Browser** | 🌐 | Chromium WebView2 with tabs, bookmarks, mobile UA |
-| **Maps** | 🗺️ | GPS navigation with OpenStreetMap, turn-by-turn routing |
+### Internet & Navigation
+| App | Description |
+|-----|-------------|
+| **Browser** | Chromium WebView2 with tabs, bookmarks, mobile UA |
+| **Maps** | GPS navigation with OpenStreetMap, turn-by-turn routing |
 
-### 🎬 Media & Entertainment
-| App | Icon | Description |
-|-----|:----:|-------------|
-| **Music** | 🎵 | Audio player with 64-bar spectrum visualizer, shuffle/repeat |
-| **Video** | 🎬 | Video player with progress seeking, 10s skip, fullscreen |
-| **Gallery** | 🖼️ | Image viewer with thumbnail strip navigation |
-| **Solitaire** | 🃏 | Classic Klondike with undo and auto-complete |
-| **Mahjong** | 🀄 | Tile matching game with hints and shuffle |
+### Media & Entertainment
+| App | Description |
+|-----|-------------|
+| **Music** | Audio player with 64-bar spectrum visualizer |
+| **Video** | Video player with progress seeking, fullscreen |
+| **Gallery** | Image viewer with thumbnail navigation |
+| **Solitaire** | Classic Klondike with undo and auto-complete |
+| **Mahjong** | Tile matching with hints and shuffle |
 
-### 🛠️ Utilities
-| App | Icon | Description |
-|-----|:----:|-------------|
-| **Calendar** | 📅 | Month/day/year views with date marking |
-| **Settings** | ⚙️ | Bluetooth, WiFi, About Phone, system configuration |
-| **Terminal** | 🖥️ | Tabbed terminal with CMD, PowerShell, WSL support |
-| **Files** | 📂 | File browser *(placeholder)* |
-| **Camera** | 📷 | Camera capture *(placeholder)* |
+### Utilities
+| App | Description |
+|-----|-------------|
+| **Calendar** | Month/day/year views with date marking |
+| **Settings** | Bluetooth, WiFi, themes, system configuration |
+| **Terminal** | Tabbed terminal (CMD, PowerShell, WSL) |
+| **Files** | File browser |
+| **Camera** | Camera capture |
 
-### 🤖 AI & Android Integration
-| App | Icon | Description |
-|-----|:----:|-------------|
-| **Claude** | 🤖 | Voice/text chat with Claude Code for repo management |
-| **Android** | 📦 | Sideload APK files via WSA, manage Android apps |
-
-> 💡 **Tip:** Apps requiring hardware (Dialer, Maps) include **demo mode toggles** for testing without devices!
+### AI & Integration
+| App | Description |
+|-----|-------------|
+| **Claude Code** | Voice/text chat with AI for repository management |
+| **Android Apps** | Sideload APK files via WSA |
 
 ---
 
-## ⌨️ Keyboard Shortcuts
+## Quick Start
+
+### Prerequisites
+- Windows 10/11
+- [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- PowerShell 5.1+
+
+### Build All Applications
+
+```powershell
+# Clone the repository
+git clone https://github.com/sp00nznet/windowsphone-next.git
+cd windowsphone-next
+
+# Build all applications
+.\Build\build-all.ps1
+
+# Output is in the Output/ folder
+```
+
+### Run the Launcher
+
+```powershell
+# Start the launcher
+.\Output\WindowsPhoneLauncher\WindowsPhoneLauncher.exe
+```
+
+---
+
+## Deployment
+
+### Option 1: Manual Installation
+
+1. Build the applications: `.\Build\build-all.ps1`
+2. Copy the `Output/` folder to the target device
+3. Run `WindowsPhoneLauncher.exe`
+
+### Option 2: Full Image Deployment
+
+Create a bootable Windows 11 installation with everything pre-configured:
+
+```powershell
+# Build apps and create deployment package
+.\Build\deploy.ps1 -IsoPath "C:\Windows11LTSC.iso"
+
+# Or just create a manual deployment package (no ISO required)
+.\Build\deploy.ps1 -BuildOnly
+```
+
+See [Build System Documentation](docs/BUILD.md) for detailed instructions.
+
+---
+
+## Theming
+
+Windows Phone Next includes 9 built-in themes configurable through the Settings app:
+
+| Theme | Description |
+|-------|-------------|
+| **Dark** | Default navy/blue dark theme |
+| **Light** | Clean white/gray theme |
+| **Midnight Blue** | Deep blue night theme |
+| **Forest Green** | Natural green theme |
+| **Purple Night** | Rich purple theme |
+| **Sunset Orange** | Warm orange theme |
+| **Rose Pink** | Elegant pink theme |
+| **Ocean Teal** | Calm teal theme |
+| **High Contrast** | Accessibility theme |
+
+Themes are applied system-wide and persist across app restarts.
+
+---
+
+## Keyboard Shortcuts
 
 | Key | App | Key | App |
 |:---:|-----|:---:|-----|
-| **P** | 📞 Phone | **M** | 💬 Messages |
-| **O** | 👤 Contacts | **B** | 🌐 Browser |
-| **E** | 📧 Gmail | **N** | 🗺️ Maps |
-| **U** | 🎵 Music | **V** | 🎬 Video |
-| **C** | 📅 Calendar | **G** | 🖼️ Gallery |
-| **S** | ⚙️ Settings | **A** | 📦 Android |
-| **T** | 🖥️ Terminal | **L** | 🤖 Claude |
-| **1-9** | Quick launch by position | **Esc** | Exit app |
+| **P** | Phone | **M** | Messages |
+| **O** | Contacts | **B** | Browser |
+| **E** | Gmail | **N** | Maps |
+| **U** | Music | **V** | Video |
+| **C** | Calendar | **G** | Gallery |
+| **S** | Settings | **A** | Android |
+| **T** | Terminal | **L** | Claude |
+| **1-9** | Quick launch | **Esc** | Exit app |
 
 ---
 
-## 🚀 Quick Start
+## Project Structure
 
-```powershell
-# Build all apps
-.\Build.ps1
-
-# Output in Dist/ folder
+```
+windowsphone-next/
+├── Apps/
+│   ├── Launcher/           # Home screen
+│   ├── Dialer/             # Phone calls
+│   ├── Messaging/          # SMS messaging
+│   ├── Contacts/           # Contact management
+│   ├── Browser/            # Web browser
+│   ├── Gmail/              # Gmail client
+│   ├── Maps/               # GPS navigation
+│   ├── Music/              # Audio player
+│   ├── Video/              # Video player
+│   ├── Calendar/           # Calendar
+│   ├── Gallery/            # Image viewer
+│   ├── Settings/           # System settings
+│   ├── Terminal/           # Tabbed terminal
+│   ├── ClaudeCode/         # AI assistant
+│   ├── AndroidApps/        # APK sideloader
+│   ├── Camera/             # Camera
+│   ├── Files/              # File browser
+│   ├── Solitaire/          # Card game
+│   ├── Mahjong/            # Tile game
+│   └── Shared/
+│       ├── ModemLib/       # Modem AT command library
+│       ├── BlockingService/ # Call/message blocking
+│       ├── Services/       # Theme manager
+│       └── Themes/         # Shared theme resources
+├── Build/
+│   ├── build-all.ps1       # Build all applications
+│   ├── download-drivers.ps1 # Download LattePanda drivers
+│   ├── create-image.ps1    # Create Windows image
+│   └── deploy.ps1          # Master deployment script
+├── Setup/
+│   ├── Autounattend.xml    # Unattended Windows install
+│   ├── setup.ps1           # Post-install setup
+│   └── configure-autostart.ps1 # Launcher autostart
+├── Drivers/                # LattePanda 3 Delta drivers
+├── Output/                 # Built applications
+└── docs/
+    ├── APPS.md             # Application guide
+    ├── BUILD.md            # Build system documentation
+    ├── DEPLOYMENT.md       # Deployment guide
+    └── DEVELOPMENT.md      # Development guide
 ```
 
-### 📋 Requirements
-- Windows 11
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-- *(Optional)* Windows Subsystem for Android (for APK sideloading)
+---
+
+## Documentation
+
+- [Application Guide](docs/APPS.md) - Detailed app features and usage
+- [Build System](docs/BUILD.md) - Build scripts and process
+- [Deployment Guide](docs/DEPLOYMENT.md) - Image creation and installation
+- [Development Guide](docs/DEVELOPMENT.md) - API reference, theming, architecture
 
 ---
 
-## 📦 Installation
-
-```powershell
-# 1. Build the project
-.\Build.ps1
-
-# 2. Copy Dist/ folder to target device
-
-# 3. Run the launcher
-.\Dist\Start-WindowsPhone.bat
-
-# 4. (Optional) Enable kiosk mode
-.\Setup\Configure-KioskMode.ps1
-```
-
----
-
-## 🤖 Android App Sideloading
-
-Windows Phone Next supports running Android apps through Windows Subsystem for Android (WSA):
-
-1. **Install WSA** from the Microsoft Store
-2. Open the **Android** app from the launcher
-3. Tap **Install APK** to sideload any Android app
-4. Installed apps appear in the list and can be launched directly
-
-> ⚠️ **Note:** WSA must be running to launch Android apps. The Android app will show connection status.
-
----
-
-## 📖 Documentation
-
-- **[Application Guide](docs/APPS.md)** - Detailed app features and usage
-- **[Development Guide](docs/DEVELOPMENT.md)** - API reference, AT commands, theming
-
----
-
-## 🎨 UI Specifications
+## UI Specifications
 
 | Property | Value |
 |----------|-------|
-| **Resolution** | 720 × 1560 pixels |
+| **Resolution** | 720 x 1560 pixels |
 | **Aspect Ratio** | 9:19.5 (tall phone format) |
-| **UI Framework** | WPF (.NET 8) |
-| **Theme** | Dark mode with Windows accent colors |
+| **UI Framework** | WPF (.NET 8.0) |
+| **Bezel Radius** | 32px corner radius |
+| **Default Theme** | Dark mode |
 
 ---
 
-## 📁 Project Structure
+## License
 
-```
-Apps/
-├── Launcher/          # 🏠 Home screen
-├── Dialer/            # 📞 Phone calls
-├── Messaging/         # 💬 SMS
-├── Contacts/          # 👤 Contact management
-├── Browser/           # 🌐 Web browser
-├── Gmail/             # 📧 Gmail client
-├── Maps/              # 🗺️ Navigation
-├── Music/             # 🎵 Audio player
-├── Video/             # 🎬 Video player
-├── Calendar/          # 📅 Calendar
-├── Gallery/           # 🖼️ Image viewer
-├── Settings/          # ⚙️ System settings (Bluetooth, WiFi, About Phone)
-├── Terminal/          # 🖥️ Tabbed terminal (CMD, PowerShell, WSL)
-├── ClaudeCode/        # 🤖 AI assistant for code repositories
-├── AndroidApps/       # 📦 APK sideloader
-├── Solitaire/         # 🃏 Card game
-├── Mahjong/           # 🀄 Tile game
-└── Shared/ModemLib/   # 📡 Modem communication library
-```
+This project is provided as-is for educational and personal use. Windows and related components are property of Microsoft Corporation.
 
 ---
 
-## 📜 License
-
-This project is provided as-is for educational and personal use.
-
----
-
-Made with ❤️ for mobile enthusiasts
+Made with care for mobile enthusiasts
