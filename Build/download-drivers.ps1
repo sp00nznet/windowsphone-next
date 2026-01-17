@@ -100,11 +100,12 @@ foreach ($driver in $Drivers) {
     Write-Host "[$currentDriver/$totalDrivers] $($driver.Description)... " -NoNewline
 
     try {
-        # Download driver
+        # Download driver using curl (more reliable with GitHub)
         if (-not (Test-Path $destPath)) {
-            $ProgressPreference = 'SilentlyContinue'
-            Invoke-WebRequest -Uri $driver.Url -OutFile $destPath -UseBasicParsing
-            $ProgressPreference = 'Continue'
+            $curlResult = & curl.exe -L -s -o $destPath $driver.Url 2>&1
+            if ($LASTEXITCODE -ne 0) {
+                throw "curl failed: $curlResult"
+            }
         }
 
         # Extract driver
