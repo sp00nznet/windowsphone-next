@@ -1,14 +1,12 @@
 <#
 .SYNOPSIS
-    Downloads Windows 11 IoT Enterprise LTSC evaluation ISO
+    Downloads Windows 11 IoT Enterprise LTSC 2024 ISO automatically
 .DESCRIPTION
-    Automatically downloads the Windows 11 IoT Enterprise LTSC ISO from
-    Microsoft's Evaluation Center. Falls back to browser download if
-    automated download is not possible.
+    Downloads the Windows 11 IoT Enterprise LTSC 2024 ISO from archive.org.
+    No user interaction required - fully automated download.
 .EXAMPLE
     .\download-iso.ps1
     .\download-iso.ps1 -OutputPath "C:\ISOs"
-    .\download-iso.ps1 -Language "English"
 #>
 
 param(
@@ -16,30 +14,36 @@ param(
     [string]$OutputPath = ".",
 
     [Parameter()]
-    [ValidateSet("English", "German", "French", "Spanish", "Japanese", "Korean", "Chinese")]
-    [string]$Language = "English",
-
-    [Parameter()]
     [switch]$Force
 )
 
 $ErrorActionPreference = "Stop"
 
-# Configuration
-$EvalCenterUrl = "https://www.microsoft.com/en-us/evalcenter/evaluate-windows-11-iot-enterprise-ltsc"
-$IsoFileName = "Windows11_IoT_Enterprise_LTSC.iso"
-$OutputFile = Join-Path (Resolve-Path $OutputPath) $IsoFileName
+# Archive.org item details
+$ArchiveItemId = "windows-11-iot-enterprise-ltsc-2024"
+$ArchiveBaseUrl = "https://archive.org/download/$ArchiveItemId"
+$MetadataUrl = "https://archive.org/metadata/$ArchiveItemId"
+
+# Output file
+$IsoFileName = "Windows11_IoT_Enterprise_LTSC_2024.iso"
+$OutputPath = Resolve-Path $OutputPath -ErrorAction SilentlyContinue
+if (-not $OutputPath) {
+    $OutputPath = $PWD.Path
+}
+$OutputFile = Join-Path $OutputPath $IsoFileName
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  Windows 11 IoT Enterprise LTSC ISO"  -ForegroundColor Cyan
-Write-Host "  Download Helper"                      -ForegroundColor Cyan
+Write-Host "  Windows 11 IoT Enterprise LTSC 2024" -ForegroundColor Cyan
+Write-Host "  Automatic Download" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
 # Check if ISO already exists
 if ((Test-Path $OutputFile) -and -not $Force) {
+    $fileSize = (Get-Item $OutputFile).Length / 1GB
     Write-Host "ISO already exists: $OutputFile" -ForegroundColor Green
+    Write-Host "Size: $([math]::Round($fileSize, 2)) GB" -ForegroundColor Gray
     Write-Host "Use -Force to re-download."
     return $OutputFile
 }
@@ -49,57 +53,56 @@ if (-not (Test-Path $OutputPath)) {
     New-Item -ItemType Directory -Path $OutputPath -Force | Out-Null
 }
 
-Write-Host "Attempting to download Windows 11 IoT Enterprise LTSC..." -ForegroundColor Yellow
+Write-Host "Source: archive.org/$ArchiveItemId" -ForegroundColor Gray
+Write-Host "Destination: $OutputFile" -ForegroundColor Gray
 Write-Host ""
 
-# Language codes for Microsoft downloads
-$LangCodes = @{
-    "English" = "en-us"
-    "German" = "de-de"
-    "French" = "fr-fr"
-    "Spanish" = "es-es"
-    "Japanese" = "ja-jp"
-    "Korean" = "ko-kr"
-    "Chinese" = "zh-cn"
+# Try to get metadata to find the exact ISO filename
+$IsoDownloadUrl = $null
+$IsoFileSize = 0
+
+Write-Host "Fetching file list from archive.org..." -ForegroundColor Yellow
+
+try {
+    # Try to get metadata JSON
+    $metadata = Invoke-RestMethod -Uri $MetadataUrl -TimeoutSec 30 -ErrorAction Stop
+
+    # Find the ISO file in the files list
+    $isoFile = $metadata.files | Where-Object { $_.name -like "*.iso" } | Select-Object -First 1
+
+    if ($isoFile) {
+        $IsoDownloadUrl = "$ArchiveBaseUrl/$($isoFile.name)"
+        $IsoFileSize = [long]$isoFile.size
+        Write-Host "Found: $($isoFile.name)" -ForegroundColor Green
+        Write-Host "Size: $([math]::Round($IsoFileSize / 1GB, 2)) GB" -ForegroundColor Gray
+    }
+}
+catch {
+    Write-Host "Could not fetch metadata, trying known filenames..." -ForegroundColor Yellow
 }
 
-$LangCode = $LangCodes[$Language]
-
-# Try to get download info from evaluation center
-try {
-    Write-Host "Checking Microsoft Evaluation Center..." -ForegroundColor Gray
-
-    # First, try to fetch the evaluation page to get the download API endpoint
-    $session = New-Object Microsoft.PowerShell.Commands.WebRequestSession
-    $session.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-
-    # Try the direct download API endpoint
-    $apiUrl = "https://www.microsoft.com/en-us/api/controls/contentinclude/html"
-    $apiParams = @{
-        "pageId" = "6abe2f47-d046-4eb8-83b1-52b6ebb0befc"
-        "host" = "www.microsoft.com"
-        "segments" = "software-download,windows11"
-        "query" = ""
-    }
-
-    # Alternative: Try known evaluation download patterns
-    # Microsoft sometimes has direct download links for evaluation ISOs
-
-    $possibleUrls = @(
-        # These are example patterns - actual URLs change frequently
-        "https://software-static.download.prss.microsoft.com/dbazure/988969d5-f34g-4e03-ac9d-1f9786c66749/26100.1.240331-1435.ge_release_CLIENT_ENTERPRISES_OEM_x64FRE_en-us.iso"
+# If metadata didn't work, try known filename patterns
+if (-not $IsoDownloadUrl) {
+    $knownFilenames = @(
+        "en-us_windows_11_iot_enterprise_ltsc_2024_x64_dvd_f6b14814.iso",
+        "en-us_windows_11_iot_enterprise_ltsc_2024_x64.iso",
+        "Windows_11_IoT_Enterprise_LTSC_2024_x64.iso",
+        "Win11_IoT_Enterprise_LTSC_2024_English_x64.iso",
+        "windows-11-iot-enterprise-ltsc-2024.iso"
     )
 
-    $downloadUrl = $null
-    $downloadFound = $false
+    foreach ($filename in $knownFilenames) {
+        $testUrl = "$ArchiveBaseUrl/$filename"
+        Write-Host "Trying: $filename" -ForegroundColor Gray
 
-    # Try to find a working download URL
-    foreach ($url in $possibleUrls) {
         try {
-            $response = Invoke-WebRequest -Uri $url -Method Head -TimeoutSec 10 -ErrorAction SilentlyContinue
+            $response = Invoke-WebRequest -Uri $testUrl -Method Head -TimeoutSec 10 -ErrorAction Stop
             if ($response.StatusCode -eq 200) {
-                $downloadUrl = $url
-                $downloadFound = $true
+                $IsoDownloadUrl = $testUrl
+                if ($response.Headers["Content-Length"]) {
+                    $IsoFileSize = [long]$response.Headers["Content-Length"]
+                }
+                Write-Host "Found: $filename" -ForegroundColor Green
                 break
             }
         }
@@ -107,114 +110,203 @@ try {
             continue
         }
     }
+}
 
-    if (-not $downloadFound) {
-        throw "Could not find direct download link"
-    }
+# Last resort: construct URL from the item page pattern
+if (-not $IsoDownloadUrl) {
+    # Archive.org often uses the item ID as part of the filename
+    $IsoDownloadUrl = "$ArchiveBaseUrl/${ArchiveItemId}.iso"
+    Write-Host "Using default URL pattern..." -ForegroundColor Yellow
+}
 
-    # Download the ISO
-    Write-Host "Found download URL!" -ForegroundColor Green
-    Write-Host "Downloading ISO (this may take 30-60 minutes)..." -ForegroundColor Yellow
+if (-not $IsoDownloadUrl) {
+    Write-Host ""
+    Write-Host "ERROR: Could not determine download URL." -ForegroundColor Red
+    Write-Host ""
+    Write-Host "Please download manually from:" -ForegroundColor Yellow
+    Write-Host "  https://archive.org/details/$ArchiveItemId" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "Then run:" -ForegroundColor Yellow
+    Write-Host "  .\deploy.ps1 -IsoPath 'C:\path\to\downloaded.iso'" -ForegroundColor Cyan
+    exit 1
+}
+
+Write-Host ""
+Write-Host "Downloading Windows 11 IoT Enterprise LTSC 2024..." -ForegroundColor Yellow
+if ($IsoFileSize -gt 0) {
+    Write-Host "This will download $([math]::Round($IsoFileSize / 1GB, 2)) GB" -ForegroundColor Gray
+}
+Write-Host "This may take 30-60 minutes depending on your connection." -ForegroundColor Gray
+Write-Host ""
+
+# Download the ISO
+$downloadSuccess = $false
+$tempFile = "$OutputFile.downloading"
+
+# Method 1: Try BITS transfer (best for large files, supports resume)
+$bitsAvailable = Get-Command Start-BitsTransfer -ErrorAction SilentlyContinue
+
+if ($bitsAvailable) {
+    Write-Host "Using BITS transfer (supports resume if interrupted)..." -ForegroundColor Gray
     Write-Host ""
 
-    # Use BITS for better download handling
-    $bitsSupported = Get-Command Start-BitsTransfer -ErrorAction SilentlyContinue
+    try {
+        # Remove any existing temp file
+        if (Test-Path $tempFile) {
+            Remove-Item $tempFile -Force
+        }
 
-    if ($bitsSupported) {
-        Write-Host "Using BITS transfer for reliable download..." -ForegroundColor Gray
-        Start-BitsTransfer -Source $downloadUrl -Destination $OutputFile -DisplayName "Windows 11 IoT LTSC"
+        Start-BitsTransfer -Source $IsoDownloadUrl -Destination $tempFile -DisplayName "Windows 11 IoT LTSC 2024" -Description "Downloading from archive.org"
+
+        if (Test-Path $tempFile) {
+            Move-Item $tempFile $OutputFile -Force
+            $downloadSuccess = $true
+        }
+    }
+    catch {
+        Write-Host "BITS transfer failed: $_" -ForegroundColor Yellow
+        Write-Host "Falling back to direct download..." -ForegroundColor Yellow
+    }
+}
+
+# Method 2: Invoke-WebRequest with progress
+if (-not $downloadSuccess) {
+    Write-Host "Using direct download..." -ForegroundColor Gray
+    Write-Host ""
+
+    try {
+        # Remove any existing temp file
+        if (Test-Path $tempFile) {
+            Remove-Item $tempFile -Force
+        }
+
+        $ProgressPreference = 'Continue'
+
+        # Use .NET WebClient for better progress and performance
+        $webClient = New-Object System.Net.WebClient
+        $webClient.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) WindowsPhoneNext-Downloader/1.0")
+
+        # Progress tracking
+        $downloadStart = Get-Date
+        $lastProgress = 0
+
+        $webClient.DownloadProgressChanged += {
+            param($sender, $e)
+            if ($e.ProgressPercentage -ne $lastProgress) {
+                $lastProgress = $e.ProgressPercentage
+                $elapsed = (Get-Date) - $downloadStart
+                $speed = if ($elapsed.TotalSeconds -gt 0) { $e.BytesReceived / $elapsed.TotalSeconds / 1MB } else { 0 }
+                Write-Progress -Activity "Downloading Windows 11 IoT Enterprise LTSC 2024" `
+                    -Status "$($e.ProgressPercentage)% - $([math]::Round($speed, 1)) MB/s" `
+                    -PercentComplete $e.ProgressPercentage
+            }
+        }
+
+        $webClient.DownloadFileCompleted += {
+            param($sender, $e)
+            Write-Progress -Activity "Downloading" -Completed
+            if ($e.Error) {
+                throw $e.Error
+            }
+        }
+
+        # Start async download and wait
+        $downloadTask = $webClient.DownloadFileTaskAsync($IsoDownloadUrl, $tempFile)
+
+        while (-not $downloadTask.IsCompleted) {
+            Start-Sleep -Milliseconds 500
+        }
+
+        if ($downloadTask.IsFaulted) {
+            throw $downloadTask.Exception
+        }
+
+        $webClient.Dispose()
+
+        if (Test-Path $tempFile) {
+            Move-Item $tempFile $OutputFile -Force
+            $downloadSuccess = $true
+        }
+    }
+    catch {
+        Write-Host "WebClient download failed: $_" -ForegroundColor Yellow
+    }
+}
+
+# Method 3: curl.exe (available on Windows 10+)
+if (-not $downloadSuccess) {
+    $curlPath = Get-Command curl.exe -ErrorAction SilentlyContinue
+
+    if ($curlPath) {
+        Write-Host "Using curl..." -ForegroundColor Gray
+        Write-Host ""
+
+        try {
+            # Remove any existing temp file
+            if (Test-Path $tempFile) {
+                Remove-Item $tempFile -Force
+            }
+
+            & curl.exe -L -# -o $tempFile $IsoDownloadUrl
+
+            if ($LASTEXITCODE -eq 0 -and (Test-Path $tempFile)) {
+                Move-Item $tempFile $OutputFile -Force
+                $downloadSuccess = $true
+            }
+        }
+        catch {
+            Write-Host "curl download failed: $_" -ForegroundColor Yellow
+        }
+    }
+}
+
+# Cleanup temp file if it exists
+if (Test-Path $tempFile) {
+    Remove-Item $tempFile -Force -ErrorAction SilentlyContinue
+}
+
+# Verify download
+if ($downloadSuccess -and (Test-Path $OutputFile)) {
+    $finalSize = (Get-Item $OutputFile).Length
+
+    # Basic size validation (ISO should be at least 4GB)
+    if ($finalSize -lt 4GB) {
+        Write-Host ""
+        Write-Host "WARNING: Downloaded file seems too small ($([math]::Round($finalSize / 1GB, 2)) GB)" -ForegroundColor Yellow
+        Write-Host "Expected at least 4 GB for Windows 11 ISO." -ForegroundColor Yellow
+        Write-Host "The download may be incomplete or the file may be an error page." -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "Please verify the file or download manually from:" -ForegroundColor Yellow
+        Write-Host "  https://archive.org/details/$ArchiveItemId" -ForegroundColor Cyan
     }
     else {
-        # Fallback to Invoke-WebRequest with progress
-        $ProgressPreference = 'Continue'
-        Invoke-WebRequest -Uri $downloadUrl -OutFile $OutputFile -UseBasicParsing
+        Write-Host ""
+        Write-Host "========================================" -ForegroundColor Green
+        Write-Host "  Download Complete!" -ForegroundColor Green
+        Write-Host "========================================" -ForegroundColor Green
+        Write-Host ""
+        Write-Host "ISO saved to: $OutputFile" -ForegroundColor Green
+        Write-Host "Size: $([math]::Round($finalSize / 1GB, 2)) GB" -ForegroundColor Gray
+        Write-Host ""
     }
-
-    Write-Host ""
-    Write-Host "Download complete!" -ForegroundColor Green
-    Write-Host "ISO saved to: $OutputFile" -ForegroundColor Green
 
     return $OutputFile
 }
-catch {
+else {
     Write-Host ""
-    Write-Host "Automatic download not available." -ForegroundColor Yellow
+    Write-Host "========================================" -ForegroundColor Red
+    Write-Host "  Download Failed" -ForegroundColor Red
+    Write-Host "========================================" -ForegroundColor Red
     Write-Host ""
-    Write-Host "Microsoft requires registration to download evaluation ISOs." -ForegroundColor White
+    Write-Host "Could not download the ISO automatically." -ForegroundColor Yellow
     Write-Host ""
     Write-Host "Please download manually:" -ForegroundColor White
+    Write-Host "  1. Go to: https://archive.org/details/$ArchiveItemId" -ForegroundColor Cyan
+    Write-Host "  2. Click the ISO file to download" -ForegroundColor White
+    Write-Host "  3. Save it to: $OutputFile" -ForegroundColor White
     Write-Host ""
-    Write-Host "  1. Opening the Microsoft Evaluation Center in your browser..."
+    Write-Host "Then run:" -ForegroundColor White
+    Write-Host "  .\deploy.ps1 -IsoPath '$OutputFile'" -ForegroundColor Cyan
     Write-Host ""
-
-    # Open the browser
-    Start-Process $EvalCenterUrl
-
-    Write-Host "  2. Fill out the registration form"
-    Write-Host "  3. Select: 64-bit edition, $Language language"
-    Write-Host "  4. Download the ISO file"
-    Write-Host "  5. Save it as: $OutputFile"
-    Write-Host ""
-    Write-Host "  Or save it anywhere and run:" -ForegroundColor Gray
-    Write-Host "    .\deploy.ps1 -IsoPath 'C:\path\to\downloaded.iso'" -ForegroundColor Gray
-    Write-Host ""
-
-    # Wait for user to download
-    Write-Host "Waiting for ISO file..." -ForegroundColor Yellow
-    Write-Host "(Press Ctrl+C to cancel)" -ForegroundColor DarkGray
-    Write-Host ""
-
-    $waitStart = Get-Date
-    $maxWait = 3600  # 1 hour timeout
-
-    # Also check Downloads folder
-    $downloadsFolder = [Environment]::GetFolderPath("UserProfile") + "\Downloads"
-    $possibleFiles = @(
-        $OutputFile,
-        "$downloadsFolder\*.iso"
-    )
-
-    while ($true) {
-        # Check if the expected file exists
-        if (Test-Path $OutputFile) {
-            Write-Host ""
-            Write-Host "ISO detected at: $OutputFile" -ForegroundColor Green
-            return $OutputFile
-        }
-
-        # Check Downloads folder for any recent ISO files
-        $recentIsos = Get-ChildItem -Path $downloadsFolder -Filter "*.iso" -ErrorAction SilentlyContinue |
-            Where-Object { $_.LastWriteTime -gt $waitStart } |
-            Sort-Object LastWriteTime -Descending |
-            Select-Object -First 1
-
-        if ($recentIsos) {
-            $foundIso = $recentIsos.FullName
-            Write-Host ""
-            Write-Host "ISO detected in Downloads: $foundIso" -ForegroundColor Green
-
-            # Copy to expected location
-            Write-Host "Copying to: $OutputFile" -ForegroundColor Gray
-            Copy-Item -Path $foundIso -Destination $OutputFile -Force
-
-            return $OutputFile
-        }
-
-        # Check timeout
-        $elapsed = ((Get-Date) - $waitStart).TotalSeconds
-        if ($elapsed -gt $maxWait) {
-            Write-Host ""
-            Write-Host "Timeout waiting for ISO download." -ForegroundColor Red
-            Write-Host "Please download manually and run:" -ForegroundColor Yellow
-            Write-Host "  .\deploy.ps1 -IsoPath 'C:\path\to\windows.iso'" -ForegroundColor Yellow
-            exit 1
-        }
-
-        # Show waiting indicator
-        $minutes = [math]::Floor($elapsed / 60)
-        $seconds = [math]::Floor($elapsed % 60)
-        Write-Host "`rWaiting... ($minutes`:$($seconds.ToString('00')) elapsed)" -NoNewline
-
-        Start-Sleep -Seconds 5
-    }
+    exit 1
 }

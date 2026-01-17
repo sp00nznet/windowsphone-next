@@ -305,12 +305,12 @@ C:\
 
 ### Purpose
 
-Downloads Windows 11 IoT Enterprise LTSC evaluation ISO from Microsoft's Evaluation Center.
+Automatically downloads Windows 11 IoT Enterprise LTSC 2024 ISO from archive.org. No user interaction required.
 
 ### Usage
 
 ```powershell
-# Download ISO to default location
+# Download ISO to default location (fully automatic)
 .\Build\download-iso.ps1
 
 # Download to custom location
@@ -325,15 +325,21 @@ Downloads Windows 11 IoT Enterprise LTSC evaluation ISO from Microsoft's Evaluat
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `-OutputPath` | String | `.` | Directory to save the ISO |
-| `-Language` | String | `English` | ISO language (English, German, French, etc.) |
 | `-Force` | Switch | `false` | Re-download even if ISO exists |
 
 ### How It Works
 
-1. Attempts to find a direct download link
-2. If automatic download isn't possible, opens the Microsoft Evaluation Center in browser
-3. Monitors the Downloads folder for new ISO files
-4. Copies the downloaded ISO to the expected location
+1. Fetches metadata from archive.org to find the ISO filename
+2. Falls back to known filename patterns if metadata unavailable
+3. Downloads using BITS (with resume support) or WebClient
+4. Validates downloaded file size (must be >4GB)
+5. Returns the path to the downloaded ISO
+
+### Download Source
+
+- **URL**: https://archive.org/details/windows-11-iot-enterprise-ltsc-2024
+- **Size**: ~5 GB
+- **Time**: 30-60 minutes depending on connection speed
 
 ---
 
@@ -409,7 +415,7 @@ Windows 11 IoT Enterprise LTSC (Long-Term Servicing Channel) is recommended for 
 The easiest way to get the ISO is using the built-in download script:
 
 ```powershell
-# Let the script download the ISO automatically
+# Let the script download the ISO automatically (no user interaction needed)
 .\Build\deploy.ps1 -DownloadIso
 
 # Or download the ISO separately
@@ -417,22 +423,25 @@ The easiest way to get the ISO is using the built-in download script:
 ```
 
 This will:
-1. Try to download directly from Microsoft
-2. If that fails, open the Evaluation Center in your browser
-3. Monitor your Downloads folder for the ISO
-4. Automatically use it once downloaded
+1. Automatically download from archive.org
+2. Use BITS transfer (supports resume if interrupted)
+3. Validate the downloaded file
+4. ~5 GB download, takes 30-60 minutes
 
-### Manual Sources
+### Alternative Sources
 
-1. **Microsoft Evaluation Center - IoT Enterprise LTSC** (90-day trial)
+1. **Archive.org** (used by the download script)
+   - https://archive.org/details/windows-11-iot-enterprise-ltsc-2024
+   - Direct download, no registration required
+
+2. **Microsoft Evaluation Center** (90-day trial, requires registration)
    - https://www.microsoft.com/en-us/evalcenter/evaluate-windows-11-iot-enterprise-ltsc
-   - Best for testing and development
 
-2. **Visual Studio Subscriptions** (formerly MSDN)
+3. **Visual Studio Subscriptions** (formerly MSDN)
    - Full license for subscribers
    - https://visualstudio.microsoft.com/subscriptions/
 
-3. **Volume Licensing Service Center** (VLSC)
+4. **Volume Licensing Service Center** (VLSC)
    - For organizations with volume licenses
    - https://www.microsoft.com/licensing/servicecenter/
 
