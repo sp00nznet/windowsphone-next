@@ -73,22 +73,37 @@
 
     <!-- Progress Slider Style -->
     <Style x:Key="ProgressSliderStyle" TargetType="Slider">
+        <Setter Property="Background" Value="{StaticResource CardBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Slider">
                     <Grid>
-                        <Border Height="4" Background="{StaticResource CardBrush}" CornerRadius="2"/>
-                        <Border Height="4" Background="{StaticResource PrimaryBrush}" CornerRadius="2"
-                               HorizontalAlignment="Left"
-                               Width="{Binding Value, RelativeSource={RelativeSource TemplatedParent},
-                                       Converter={x:Static local:PercentToWidthConverter.Instance}}"/>
-                        <Track x:Name="PART_Track">
+                        <Border Height="4" Background="{StaticResource CardBrush}" CornerRadius="2" VerticalAlignment="Center"/>
+                        <Track x:Name="PART_Track" Margin="8,0">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Command="{x:Static Slider.DecreaseLarge}">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate TargetType="RepeatButton">
+                                            <Border Height="4" Background="{StaticResource PrimaryBrush}" CornerRadius="2"/>
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.DecreaseRepeatButton>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Command="{x:Static Slider.IncreaseLarge}">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate TargetType="RepeatButton">
+                                            <Border Background="Transparent"/>
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.IncreaseRepeatButton>
                             <Track.Thumb>
                                 <Thumb Width="16" Height="16">
                                     <Thumb.Template>
                                         <ControlTemplate>
-                                            <Ellipse Fill="{StaticResource PrimaryBrush}"
-                                                    Width="16" Height="16"/>
+                                            <Ellipse Fill="{StaticResource PrimaryBrush}" Width="16" Height="16"/>
                                         </ControlTemplate>
                                     </Thumb.Template>
                                 </Thumb>

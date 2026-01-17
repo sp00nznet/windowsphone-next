@@ -236,4 +236,5 @@
                 IsHitTestVisible="False"/>
 
     </Grid>
+    </Border>
 </Window>

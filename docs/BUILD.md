@@ -4,12 +4,13 @@ This document describes the Windows Phone Next build system, including how to co
 
 ## Overview
 
-The build system consists of four PowerShell scripts in the `Build/` directory:
+The build system consists of five PowerShell scripts in the `Build/` directory:
 
 | Script | Purpose |
 |--------|---------|
 | `build-all.ps1` | Compiles all 19 applications |
 | `download-drivers.ps1` | Downloads LattePanda 3 Delta drivers |
+| `download-iso.ps1` | Downloads Windows 11 IoT Enterprise LTSC ISO |
 | `create-image.ps1` | Creates custom Windows 11 installation image |
 | `deploy.ps1` | Master script that orchestrates everything |
 
@@ -300,6 +301,42 @@ C:\
 
 ---
 
+## ISO Download Script (download-iso.ps1)
+
+### Purpose
+
+Downloads Windows 11 IoT Enterprise LTSC evaluation ISO from Microsoft's Evaluation Center.
+
+### Usage
+
+```powershell
+# Download ISO to default location
+.\Build\download-iso.ps1
+
+# Download to custom location
+.\Build\download-iso.ps1 -OutputPath "C:\ISOs"
+
+# Force re-download if exists
+.\Build\download-iso.ps1 -Force
+```
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `-OutputPath` | String | `.` | Directory to save the ISO |
+| `-Language` | String | `English` | ISO language (English, German, French, etc.) |
+| `-Force` | Switch | `false` | Re-download even if ISO exists |
+
+### How It Works
+
+1. Attempts to find a direct download link
+2. If automatic download isn't possible, opens the Microsoft Evaluation Center in browser
+3. Monitors the Downloads folder for new ISO files
+4. Copies the downloaded ISO to the expected location
+
+---
+
 ## Master Deployment Script (deploy.ps1)
 
 ### Purpose
@@ -309,7 +346,10 @@ Orchestrates the entire build and deployment process with a single command.
 ### Usage
 
 ```powershell
-# Full deployment (build + drivers + image)
+# Easiest: Auto-download ISO and create image
+.\Build\deploy.ps1 -DownloadIso
+
+# Full deployment with existing ISO
 .\Build\deploy.ps1 -IsoPath "C:\Windows11LTSC.iso"
 
 # Build only (no image creation)
@@ -317,6 +357,9 @@ Orchestrates the entire build and deployment process with a single command.
 
 # Skip driver download (use existing)
 .\Build\deploy.ps1 -IsoPath "C:\Windows11LTSC.iso" -SkipDrivers
+
+# Skip build (use existing build output)
+.\Build\deploy.ps1 -IsoPath "C:\Windows11LTSC.iso" -SkipBuild
 
 # Clean build
 .\Build\deploy.ps1 -BuildOnly -Clean
@@ -327,8 +370,10 @@ Orchestrates the entire build and deployment process with a single command.
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `-IsoPath` | String | Path to Windows 11 ISO file |
+| `-DownloadIso` | Switch | Auto-download Windows 11 IoT Enterprise LTSC |
 | `-BuildOnly` | Switch | Only build apps, skip image creation |
 | `-SkipDrivers` | Switch | Use existing drivers, don't download |
+| `-SkipBuild` | Switch | Use existing build output |
 | `-Clean` | Switch | Clean build (remove previous) |
 
 ### Manual Deployment Package
@@ -352,16 +397,36 @@ This can be copied to a device with Windows already installed and run manually.
 
 ## Obtaining Windows 11 LTSC
 
-Windows 11 Enterprise LTSC (Long-Term Servicing Channel) is recommended for embedded devices because:
+Windows 11 IoT Enterprise LTSC (Long-Term Servicing Channel) is recommended for embedded devices because:
 - No feature updates (stability)
 - No Microsoft Store / consumer apps
-- Extended support lifecycle
+- Extended support lifecycle (10 years)
 - Reduced resource usage
+- Designed for embedded/kiosk scenarios
 
-### Sources
+### Automatic Download (Recommended)
 
-1. **Microsoft Evaluation Center** (90-day trial)
-   - https://www.microsoft.com/en-us/evalcenter/evaluate-windows-11-enterprise
+The easiest way to get the ISO is using the built-in download script:
+
+```powershell
+# Let the script download the ISO automatically
+.\Build\deploy.ps1 -DownloadIso
+
+# Or download the ISO separately
+.\Build\download-iso.ps1
+```
+
+This will:
+1. Try to download directly from Microsoft
+2. If that fails, open the Evaluation Center in your browser
+3. Monitor your Downloads folder for the ISO
+4. Automatically use it once downloaded
+
+### Manual Sources
+
+1. **Microsoft Evaluation Center - IoT Enterprise LTSC** (90-day trial)
+   - https://www.microsoft.com/en-us/evalcenter/evaluate-windows-11-iot-enterprise-ltsc
+   - Best for testing and development
 
 2. **Visual Studio Subscriptions** (formerly MSDN)
    - Full license for subscribers

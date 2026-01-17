@@ -48,16 +48,8 @@
                 <!-- Search Bar with bezel-safe margins -->
                 <Border Grid.Row="1" Padding="16,8" Margin="12,0">
                 <TextBox x:Name="SearchBox"
-                        Style="{StaticResource SearchBoxStyle}"
                         Text=""
                         TextChanged="SearchBox_TextChanged">
-                    <TextBox.Resources>
-                        <VisualBrush x:Key="HintBrush" TileMode="None" Opacity="0.5" Stretch="None" AlignmentX="Left">
-                            <VisualBrush.Visual>
-                                <TextBlock Text="Search contacts..." FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" Margin="4,0,0,0"/>
-                            </VisualBrush.Visual>
-                        </VisualBrush>
-                    </TextBox.Resources>
                     <TextBox.Style>
                         <Style TargetType="TextBox" BasedOn="{StaticResource SearchBoxStyle}">
                             <Style.Triggers>
