@@ -53,6 +53,7 @@ $AppsFolder = Join-Path $ProjectRoot "Apps"
 # All projects to build (in dependency order)
 $SharedProjects = @(
     "Shared\ModemLib\ModemLib.csproj",
+    "Shared\PiSugarLib\PiSugarLib.csproj",
     "Shared\BlockingService\BlockingService.csproj",
     "Shared\Services\SharedServices.csproj"
 )

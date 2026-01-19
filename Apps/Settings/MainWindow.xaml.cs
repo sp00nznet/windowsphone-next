@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using WindowsPhoneNext.ModemLib;
+using WindowsPhoneNext.PiSugarLib;
 using WindowsPhoneNext.Shared.Services;
 
 namespace WindowsPhoneNext.Settings;
@@ -18,6 +19,7 @@ namespace WindowsPhoneNext.Settings;
 public partial class MainWindow : Window
 {
     private readonly ModemController _modem;
+    private readonly PiSugarController _battery;
     private readonly string _settingsFilePath;
     private readonly ObservableCollection<BluetoothDeviceInfo> _pairedBluetoothDevices = new();
     private readonly ObservableCollection<BluetoothDeviceInfo> _availableBluetoothDevices = new();
@@ -26,12 +28,14 @@ public partial class MainWindow : Window
     private readonly ObservableCollection<ThemeDisplayInfo> _themes = new();
     private string? _pendingWifiSsid;
     private bool _isScanning;
+    private bool _piSugarAvailable;
 
     public MainWindow()
     {
         InitializeComponent();
 
         _modem = new ModemController();
+        _battery = new PiSugarController();
 
         // Setup settings storage path
         var appData = Path.Combine(
@@ -57,6 +61,7 @@ public partial class MainWindow : Window
     {
         await LoadModemInfoAsync();
         await CheckCurrentWifiConnectionAsync();
+        await LoadBatteryInfoAsync();
     }
 
     #region Storage
@@ -912,6 +917,218 @@ public partial class MainWindow : Window
 
     #endregion
 
+    #region Battery
+
+    private async System.Threading.Tasks.Task LoadBatteryInfoAsync()
+    {
+        try
+        {
+            _piSugarAvailable = await _battery.IsAvailableAsync();
+
+            if (_piSugarAvailable)
+            {
+                var status = await _battery.GetBatteryStatusAsync();
+                if (status != null)
+                {
+                    UpdateBatteryDisplay(status);
+
+                    // Load battery settings
+                    var chargingAllowed = await _battery.IsChargingAllowedAsync();
+                    AllowChargingCheckBox.IsChecked = chargingAllowed;
+
+                    var inputProtection = await _battery.IsInputProtectionEnabledAsync();
+                    InputProtectionCheckBox.IsChecked = inputProtection;
+
+                    var outputEnabled = await _battery.IsOutputEnabledAsync();
+                    BatteryOutputCheckBox.IsChecked = outputEnabled;
+
+                    var (startPercent, stopPercent) = await _battery.GetChargingRangeAsync();
+                    ChargingStartTextBox.Text = startPercent.ToString();
+                    ChargingStopTextBox.Text = stopPercent.ToString();
+
+                    // Show battery settings panel
+                    BatterySettingsPanel.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    _piSugarAvailable = false;
+                    ShowBatteryUnavailable();
+                }
+            }
+            else
+            {
+                ShowBatteryUnavailable();
+            }
+        }
+        catch (Exception ex)
+        {
+            BatteryLevelText.Text = "Error";
+            BatteryStatusText.Text = ex.Message;
+        }
+    }
+
+    private void UpdateBatteryDisplay(BatteryStatus status)
+    {
+        BatteryLevelText.Text = $"{status.Level}%";
+        BatteryStatusText.Text = status.StatusText;
+
+        if (status.Voltage > 0)
+        {
+            BatteryVoltageText.Text = $"Voltage: {status.Voltage:F2}V";
+        }
+
+        if (status.Current != -1)
+        {
+            var currentMa = status.Current * 1000;
+            BatteryCurrentText.Text = status.IsCharging
+                ? $"Current: +{Math.Abs(currentMa):F0}mA (charging)"
+                : $"Current: {currentMa:F0}mA";
+        }
+
+        // Update progress bar
+        var width = BatteryStatusPanel.ActualWidth > 0
+            ? BatteryStatusPanel.ActualWidth * (status.Level / 100.0)
+            : 200 * (status.Level / 100.0);
+        BatteryProgressBar.Width = width;
+
+        // Update progress bar color
+        if (status.IsCharging)
+        {
+            BatteryProgressBar.Background = FindResource("AccentBrush") as Brush;
+        }
+        else if (status.Level < 20)
+        {
+            BatteryProgressBar.Background = FindResource("ErrorBrush") as Brush;
+        }
+        else if (status.Level < 50)
+        {
+            BatteryProgressBar.Background = FindResource("WarningBrush") as Brush;
+        }
+        else
+        {
+            BatteryProgressBar.Background = FindResource("SuccessBrush") as Brush;
+        }
+    }
+
+    private void ShowBatteryUnavailable()
+    {
+        BatteryLevelText.Text = "Not available";
+        BatteryStatusText.Text = "PiSugar2 daemon not running";
+        BatteryVoltageText.Text = "Install pisugar-power-manager";
+        BatteryCurrentText.Text = "See: https://github.com/PiSugar/PiSugar";
+        BatteryProgressBar.Width = 0;
+        BatterySettingsPanel.Visibility = Visibility.Collapsed;
+    }
+
+    private async void RefreshBatteryButton_Click(object sender, RoutedEventArgs e)
+    {
+        RefreshBatteryButton.IsEnabled = false;
+
+        try
+        {
+            await LoadBatteryInfoAsync();
+        }
+        finally
+        {
+            RefreshBatteryButton.IsEnabled = true;
+        }
+    }
+
+    private async void AllowCharging_Changed(object sender, RoutedEventArgs e)
+    {
+        if (!_piSugarAvailable || AllowChargingCheckBox == null) return;
+
+        try
+        {
+            var allowed = AllowChargingCheckBox.IsChecked == true;
+            await _battery.SetChargingAllowedAsync(allowed);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Failed to update charging setting: {ex.Message}", "Error",
+                MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private async void ApplyChargingRange_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (!int.TryParse(ChargingStartTextBox.Text, out var startPercent) ||
+                !int.TryParse(ChargingStopTextBox.Text, out var stopPercent))
+            {
+                MessageBox.Show("Please enter valid percentage values (0-100)", "Invalid Input",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (startPercent < 0 || startPercent > 100 || stopPercent < 0 || stopPercent > 100)
+            {
+                MessageBox.Show("Percentage values must be between 0 and 100", "Invalid Range",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (startPercent >= stopPercent)
+            {
+                MessageBox.Show("Start percentage must be less than stop percentage", "Invalid Range",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var success = await _battery.SetChargingRangeAsync(startPercent, stopPercent);
+            if (success)
+            {
+                MessageBox.Show($"Charging range set to {startPercent}% - {stopPercent}%", "Success",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show("Failed to set charging range", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Failed to set charging range: {ex.Message}", "Error",
+                MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private async void InputProtection_Changed(object sender, RoutedEventArgs e)
+    {
+        if (!_piSugarAvailable || InputProtectionCheckBox == null) return;
+
+        try
+        {
+            var enabled = InputProtectionCheckBox.IsChecked == true;
+            await _battery.SetInputProtectionAsync(enabled);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Failed to update input protection: {ex.Message}", "Error",
+                MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private async void BatteryOutput_Changed(object sender, RoutedEventArgs e)
+    {
+        if (!_piSugarAvailable || BatteryOutputCheckBox == null) return;
+
+        try
+        {
+            var enabled = BatteryOutputCheckBox.IsChecked == true;
+            await _battery.SetOutputEnabledAsync(enabled);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Failed to update battery output: {ex.Message}", "Error",
+                MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    #endregion
+
     #region Window Events
 
     private void Window_KeyDown(object sender, KeyEventArgs e)
@@ -939,6 +1156,7 @@ public partial class MainWindow : Window
     protected override void OnClosed(EventArgs e)
     {
         _modem.Dispose();
+        _battery.Dispose();
         base.OnClosed(e);
     }
 

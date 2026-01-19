@@ -35,9 +35,11 @@ A custom Windows 11 phone platform for embedded single-board computers. Experien
 - **Android Support** - Sideload APKs via Windows Subsystem for Android
 
 ### Deployment
+- **Windows Phone Next Build Tool** - GUI application for building, compiling, and image creation
 - **Automated Build System** - Single command builds all 19 applications
 - **Custom Image Creator** - Create bootable Windows 11 installation with apps pre-installed
 - **Driver Integration** - LattePanda 3 Delta drivers included
+- **ISO Management** - Browse or auto-download Windows 11 IoT Enterprise LTSC
 
 ---
 
@@ -101,8 +103,35 @@ A custom Windows 11 phone platform for embedded single-board computers. Experien
 - Windows 10/11
 - [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
 - PowerShell 5.1+
+- Administrator privileges (for image creation)
 
-### Build All Applications
+### Option 1: Using the Build Tool (Recommended)
+
+The easiest way to build Windows Phone Next is with the graphical Build Tool:
+
+```powershell
+# Clone the repository
+git clone https://github.com/sp00nznet/windowsphone-next.git
+cd windowsphone-next
+
+# Build the Build Tool
+.\BuildTool\build-tool.ps1
+
+# Run the Build Tool (as Administrator)
+.\BuildTool\bin\Release\net8.0-windows\WindowsPhoneNextBuildTool.exe
+```
+
+The Build Tool provides:
+- Windows Phone Next-themed GUI
+- ISO management (browse or auto-download)
+- One-click build for all 19 applications
+- Driver integration for LattePanda 3 Delta
+- Bootable ISO image creation
+- Real-time progress tracking and logs
+
+See [BuildTool/README.md](BuildTool/README.md) for detailed documentation.
+
+### Option 2: Command Line Build
 
 ```powershell
 # Clone the repository
@@ -126,19 +155,45 @@ cd windowsphone-next
 
 ## Deployment
 
-### Option 1: Manual Installation
+### Option 1: Build Tool GUI (Easiest)
+
+Use the Windows Phone Next Build Tool for a streamlined experience:
+
+1. **Build the Build Tool**:
+   ```powershell
+   .\BuildTool\build-tool.ps1
+   ```
+
+2. **Launch as Administrator**:
+   ```powershell
+   .\BuildTool\bin\Release\net8.0-windows\WindowsPhoneNextBuildTool.exe
+   ```
+
+3. **Configure Options**:
+   - Browse for Windows 11 ISO (or enable auto-download)
+   - Select build options (apps, drivers, image creation)
+   - Click "Start Build"
+
+4. **Deploy**:
+   - Output: `ImageWork/WindowsPhoneNext.iso`
+   - Create bootable USB with included script
+
+### Option 2: Manual Installation
 
 1. Build the applications: `.\Build\build-all.ps1`
 2. Copy the `Output/` folder to the target device
 3. Run `WindowsPhoneLauncher.exe`
 
-### Option 2: Full Image Deployment
+### Option 3: Command Line Deployment
 
 Create a bootable Windows 11 installation with everything pre-configured:
 
 ```powershell
 # Build apps and create deployment package
 .\Build\deploy.ps1 -IsoPath "C:\Windows11LTSC.iso"
+
+# Or auto-download Windows 11 IoT Enterprise LTSC
+.\Build\deploy.ps1 -DownloadIso
 
 # Or just create a manual deployment package (no ISO required)
 .\Build\deploy.ps1 -BuildOnly
@@ -212,6 +267,11 @@ windowsphone-next/
 │       ├── BlockingService/ # Call/message blocking
 │       ├── Services/       # Theme manager
 │       └── Themes/         # Shared theme resources
+├── BuildTool/              # Win32 Build Tool (GUI)
+│   ├── MainWindow.xaml     # Windows Phone Next-themed UI
+│   ├── build-tool.ps1      # Build Tool compiler
+│   ├── Themes/             # Build Tool theme resources
+│   └── README.md           # Build Tool documentation
 ├── Build/
 │   ├── build-all.ps1       # Build all applications
 │   ├── download-drivers.ps1 # Download LattePanda drivers

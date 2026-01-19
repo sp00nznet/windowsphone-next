@@ -4,22 +4,26 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using WindowsPhoneNext.ModemLib;
+using WindowsPhoneNext.PiSugarLib;
 
 namespace WindowsPhoneNext.Launcher;
 
 public partial class MainWindow : Window
 {
     private readonly ModemController _modem;
+    private readonly PiSugarController _battery;
     private readonly DispatcherTimer _clockTimer;
     private readonly DispatcherTimer _statusTimer;
     private readonly List<AppInfo> _apps;
     private readonly string _appsBasePath;
+    private bool _piSugarAvailable;
 
     public MainWindow()
     {
         InitializeComponent();
 
         _modem = new ModemController();
+        _battery = new PiSugarController();
         _appsBasePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..");
 
         // Initialize apps list (scrollable grid)
@@ -71,6 +75,10 @@ public partial class MainWindow : Window
     private async void Window_Loaded(object sender, RoutedEventArgs e)
     {
         UpdateClock();
+
+        // Check if PiSugar2 is available
+        _piSugarAvailable = await _battery.IsAvailableAsync();
+
         await InitializeModemAsync();
         await UpdateStatusAsync();
     }
@@ -134,8 +142,26 @@ public partial class MainWindow : Window
                 };
             }
 
-            // Update battery (simulated - would need PiSugar2 API)
-            UpdateBattery(85);
+            // Update battery from PiSugar2
+            if (_piSugarAvailable)
+            {
+                var batteryStatus = await _battery.GetBatteryStatusAsync();
+                if (batteryStatus != null)
+                {
+                    UpdateBattery(batteryStatus.Level, batteryStatus.IsCharging);
+                }
+                else
+                {
+                    // PiSugar2 connection lost
+                    _piSugarAvailable = false;
+                    UpdateBattery(50, false); // Fallback
+                }
+            }
+            else
+            {
+                // Simulated battery when PiSugar2 is not available
+                UpdateBattery(85, false);
+            }
         }
         catch
         {
@@ -171,12 +197,18 @@ public partial class MainWindow : Window
         };
     }
 
-    private void UpdateBattery(int percent)
+    private void UpdateBattery(int percent, bool isCharging)
     {
-        BatteryText.Text = $"{percent}%";
+        // Show charging indicator if charging
+        BatteryText.Text = isCharging ? $"{percent}% ⚡" : $"{percent}%";
         BatteryLevel.Width = 24 * (percent / 100.0);
 
-        if (percent < 20)
+        if (isCharging)
+        {
+            // Show blue/accent color when charging
+            BatteryLevel.Fill = FindResource("AccentBrush") as System.Windows.Media.Brush;
+        }
+        else if (percent < 20)
         {
             BatteryLevel.Fill = FindResource("ErrorBrush") as System.Windows.Media.Brush;
         }
@@ -330,6 +362,7 @@ public partial class MainWindow : Window
         _clockTimer.Stop();
         _statusTimer.Stop();
         _modem.Dispose();
+        _battery.Dispose();
         base.OnClosed(e);
     }
 }
