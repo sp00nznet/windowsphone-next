@@ -1,10 +1,10 @@
 # PiSugarLib - PiSugar2 Battery Management Library
 
-A .NET 8.0 library for interfacing with the PiSugar2 and PiSugar2 Plus battery management system via TCP socket communication.
+A .NET 8.0 library for interfacing with the PiSugar2 and PiSugar2 Plus battery management system via **direct I2C communication** on LattePanda 3 Delta.
 
 ## Overview
 
-PiSugarLib provides a comprehensive C# API for monitoring and controlling PiSugar2 battery systems. It communicates with the `pisugar-server` daemon running on the system via TCP sockets (localhost:8423).
+PiSugarLib provides a comprehensive C# API for monitoring PiSugar2 battery systems. It communicates directly with the IP5209/IP5312 power management IC via I2C, bypassing the need for Raspberry Pi-specific daemon software.
 
 ## Features
 
@@ -24,14 +24,24 @@ PiSugarLib provides a comprehensive C# API for monitoring and controlling PiSuga
 
 ## Prerequisites
 
-The PiSugar2 power manager daemon must be installed and running:
+### Hardware Requirements
 
-```bash
-wget https://cdn.pisugar.com/release/pisugar-power-manager.sh
-bash pisugar-power-manager.sh -c release
-```
+1. **PiSugar2 Plus** 5000mAh battery
+2. **LattePanda 3 Delta** with Arduino Leonardo GPIO headers
+3. **Physical I2C Connection**: Wires soldered from PiSugar2 to LattePanda I2C pins
+   - SDA → Pin 20 (D2)
+   - SCL → Pin 21 (D3)
+   - GND → GND
+4. **Pull-up Resistors**: 4.7kΩ on SDA and SCL (if not built-in)
 
-This will start the `pisugar-server` daemon on `127.0.0.1:8423`.
+**📖 See [I2C_SETUP_GUIDE.md](I2C_SETUP_GUIDE.md) for complete wiring instructions and parts list.**
+
+### Software Requirements
+
+- Windows 10/11 with I2C support
+- .NET 8.0 Windows SDK
+- LattePanda Arduino Leonardo drivers
+- Administrator privileges (for I2C access)
 
 ## Usage
 
@@ -40,42 +50,61 @@ This will start the `pisugar-server` daemon on `127.0.0.1:8423`.
 ```csharp
 using WindowsPhoneNext.PiSugarLib;
 
-var battery = new PiSugarController();
+var battery = new PiSugarI2CController();
 
-// Check if PiSugar2 is available
-if (await battery.IsAvailableAsync())
+// Initialize I2C connection
+if (await battery.InitializeAsync())
 {
+    Console.WriteLine("PiSugar2 connected via I2C!");
+
     // Get battery level
     int level = await battery.GetBatteryLevelAsync();
     Console.WriteLine($"Battery: {level}%");
 
+    // Get voltage and current
+    double voltage = await battery.GetBatteryVoltageAsync();
+    double current = await battery.GetBatteryCurrentAsync();
+    Console.WriteLine($"Voltage: {voltage:F2}V");
+    Console.WriteLine($"Current: {current:F3}A");
+
     // Get charging status
     bool isCharging = await battery.IsChargingAsync();
-    bool isPowered = await battery.IsPowerPluggedAsync();
+    Console.WriteLine($"Charging: {isCharging}");
 
     // Get comprehensive status
     var status = await battery.GetBatteryStatusAsync();
-    Console.WriteLine($"Level: {status.Level}%");
-    Console.WriteLine($"Voltage: {status.Voltage:F2}V");
     Console.WriteLine($"Status: {status.StatusText}");
+}
+else
+{
+    Console.WriteLine("Failed to initialize I2C connection");
+    Console.WriteLine("Check wiring and I2C setup");
 }
 ```
 
-### Battery Management
+### Advanced Usage
 
 ```csharp
-// Set charging range (start at 20%, stop at 90%)
-await battery.SetChargingRangeAsync(20, 90);
+// Real-time monitoring loop
+while (true)
+{
+    var status = await battery.GetBatteryStatusAsync();
 
-// Disable charging (useful for battery calibration)
-await battery.SetChargingAllowedAsync(false);
+    if (status != null)
+    {
+        Console.Clear();
+        Console.WriteLine($"Battery Level: {status.Level}%");
+        Console.WriteLine($"Voltage: {status.Voltage:F2}V");
+        Console.WriteLine($"Current: {status.Current:F3}A");
+        Console.WriteLine($"Status: {status.StatusText}");
+        Console.WriteLine($"Charging: {(status.IsCharging ? "Yes" : "No")}");
+    }
 
-// Enable input protection
-await battery.SetInputProtectionAsync(true);
-
-// Control battery output
-await battery.SetOutputEnabledAsync(true);
+    await Task.Delay(5000); // Update every 5 seconds
+}
 ```
+
+**Note**: The I2C version currently supports **read-only** operations. Write operations (charging control, etc.) require additional register manipulation and will be added in future updates.
 
 ### Real-time Monitoring
 
@@ -107,25 +136,18 @@ timer.Start();
 
 ## API Reference
 
-### PiSugarController Methods
+### PiSugarI2CController Methods
 
 | Method | Return Type | Description |
 |--------|-------------|-------------|
-| `IsAvailableAsync()` | `Task<bool>` | Check if PiSugar2 daemon is running |
+| `InitializeAsync()` | `Task<bool>` | Initialize I2C connection to PiSugar2 |
+| `IsAvailableAsync()` | `Task<bool>` | Check if PiSugar2 is detected on I2C bus |
 | `GetBatteryLevelAsync()` | `Task<int>` | Get battery percentage (0-100) |
 | `GetBatteryVoltageAsync()` | `Task<double>` | Get battery voltage in volts |
 | `GetBatteryCurrentAsync()` | `Task<double>` | Get battery current in amps |
-| `IsChargingAsync()` | `Task<bool>` | Check if battery is charging |
-| `IsPowerPluggedAsync()` | `Task<bool>` | Check if USB power is connected |
+| `IsChargingAsync()` | `Task<bool>` | Check if battery is charging (current > 50mA) |
 | `GetBatteryStatusAsync()` | `Task<BatteryStatus?>` | Get comprehensive battery status |
-| `GetChargingRangeAsync()` | `Task<(int, int)>` | Get charging range (start%, stop%) |
-| `SetChargingRangeAsync(start, stop)` | `Task<bool>` | Set charging range |
-| `IsChargingAllowedAsync()` | `Task<bool>` | Check if charging is allowed |
-| `SetChargingAllowedAsync(allowed)` | `Task<bool>` | Enable/disable charging |
-| `IsInputProtectionEnabledAsync()` | `Task<bool>` | Check input protection status |
-| `SetInputProtectionAsync(enabled)` | `Task<bool>` | Enable/disable input protection |
-| `IsOutputEnabledAsync()` | `Task<bool>` | Check battery output status |
-| `SetOutputEnabledAsync(enabled)` | `Task<bool>` | Enable/disable battery output |
+| `Dispose()` | `void` | Clean up I2C resources |
 
 ### BatteryStatus Properties
 
@@ -141,27 +163,45 @@ timer.Start();
 
 ## Protocol Details
 
-PiSugarLib communicates with the PiSugar2 daemon using a simple text-based protocol over TCP:
+PiSugarLib communicates directly with the IP5209/IP5312 power management IC via I2C:
 
-### Command Format
+### I2C Configuration
+
+- **I2C Address**: `0x75` (or `0x32` for some models)
+- **Clock Speed**: 100kHz (Standard Mode)
+- **Logic Level**: 3.3V
+- **Pull-up Resistors**: Required (4.7kΩ)
+
+### Register Map
+
+| Register | Address | Description | Data Type |
+|----------|---------|-------------|-----------|
+| READ0 | 0xA0 | Battery voltage [15:8] | uint8 |
+| READ1 | 0xA1 | Battery voltage [7:0] | uint8 |
+| READ2 | 0xA2 | Battery current [15:8] | uint8 |
+| READ3 | 0xA3 | Battery current [7:0] | uint8 |
+| READ4 | 0xA4 | Battery percentage | uint8 |
+
+### Data Conversion
+
+**Battery Voltage**:
 ```
-<command>\n
+Raw Value = (READ0 << 8) | READ1
+Voltage (mV) = (Raw × 0.26855) + 2600
+Voltage (V) = Voltage_mV / 1000
 ```
 
-### Response Format
+**Battery Current** (signed 16-bit):
 ```
-<key>: <value>\n
+Raw Value = (READ2 << 8) | READ3
+If Raw > 32767: Raw = Raw - 65536  // Convert to signed
+Current (mA) = Raw × 0.745985
+Current (A) = Current_mA / 1000
 ```
 
-### Example Commands
-
+**Battery Percentage**:
 ```
-get battery                      → battery: 85
-get battery_v                    → battery_v: 4.15
-get battery_charging             → battery_charging: true
-get battery_power_plugged        → battery_power_plugged: true
-set_battery_charging_range 20 90 → (no response on success)
-set_allow_charging true          → (no response on success)
+Percentage = READ4 % 101
 ```
 
 ## Error Handling
@@ -231,57 +271,93 @@ All models use the same TCP socket protocol.
 
 ## Troubleshooting
 
-### "PiSugar2 daemon not running"
+### I2C Device Not Detected
 
-**Solution**: Install and start the pisugar-power-manager:
-```bash
-bash pisugar-power-manager.sh -c release
-systemctl enable pisugar-server
-systemctl start pisugar-server
-```
-
-### Connection Timeout
-
-**Symptoms**: `IsAvailableAsync()` returns `false`
+**Symptoms**: `InitializeAsync()` returns `false`
 
 **Solutions**:
-1. Check if daemon is running: `systemctl status pisugar-server`
-2. Verify TCP port is open: `netstat -tuln | grep 8423`
-3. Check firewall settings
+1. **Check Physical Connections**:
+   - Use multimeter to verify continuity
+   - Ensure SDA/SCL connected to correct pins
+   - Verify GND connection
+2. **Check Pull-up Resistors**:
+   - Measure SDA/SCL voltage (should be ~3.3V when idle)
+   - Add 4.7kΩ pull-ups if missing
+3. **Try Alternative I2C Address**:
+   ```csharp
+   // Change in PiSugarI2CController.cs:
+   private const byte I2C_ADDRESS = 0x32; // Try this if 0x75 fails
+   ```
+4. **Verify LattePanda I2C**:
+   - Install Arduino Leonardo drivers
+   - Check Device Manager for I2C controller
+   - Enable Arduino co-processor in BIOS
 
 ### Invalid Battery Readings
 
 **Symptoms**: Battery level returns `-1` or voltage shows `0.0V`
 
 **Solutions**:
-1. Check I2C connection to PiSugar2
-2. Verify battery is properly connected
-3. Restart pisugar-server: `systemctl restart pisugar-server`
+1. **Check Power**:
+   - Verify PiSugar2 has battery installed
+   - Ensure PiSugar2 powered via USB-C
+2. **Verify IC Model**:
+   - IP5209 vs IP5312 may have different registers
+   - Check PiSugar2 version and adjust constants
+3. **Test I2C Communication**:
+   - Use logic analyzer to verify I2C signals
+   - Check for ACK/NACK responses
+
+### Intermittent Connection
+
+**Symptoms**: Readings work sometimes, fail other times
+
+**Solutions**:
+1. Check solder joints for cold solder
+2. Add strain relief to wires
+3. Move away from electromagnetic interference sources
+4. Ensure stable power supply to PiSugar2
+
+### See Also
+
+📖 **[I2C_SETUP_GUIDE.md](I2C_SETUP_GUIDE.md)** - Complete troubleshooting guide with multimeter tests and wiring verification
 
 ## Performance
 
-- **Connection Timeout**: 2 seconds
-- **Read Timeout**: 1 second
-- **Typical Response Time**: < 50ms
-- **Recommended Poll Interval**: 30 seconds (to avoid excessive I2C traffic)
+- **I2C Clock Speed**: 100kHz (Standard Mode)
+- **Register Read Time**: ~1-2ms per register
+- **Typical Status Read**: ~10ms (all registers)
+- **Recommended Poll Interval**: 30 seconds (battery status changes slowly)
+- **I2C Bus Load**: Minimal (~0.1% at 30s interval)
 
 ## Thread Safety
 
-PiSugarController is **not thread-safe**. Use separate instances per thread or implement your own locking.
+PiSugarI2CController is **not thread-safe**. Use separate instances per thread or implement your own locking when accessing I2C from multiple threads.
 
 ## Dependencies
 
-- .NET 8.0 Windows
-- System.Net.Sockets (included in .NET)
+- **.NET 8.0 Windows** (with Windows 10 SDK 19041)
+- **Windows.Devices.I2c** namespace (UWP APIs)
+- **Microsoft.Windows.SDK.Contracts** NuGet package
 
-No external NuGet packages required.
+All dependencies are included in the project file.
 
 ## References
 
-- [PiSugar2 Official Documentation](https://docs.pisugar.com/)
-- [PiSugar GitHub Repository](https://github.com/PiSugar/PiSugar)
-- [PiSugar Power Manager](https://github.com/PiSugar/pisugar-power-manager-rs)
-- [PiSugar2 Plus Product Page](https://www.pisugar.com/)
+### Documentation
+- **[I2C_SETUP_GUIDE.md](I2C_SETUP_GUIDE.md)** - Complete hardware setup guide (wiring, parts list, troubleshooting)
+- [PiSugar2 Plus Wiki](https://github.com/PiSugar/PiSugar/wiki/PiSugar2-Plus)
+- [IP5209 Datasheet](https://github.com/PiSugar/PiSugar/tree/master/hardware)
+- [LattePanda Documentation](https://docs.lattepanda.com/)
+
+### API References
+- [Windows.Devices.I2c](https://docs.microsoft.com/en-us/uwp/api/windows.devices.i2c)
+- [UWP Device APIs](https://docs.microsoft.com/en-us/windows/uwp/devices-sensors/)
+
+### Hardware
+- [PiSugar2 Plus Product](https://www.pisugar.com/)
+- [LattePanda 3 Delta](https://www.lattepanda.com/lattepanda-3-delta)
+- [PiSugar GitHub](https://github.com/PiSugar/PiSugar)
 
 ## License
 
