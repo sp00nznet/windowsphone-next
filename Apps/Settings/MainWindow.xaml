@@ -547,6 +547,214 @@
                     </StackPanel>
                 </Border>
 
+                <!-- Battery Info -->
+                <Border Style="{StaticResource SettingsItemStyle}">
+                    <StackPanel>
+                        <TextBlock Text="Battery (PiSugar2 Plus)"
+                                  FontSize="16"
+                                  FontWeight="SemiBold"
+                                  Foreground="{StaticResource TextPrimaryBrush}"
+                                  Margin="0,0,0,8"/>
+
+                        <!-- Battery Status Display -->
+                        <Grid x:Name="BatteryStatusPanel">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock x:Name="BatteryLevelText"
+                                          Text="Not available"
+                                          FontSize="18"
+                                          FontWeight="Bold"
+                                          Foreground="{StaticResource AccentBrush}"
+                                          Margin="0,0,0,4"/>
+                                <TextBlock x:Name="BatteryStatusText"
+                                          Text="Checking..."
+                                          FontSize="12"
+                                          Foreground="{StaticResource TextSecondaryBrush}"
+                                          Margin="0,0,0,4"/>
+                                <TextBlock x:Name="BatteryVoltageText"
+                                          Text=""
+                                          FontSize="11"
+                                          Foreground="{StaticResource TextSecondaryBrush}"
+                                          Margin="0,0,0,2"/>
+                                <TextBlock x:Name="BatteryCurrentText"
+                                          Text=""
+                                          FontSize="11"
+                                          Foreground="{StaticResource TextSecondaryBrush}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="&#x1F50B;"
+                                          FontSize="48"
+                                          Foreground="{StaticResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Battery Progress Bar -->
+                        <Border Background="{StaticResource SurfaceBrush}"
+                               Height="12"
+                               CornerRadius="6"
+                               Margin="0,12,0,12">
+                            <Border x:Name="BatteryProgressBar"
+                                   Background="{StaticResource SuccessBrush}"
+                                   CornerRadius="6"
+                                   HorizontalAlignment="Left"
+                                   Width="0"/>
+                        </Border>
+
+                        <!-- Refresh Button -->
+                        <Button x:Name="RefreshBatteryButton"
+                               Style="{StaticResource SecondaryButtonStyle}"
+                               Click="RefreshBatteryButton_Click"
+                               Margin="0,8,0,0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#x1F504;" FontSize="14" Margin="0,0,8,0"/>
+                                <TextBlock Text="Refresh Battery Info"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Border>
+
+                <!-- Battery Settings -->
+                <Border x:Name="BatterySettingsPanel"
+                       Style="{StaticResource SettingsItemStyle}"
+                       Visibility="Collapsed">
+                    <StackPanel>
+                        <TextBlock Text="Battery Settings"
+                                  FontSize="14"
+                                  FontWeight="SemiBold"
+                                  Foreground="{StaticResource TextPrimaryBrush}"
+                                  Margin="0,0,0,12"/>
+
+                        <!-- Charging Control -->
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Allow Charging"
+                                          FontSize="14"
+                                          Foreground="{StaticResource TextPrimaryBrush}"/>
+                                <TextBlock Text="Enable/disable charging when plugged in"
+                                          FontSize="11"
+                                          Foreground="{StaticResource TextSecondaryBrush}"
+                                          Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <CheckBox x:Name="AllowChargingCheckBox"
+                                     Grid.Column="1"
+                                     Style="{StaticResource ToggleSwitchStyle}"
+                                     Checked="AllowCharging_Changed"
+                                     Unchecked="AllowCharging_Changed"
+                                     VerticalAlignment="Center"/>
+                        </Grid>
+
+                        <!-- Charging Range -->
+                        <TextBlock Text="Charging Range"
+                                  FontSize="14"
+                                  Foreground="{StaticResource TextPrimaryBrush}"
+                                  Margin="0,0,0,8"/>
+                        <TextBlock Text="Start charging at low%, stop at high%"
+                                  FontSize="11"
+                                  Foreground="{StaticResource TextSecondaryBrush}"
+                                  Margin="0,0,0,8"/>
+
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0"
+                                      Text="Start:"
+                                      VerticalAlignment="Center"
+                                      Margin="0,0,8,0"
+                                      Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <TextBox x:Name="ChargingStartTextBox"
+                                    Grid.Column="1"
+                                    Text="20"
+                                    Height="32"
+                                    Padding="8,0"
+                                    Background="{StaticResource SurfaceBrush}"
+                                    Foreground="{StaticResource TextPrimaryBrush}"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    Margin="0,0,16,0"/>
+
+                            <TextBlock Grid.Column="2"
+                                      Text="Stop:"
+                                      VerticalAlignment="Center"
+                                      Margin="0,0,8,0"
+                                      Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <TextBox x:Name="ChargingStopTextBox"
+                                    Grid.Column="3"
+                                    Text="90"
+                                    Height="32"
+                                    Padding="8,0"
+                                    Background="{StaticResource SurfaceBrush}"
+                                    Foreground="{StaticResource TextPrimaryBrush}"
+                                    BorderBrush="{StaticResource BorderBrush}"/>
+                        </Grid>
+
+                        <Button x:Name="ApplyChargingRangeButton"
+                               Style="{StaticResource SecondaryButtonStyle}"
+                               Click="ApplyChargingRange_Click"
+                               Margin="0,0,0,16">
+                            <TextBlock Text="Apply Charging Range"/>
+                        </Button>
+
+                        <!-- Input Protection -->
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Input Protection"
+                                          FontSize="14"
+                                          Foreground="{StaticResource TextPrimaryBrush}"/>
+                                <TextBlock Text="Protect against input voltage issues"
+                                          FontSize="11"
+                                          Foreground="{StaticResource TextSecondaryBrush}"
+                                          Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <CheckBox x:Name="InputProtectionCheckBox"
+                                     Grid.Column="1"
+                                     Style="{StaticResource ToggleSwitchStyle}"
+                                     Checked="InputProtection_Changed"
+                                     Unchecked="InputProtection_Changed"
+                                     VerticalAlignment="Center"/>
+                        </Grid>
+
+                        <!-- Battery Output -->
+                        <Grid Margin="0,0,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Battery Output"
+                                          FontSize="14"
+                                          Foreground="{StaticResource TextPrimaryBrush}"/>
+                                <TextBlock Text="Enable/disable battery power output"
+                                          FontSize="11"
+                                          Foreground="{StaticResource TextSecondaryBrush}"
+                                          Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <CheckBox x:Name="BatteryOutputCheckBox"
+                                     Grid.Column="1"
+                                     Style="{StaticResource ToggleSwitchStyle}"
+                                     Checked="BatteryOutput_Changed"
+                                     Unchecked="BatteryOutput_Changed"
+                                     VerticalAlignment="Center"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
                 <!-- ==================== ABOUT PHONE SECTION ==================== -->
                 <TextBlock Text="About Phone"
                           Style="{StaticResource SectionHeaderStyle}"/>
