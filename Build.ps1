@@ -490,13 +490,25 @@ if ($App -eq "All") {
         $appInfo = $Apps[$appName]
         if ($appInfo.Type -eq "Application") {
             $projectDir = Split-Path (Join-Path $AppsPath $appInfo.Project)
-            $binPath = Join-Path $projectDir "bin\$Configuration\net8.0-windows"
+            $binBase = Join-Path $projectDir "bin\$Configuration"
+
+            # Find the output folder (handles net8.0-windows and net8.0-windows10.0.x variants)
+            $binPath = $null
+            if (Test-Path $binBase) {
+                $targetFolder = Get-ChildItem -Path $binBase -Directory | Where-Object { $_.Name -like "net8.0-windows*" } | Select-Object -First 1
+                if ($targetFolder) {
+                    $binPath = $targetFolder.FullName
+                }
+            }
+
             $appDistPath = Join-Path $DistPath $appName
 
-            if (Test-Path $binPath) {
+            if ($binPath -and (Test-Path $binPath)) {
                 New-Item -ItemType Directory -Path $appDistPath -Force | Out-Null
                 Copy-Item -Path "$binPath\*" -Destination $appDistPath -Recurse -Force
                 Write-Status "  Packaged $appName" -Type "Success"
+            } else {
+                Write-Status "  Skipped $appName (no output found)" -Type "Warning"
             }
         }
     }
