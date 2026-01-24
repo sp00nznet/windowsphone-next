@@ -1,0 +1,18 @@
+# Build outputs
+bin/
+obj/
+Output/
+Dist/
+
+# IDE
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Local .NET SDK installation (CI)
+.dotnet/
+
+# OS files
+Thumbs.db
+.DS_Store

@@ -12,6 +12,15 @@ variables:
   DOTNET_VERSION: "8.0"
   # Install outside project directory to avoid Git cleanup issues
   DOTNET_INSTALL_DIR: "C:\\gitlab-dotnet-sdk"
+  # Exclude .dotnet from Git clean to avoid locked file issues
+  GIT_CLEAN_FLAGS: -ffdx -e .dotnet/
+
+# Kill any lingering compiler processes that may hold file locks
+.cleanup_locks: &cleanup_locks
+  - |
+    # Kill VBCSCompiler processes that hold locks on SDK files
+    Get-Process -Name "VBCSCompiler" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+    Get-Process -Name "dotnet" -ErrorAction SilentlyContinue | Where-Object { $_.StartTime -lt (Get-Date).AddMinutes(-5) } | Stop-Process -Force -ErrorAction SilentlyContinue
 
 # Reusable script to ensure .NET SDK is available
 .install_dotnet: &install_dotnet
@@ -56,6 +65,7 @@ build:
     - windows
     - shell
   before_script:
+    - *cleanup_locks
     - *install_dotnet
     - Write-Host "Building Windows Phone Next Platform"
   script:
@@ -79,6 +89,7 @@ package:
   dependencies:
     - build
   before_script:
+    - *cleanup_locks
     - *install_dotnet
   script:
     - powershell -ExecutionPolicy Bypass -File .\Build.ps1 -Configuration $env:CONFIGURATION
@@ -99,6 +110,7 @@ build:mr:
     - windows
     - shell
   before_script:
+    - *cleanup_locks
     - *install_dotnet
   script:
     - powershell -ExecutionPolicy Bypass -File .\Build.ps1 -Configuration Debug
