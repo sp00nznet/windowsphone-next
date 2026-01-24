@@ -4,6 +4,7 @@
 stages:
   - build
   - package
+  - deploy
 
 variables:
   CONFIGURATION: Release
@@ -117,3 +118,46 @@ build:mr:
   rules:
     - if: $CI_MERGE_REQUEST_ID
   allow_failure: false
+
+# Deploy tagged releases to shared storage
+deploy:linux:
+  stage: deploy
+  tags:
+    - linux
+  dependencies:
+    - package
+  script:
+    - mkdir -p /mnt/releases/$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME
+    - cp -r Dist/ /mnt/releases/$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME/
+  rules:
+    - if: $CI_COMMIT_TAG
+
+deploy:windows:
+  stage: deploy
+  tags:
+    - windows
+    - shell
+  dependencies:
+    - package
+  script:
+    - net use R: \\192.168.100.22\releases gitlab /user:root
+    - if not exist "R:\%CI_PROJECT_NAME%\%CI_COMMIT_REF_NAME%" mkdir "R:\%CI_PROJECT_NAME%\%CI_COMMIT_REF_NAME%"
+    - xcopy /E /I /Y Dist "R:\%CI_PROJECT_NAME%\%CI_COMMIT_REF_NAME%"
+    - net use R: /delete
+  rules:
+    - if: $CI_COMMIT_TAG
+
+deploy:macos:
+  stage: deploy
+  tags:
+    - macos
+  dependencies:
+    - package
+  script:
+    - mkdir -p /tmp/releases
+    - mount_smbfs //root:gitlab@192.168.100.22/releases /tmp/releases
+    - mkdir -p /tmp/releases/$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME
+    - cp -r Dist/ /tmp/releases/$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME/
+    - umount /tmp/releases
+  rules:
+    - if: $CI_COMMIT_TAG
