@@ -141,9 +141,13 @@ deploy:windows:
   dependencies:
     - package
   script:
+    - Write-Host "Mapping network drive..."
     - 'net use R: "\\192.168.100.22\releases" gitlab /user:root'
+    - Write-Host "Creating directory R:\$env:CI_PROJECT_NAME\$env:CI_COMMIT_REF_NAME"
     - 'New-Item -ItemType Directory -Force -Path "R:\$env:CI_PROJECT_NAME\$env:CI_COMMIT_REF_NAME"'
+    - Write-Host "Copying files from Dist..."
     - 'Copy-Item -Recurse -Force Dist\* R:\$env:CI_PROJECT_NAME\$env:CI_COMMIT_REF_NAME'
+    - Write-Host "Unmapping network drive..."
     - 'net use R: /delete'
   rules:
     - if: $CI_COMMIT_TAG
