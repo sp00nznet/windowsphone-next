@@ -9,9 +9,7 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
-  <ItemGroup>
-    <!-- Windows.Devices.I2c support -->
-    <PackageReference Include="Microsoft.Windows.SDK.Contracts" Version="10.0.19041.0" />
-  </ItemGroup>
+  <!-- Windows.Devices.I2c is included via the Windows 10 target framework -->
+
 
 </Project>
