@@ -30,7 +30,7 @@
 #>
 
 param(
-    [ValidateSet("All", "Launcher", "Dialer", "Messaging", "Browser", "Music", "Maps", "Calendar", "Gallery", "Settings", "ModemLib")]
+    [ValidateSet("All", "Launcher", "Dialer", "Messaging", "Browser", "Music", "Maps", "Calendar", "Gallery", "Settings", "ModemLib", "Camera", "ClaudeCode", "Contacts", "Files", "Gmail", "Mahjong", "Solitaire", "Terminal", "Video", "AndroidApps", "BlockingService", "SharedServices", "PiSugarLib")]
     [string]$App = "All",
 
     [ValidateSet("Debug", "Release")]
@@ -118,6 +118,94 @@ $Apps = @{
         Description = "App settings and configuration"
         DependsOn = @()
     }
+    Camera = @{
+        Name = "Camera"
+        Project = "Camera\WindowsPhoneCamera.csproj"
+        Type = "Application"
+        Description = "Camera application"
+        DependsOn = @()
+    }
+    ClaudeCode = @{
+        Name = "ClaudeCode"
+        Project = "ClaudeCode\WindowsPhoneClaudeCode.csproj"
+        Type = "Application"
+        Description = "Claude Code assistant"
+        DependsOn = @()
+    }
+    Contacts = @{
+        Name = "Contacts"
+        Project = "Contacts\WindowsPhoneContacts.csproj"
+        Type = "Application"
+        Description = "Contacts manager"
+        DependsOn = @()
+    }
+    Files = @{
+        Name = "Files"
+        Project = "Files\WindowsPhoneFiles.csproj"
+        Type = "Application"
+        Description = "File manager"
+        DependsOn = @()
+    }
+    Gmail = @{
+        Name = "Gmail"
+        Project = "Gmail\WindowsPhoneGmail.csproj"
+        Type = "Application"
+        Description = "Gmail email client"
+        DependsOn = @()
+    }
+    Mahjong = @{
+        Name = "Mahjong"
+        Project = "Mahjong\WindowsPhoneMahjong.csproj"
+        Type = "Application"
+        Description = "Mahjong game"
+        DependsOn = @()
+    }
+    Solitaire = @{
+        Name = "Solitaire"
+        Project = "Solitaire\WindowsPhoneSolitaire.csproj"
+        Type = "Application"
+        Description = "Solitaire card game"
+        DependsOn = @()
+    }
+    Terminal = @{
+        Name = "Terminal"
+        Project = "Terminal\WindowsPhoneTerminal.csproj"
+        Type = "Application"
+        Description = "Terminal emulator"
+        DependsOn = @()
+    }
+    Video = @{
+        Name = "Video"
+        Project = "Video\WindowsPhoneVideo.csproj"
+        Type = "Application"
+        Description = "Video player"
+        DependsOn = @()
+    }
+    AndroidApps = @{
+        Name = "AndroidApps"
+        Project = "AndroidApps\WindowsPhoneAndroidApps.csproj"
+        Type = "Application"
+        Description = "Android apps launcher"
+        DependsOn = @()
+    }
+    BlockingService = @{
+        Name = "BlockingService"
+        Project = "Shared\BlockingService\BlockingService.csproj"
+        Type = "Library"
+        Description = "Shared blocking service library"
+    }
+    SharedServices = @{
+        Name = "SharedServices"
+        Project = "Shared\Services\SharedServices.csproj"
+        Type = "Library"
+        Description = "Shared services library"
+    }
+    PiSugarLib = @{
+        Name = "PiSugarLib"
+        Project = "Shared\PiSugarLib\PiSugarLib.csproj"
+        Type = "Library"
+        Description = "PiSugar battery library"
+    }
 }
 
 function Write-Status {
@@ -139,7 +227,7 @@ function Show-BuildTargets {
     Write-Host "========================" -ForegroundColor Magenta
     Write-Host ""
 
-    foreach ($key in @("ModemLib", "Launcher", "Dialer", "Messaging", "Browser", "Music", "Maps", "Calendar", "Gallery", "Settings")) {
+    foreach ($key in @("ModemLib", "BlockingService", "SharedServices", "PiSugarLib", "Launcher", "Dialer", "Messaging", "Browser", "Music", "Maps", "Calendar", "Gallery", "Settings", "Camera", "ClaudeCode", "Contacts", "Files", "Gmail", "Mahjong", "Solitaire", "Terminal", "Video", "AndroidApps")) {
         $appDef = $Apps[$key]
         $type = if ($appDef.Type -eq "Library") { "[LIB]" } else { "[APP]" }
         Write-Host "  $($key.PadRight(12))" -NoNewline -ForegroundColor Cyan
@@ -286,7 +374,7 @@ Write-Host ""
 # Determine which apps to build
 $appsToBuild = @()
 if ($App -eq "All") {
-    $appsToBuild = @("ModemLib", "Launcher", "Dialer", "Messaging", "Browser", "Music", "Maps", "Calendar", "Gallery", "Settings")
+    $appsToBuild = @("ModemLib", "BlockingService", "SharedServices", "PiSugarLib", "Launcher", "Dialer", "Messaging", "Browser", "Music", "Maps", "Calendar", "Gallery", "Settings", "Camera", "ClaudeCode", "Contacts", "Files", "Gmail", "Mahjong", "Solitaire", "Terminal", "Video", "AndroidApps")
 } else {
     # Add dependencies first
     $appDef = $Apps[$App]
@@ -355,7 +443,7 @@ if ($Deploy) {
     Write-Status "Deploying to $DeployPath..." -Type "Header"
 
     # Create deployment directories
-    $deployDirs = @("Launcher", "Dialer", "Messaging", "Browser", "Music", "Maps", "Calendar", "Gallery", "Settings", "Config", "Scripts", "Logs")
+    $deployDirs = @("Launcher", "Dialer", "Messaging", "Browser", "Music", "Maps", "Calendar", "Gallery", "Settings", "Camera", "ClaudeCode", "Contacts", "Files", "Gmail", "Mahjong", "Solitaire", "Terminal", "Video", "AndroidApps", "Config", "Scripts", "Logs")
     foreach ($dir in $deployDirs) {
         $fullPath = Join-Path $DeployPath $dir
         if (-not (Test-Path $fullPath)) {
