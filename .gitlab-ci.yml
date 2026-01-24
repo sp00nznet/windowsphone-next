@@ -9,6 +9,36 @@ variables:
   CONFIGURATION: Release
   DOTNET_NOLOGO: "true"
   DOTNET_CLI_TELEMETRY_OPTOUT: "true"
+  DOTNET_VERSION: "8.0"
+  DOTNET_INSTALL_DIR: "$CI_PROJECT_DIR\\.dotnet"
+
+# Reusable script to ensure .NET SDK is available
+.install_dotnet: &install_dotnet
+  - |
+    # Check if dotnet is available in PATH
+    $dotnetPath = Get-Command dotnet -ErrorAction SilentlyContinue
+    if ($dotnetPath) {
+      Write-Host "Using system .NET SDK"
+      dotnet --version
+    } else {
+      Write-Host "Installing .NET SDK ${env:DOTNET_VERSION}..."
+
+      # Create install directory
+      New-Item -ItemType Directory -Force -Path $env:DOTNET_INSTALL_DIR | Out-Null
+
+      # Download and run the official install script
+      $installScript = "$env:TEMP\dotnet-install.ps1"
+      Invoke-WebRequest -Uri "https://dot.net/v1/dotnet-install.ps1" -OutFile $installScript
+
+      # Install .NET SDK
+      & $installScript -Channel $env:DOTNET_VERSION -InstallDir $env:DOTNET_INSTALL_DIR
+
+      # Add to PATH for this session
+      $env:PATH = "$env:DOTNET_INSTALL_DIR;$env:PATH"
+
+      Write-Host "Installed .NET SDK:"
+      dotnet --version
+    }
 
 # Build all applications
 build:
@@ -17,7 +47,7 @@ build:
     - windows
     - shell
   before_script:
-    - dotnet --version
+    - *install_dotnet
     - Write-Host "Building Windows Phone Next Platform"
   script:
     - powershell -ExecutionPolicy Bypass -File .\Build.ps1 -Configuration $env:CONFIGURATION -Clean
@@ -27,7 +57,9 @@ build:
     expire_in: 1 week
   rules:
     - if: $CI_COMMIT_BRANCH
+      when: always
     - if: $CI_MERGE_REQUEST_ID
+      when: never
 
 # Create distribution package
 package:
@@ -37,6 +69,8 @@ package:
     - shell
   dependencies:
     - build
+  before_script:
+    - *install_dotnet
   script:
     - powershell -ExecutionPolicy Bypass -File .\Build.ps1 -Configuration $env:CONFIGURATION
     - Write-Host "Distribution package created in Dist folder"
@@ -56,7 +90,7 @@ build:mr:
     - windows
     - shell
   before_script:
-    - dotnet --version
+    - *install_dotnet
   script:
     - powershell -ExecutionPolicy Bypass -File .\Build.ps1 -Configuration Debug
   rules:
