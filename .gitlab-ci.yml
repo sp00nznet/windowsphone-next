@@ -140,10 +140,10 @@ deploy:windows:
   dependencies:
     - package
   script:
-    - net use R: \\192.168.100.22\releases gitlab /user:root
-    - New-Item -ItemType Directory -Force -Path "R:\$env:CI_PROJECT_NAME\$env:CI_COMMIT_REF_NAME"
-    - Copy-Item -Recurse -Force Dist\* "R:\$env:CI_PROJECT_NAME\$env:CI_COMMIT_REF_NAME\"
-    - net use R: /delete
+    - 'net use R: "\\192.168.100.22\releases" gitlab /user:root'
+    - 'New-Item -ItemType Directory -Force -Path "R:\$env:CI_PROJECT_NAME\$env:CI_COMMIT_REF_NAME"'
+    - 'Copy-Item -Recurse -Force Dist\* R:\$env:CI_PROJECT_NAME\$env:CI_COMMIT_REF_NAME'
+    - 'net use R: /delete'
   rules:
     - if: $CI_COMMIT_TAG
 
