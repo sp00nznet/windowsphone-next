@@ -134,8 +134,6 @@ deploy:
     - 'New-Item -ItemType Directory -Force -Path "R:\$env:CI_PROJECT_NAME\$env:CI_COMMIT_REF_NAME"'
     - Write-Host "Copying zip file..."
     - 'Copy-Item -Force WindowsPhoneNext.zip "R:\$env:CI_PROJECT_NAME\$env:CI_COMMIT_REF_NAME\"'
-    - Write-Host "Setting file permissions (755)..."
-    - 'icacls "R:\$env:CI_PROJECT_NAME\$env:CI_COMMIT_REF_NAME\WindowsPhoneNext.zip" /grant Everyone:RX /grant root:F'
     - Write-Host "Unmapping network drive..."
     - 'net use R: /delete'
   rules:
