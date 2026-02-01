@@ -128,6 +128,8 @@ deploy:
   dependencies:
     - package
   script:
+    - Write-Host "Cleaning up any existing drive mapping..."
+    - 'net use R: /delete 2>$null; $true'
     - Write-Host "Mapping network drive..."
     - 'net use R: "\\192.168.100.22\releases" gitlab /user:root'
     - Write-Host "Creating directory R:\$env:CI_PROJECT_NAME\$env:CI_COMMIT_REF_NAME"
