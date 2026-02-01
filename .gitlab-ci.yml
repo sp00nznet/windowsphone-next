@@ -94,11 +94,11 @@ package:
     - *install_dotnet
   script:
     - powershell -ExecutionPolicy Bypass -File .\Build.ps1 -Configuration $env:CONFIGURATION
-    - Write-Host "Distribution package created in Dist folder"
+    - Write-Host "Distribution zip package created"
   artifacts:
     name: "windowsphone-next-$CI_COMMIT_SHORT_SHA"
     paths:
-      - Dist/
+      - WindowsPhoneNext.zip
     expire_in: 4 weeks
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -132,8 +132,10 @@ deploy:
     - 'net use R: "\\192.168.100.22\releases" gitlab /user:root'
     - Write-Host "Creating directory R:\$env:CI_PROJECT_NAME\$env:CI_COMMIT_REF_NAME"
     - 'New-Item -ItemType Directory -Force -Path "R:\$env:CI_PROJECT_NAME\$env:CI_COMMIT_REF_NAME"'
-    - Write-Host "Copying files from Dist..."
-    - 'Copy-Item -Recurse -Force Dist\* R:\$env:CI_PROJECT_NAME\$env:CI_COMMIT_REF_NAME'
+    - Write-Host "Copying zip file..."
+    - 'Copy-Item -Force WindowsPhoneNext.zip "R:\$env:CI_PROJECT_NAME\$env:CI_COMMIT_REF_NAME\"'
+    - Write-Host "Setting file permissions (755)..."
+    - 'icacls "R:\$env:CI_PROJECT_NAME\$env:CI_COMMIT_REF_NAME\WindowsPhoneNext.zip" /grant Everyone:RX /grant root:F'
     - Write-Host "Unmapping network drive..."
     - 'net use R: /delete'
   rules:

@@ -513,15 +513,19 @@ if ($App -eq "All") {
         }
     }
 
-    # Create a launcher batch file
-    $launcherBat = @"
-@echo off
-cd /d "%~dp0Launcher"
-start "" "WindowsPhoneLauncher.exe"
-"@
-    $launcherBat | Out-File -FilePath (Join-Path $DistPath "Start-WindowsPhone.bat") -Encoding ASCII
+    # Create a single zip file
+    $zipName = "WindowsPhoneNext.zip"
+    $zipPath = Join-Path $ScriptPath $zipName
 
-    Write-Status "Distribution package created at: $DistPath" -Type "Success"
+    # Remove old zip if exists
+    if (Test-Path $zipPath) {
+        Remove-Item -Path $zipPath -Force
+    }
+
+    Write-Status "Creating zip package: $zipName..."
+    Compress-Archive -Path "$DistPath\*" -DestinationPath $zipPath -CompressionLevel Optimal
+
+    Write-Status "Distribution zip created at: $zipPath" -Type "Success"
 }
 
 # Summary
@@ -539,7 +543,8 @@ Write-Host ""
 Write-Host "Output locations:" -ForegroundColor Gray
 Write-Host "  Build:        $OutputPath" -ForegroundColor DarkGray
 if ($App -eq "All") {
-    Write-Host "  Distribution: $DistPath" -ForegroundColor DarkGray
+    $zipPath = Join-Path $ScriptPath "WindowsPhoneNext.zip"
+    Write-Host "  Distribution: $zipPath" -ForegroundColor DarkGray
 }
 
 if (-not $Deploy) {
